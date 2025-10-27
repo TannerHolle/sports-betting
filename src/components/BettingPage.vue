@@ -105,6 +105,7 @@ import BetResolver from './BetResolver.vue'
 import NCAAFootballCard from './NCAAFootballCard.vue'
 import NFLGameCard from './NFLGameCard.vue'
 import CollegeBasketballCard from './CollegeBasketballCard.vue'
+import NBAGameCard from './NBAGameCard.vue'
 
 export default {
   name: 'BettingPage',
@@ -113,7 +114,8 @@ export default {
     BetResolver,
     NCAAFootballCard,
     NFLGameCard,
-    CollegeBasketballCard
+    CollegeBasketballCard,
+    NBAGameCard
   },
   setup() {
     const userStore = useUserStore()
@@ -148,6 +150,13 @@ export default {
         icon: '🏀',
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard',
         component: 'CollegeBasketballCard'
+      },
+      {
+        id: 'nba',
+        name: 'NBA',
+        icon: '🏀',
+        apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard',
+        component: 'NBAGameCard'
       }
     ])
 
@@ -163,6 +172,11 @@ export default {
     const gamesWithBetting = computed(() => {
       return games.value.filter(game => {
         const competition = game.competitions?.[0]
+        // For NBA, show all games (we generate mock betting data)
+        if (activeLeague.value === 'nba') {
+          return true
+        }
+        // For other sports, only show games with real odds data
         return competition?.odds && competition.odds.length > 0
       })
     })

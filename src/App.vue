@@ -124,6 +124,7 @@ import { useUserStore } from './stores/userStore.js'
 import NCAAFootballCard from './components/NCAAFootballCard.vue'
 import NFLGameCard from './components/NFLGameCard.vue'
 import CollegeBasketballCard from './components/CollegeBasketballCard.vue'
+import NBAGameCard from './components/NBAGameCard.vue'
 import Navigation from './components/Navigation.vue'
 import BettingPage from './components/BettingPage.vue'
 import AuthPage from './components/AuthPage.vue'
@@ -134,6 +135,7 @@ export default {
     NCAAFootballCard,
     NFLGameCard,
     CollegeBasketballCard,
+    NBAGameCard,
     Navigation,
     BettingPage,
     AuthPage
@@ -205,6 +207,24 @@ export default {
           { value: 'big12', label: 'Big 12' },
           { value: 'sec', label: 'SEC' },
           { value: 'big-east', label: 'Big East' }
+        ]
+      },
+      {
+        id: 'nba',
+        name: 'NBA',
+        icon: '🏀',
+        apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard',
+        component: 'NBAGameCard',
+        filters: [
+          { value: 'all', label: 'All Games' },
+          { value: 'east', label: 'Eastern Conference' },
+          { value: 'west', label: 'Western Conference' },
+          { value: 'atlantic', label: 'Atlantic Division' },
+          { value: 'central', label: 'Central Division' },
+          { value: 'southeast', label: 'Southeast Division' },
+          { value: 'northwest', label: 'Northwest Division' },
+          { value: 'pacific', label: 'Pacific Division' },
+          { value: 'southwest', label: 'Southwest Division' }
         ]
       }
     ])
