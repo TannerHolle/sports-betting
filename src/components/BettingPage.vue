@@ -20,6 +20,10 @@
         <div class="stat-value">{{ userStats.activeBets }}</div>
         <div class="stat-label">Active Bets</div>
       </div>
+      <div class="stat-card" v-if="outstandingBetAmount > 0">
+        <div class="stat-value">${{ outstandingBetAmount.toLocaleString() }}</div>
+        <div class="stat-label">Outstanding Bets</div>
+      </div>
       <div class="stat-card" v-if="userStats.winRate > 0">
         <div class="stat-value" :class="{ 'positive': userStats.winRate > 50, 'negative': userStats.winRate < 50 }">
           {{ userStats.winRate }}%
@@ -42,8 +46,10 @@
     <BetHistory />
 
     <!-- Bet Resolver -->
-    <BetResolver />
+    <BetResolver v-if="isAdmin" />
 
+    <!-- Admin Panel -->
+    <AdminPanel v-if="isAdmin" />
 
     <!-- League Selection -->
     <div class="league-selection">
@@ -102,6 +108,7 @@ import axios from 'axios'
 import { useUserStore } from '../stores/userStore.js'
 import BetHistory from './BetHistory.vue'
 import BetResolver from './BetResolver.vue'
+import AdminPanel from './AdminPanel.vue'
 import NCAAFootballCard from './NCAAFootballCard.vue'
 import NFLGameCard from './NFLGameCard.vue'
 import CollegeBasketballCard from './CollegeBasketballCard.vue'
@@ -112,6 +119,7 @@ export default {
   components: {
     BetHistory,
     BetResolver,
+    AdminPanel,
     NCAAFootballCard,
     NFLGameCard,
     CollegeBasketballCard,
@@ -127,6 +135,19 @@ export default {
     // User data from store
     const userBalance = computed(() => userStore.userBalance.value)
     const userStats = computed(() => userStore.userStats.value)
+    
+    // Calculate outstanding bet amount (sum of all pending bets)
+    const outstandingBetAmount = computed(() => {
+      if (!userStore.currentUser.value?.bets) return 0
+      return userStore.currentUser.value.bets
+        .filter(bet => bet.status === 'pending')
+        .reduce((total, bet) => total + bet.amount, 0)
+    })
+
+    // Check if current user is admin (tannerholle)
+    const isAdmin = computed(() => {
+      return userStore.currentUser.value?.username === 'tannerholle'
+    })
 
     // Sports configuration
     const sports = ref([
@@ -235,6 +256,8 @@ export default {
       gamesWithBetting,
       userBalance,
       userStats,
+      outstandingBetAmount,
+      isAdmin,
       fetchData,
       setActiveLeague
     }

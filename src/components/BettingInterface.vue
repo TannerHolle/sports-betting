@@ -319,6 +319,7 @@ export default {
         selection: selectedBet.value.selection,
         amount: betAmount.value,
         odds: selectedBet.value.odds,
+        line: selectedBet.value.line, // Include the line (spread or total)
         potentialWin: potentialWin.value,
         gameData: {
           homeTeam: homeTeam.value,

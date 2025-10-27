@@ -6,6 +6,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const oddsDatabase = require('./services/oddsDatabase');
 const { checkAndUpdateOdds } = require('./middleware/oddsMiddleware');
+const betResolver = require('./services/betResolver');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -160,7 +161,7 @@ app.post('/api/user/:username/bet', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    const { gameId, betType, selection, amount, odds, potentialWin, gameData } = betData;
+    const { gameId, betType, selection, amount, odds, line, potentialWin, gameData } = betData;
     
     if (user.balance < amount) {
       return res.status(400).json({ error: 'Insufficient balance' });
@@ -173,6 +174,7 @@ app.post('/api/user/:username/bet', async (req, res) => {
       selection,
       amount,
       odds,
+      line, // Store the line (spread or total)
       potentialWin,
       status: 'pending',
       placedAt: new Date().toISOString(),
@@ -288,7 +290,6 @@ app.post('/api/odds/force-update', async (req, res) => {
   try {
     const oddsService = require('./services/oddsService');
     
-    console.log('Force updating odds...');
     const freshOdds = await oddsService.fetchAllOdds();
     
     const processedOdds = {};
@@ -304,6 +305,16 @@ app.post('/api/odds/force-update', async (req, res) => {
   }
 });
 
+// Force resolve bets (admin endpoint)
+app.post('/api/bets/force-resolve', async (req, res) => {
+  try {
+    await betResolver.processAllPendingBets();
+    res.json({ success: true, message: 'Bets resolved successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to resolve bets', details: error.message });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -314,4 +325,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Sports Betting Backend running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+  
+  // Start automatic bet resolution (checks every 5 minutes)
+  betResolver.startAutoResolution(5);
 });

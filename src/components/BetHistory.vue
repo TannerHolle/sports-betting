@@ -240,25 +240,17 @@ export default {
 
     // Load user data when component mounts
     onMounted(async () => {
-      console.log('BetHistory mounted - isAuthenticated:', isAuthenticated.value)
-      console.log('BetHistory mounted - currentUser:', currentUser.value)
-      
       if (isAuthenticated.value && currentUser.value?.username) {
         try {
           // Refresh user data from API to get latest bets
           const freshUserData = await userStore.loadUserFromAPI(currentUser.value.username)
           if (freshUserData) {
-            console.log('User data refreshed in BetHistory:', freshUserData)
-            console.log('Active bets after refresh:', freshUserData.bets?.filter(bet => bet.status === 'pending'))
-            
             // Start live score refresh after user data is loaded
             startLiveScoreRefresh()
           }
         } catch (error) {
           console.error('Error loading user data in BetHistory:', error)
         }
-      } else {
-        console.log('Not authenticated or no username, skipping user data load')
       }
     })
 

@@ -46,7 +46,6 @@ class OddsService {
       
       // If API quota exceeded or other error, return mock data
       if (error.response?.status === 401 || error.response?.status === 429) {
-        console.log(`API quota exceeded for ${sport}, using mock data`);
         return this.generateMockOdds(sport);
       }
       
@@ -261,7 +260,6 @@ class OddsService {
 
     for (const sport of sports) {
       try {
-        console.log(`Fetching odds for ${sport}...`);
         allOdds[sport] = await this.fetchOdds(sport);
       } catch (error) {
         console.error(`Failed to fetch odds for ${sport}:`, error.message);

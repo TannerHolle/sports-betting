@@ -8,7 +8,6 @@ const checkAndUpdateOdds = async (req, res, next) => {
     const needsUpdate = await oddsDatabase.needsUpdate();
     
     if (needsUpdate) {
-      console.log('Odds need updating, fetching from Odds API...');
       
       try {
         // Fetch fresh odds from API
@@ -23,7 +22,6 @@ const checkAndUpdateOdds = async (req, res, next) => {
         // Save to database
         await oddsDatabase.updateOdds(processedOdds);
         
-        console.log('Odds updated successfully');
       } catch (error) {
         console.error('Failed to update odds:', error.message);
         // Continue with cached data if API fails

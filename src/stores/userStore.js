@@ -13,14 +13,12 @@ const initializeSession = async () => {
       const parsedUser = JSON.parse(savedUser)
       currentUser.value = parsedUser
       isAuthenticated.value = true
-      console.log('User session restored from sessionStorage')
       
       // Refresh user data from API to get latest bets
       if (parsedUser.username) {
         try {
           const freshData = await loadUserFromAPI(parsedUser.username)
           if (freshData) {
-            console.log('User data refreshed from API on initialization')
           }
         } catch (error) {
           console.error('Error refreshing user data on initialization:', error)
@@ -46,12 +44,10 @@ const loadUserFromAPI = async (username) => {
     if (response.data) {
       currentUser.value = response.data
       isAuthenticated.value = true
-      console.log('User data loaded successfully from API')
       return response.data
     }
   } catch (error) {
     if (error.response?.status === 404) {
-      console.log('User not found on server')
     } else {
       console.error('Error loading user from API:', error)
     }
@@ -73,7 +69,6 @@ const createAccount = async (username, password) => {
       isAuthenticated.value = true
       // Save to sessionStorage for persistence
       sessionStorage.setItem('currentUser', JSON.stringify(response.data))
-      console.log('User account created successfully')
       return response.data
     }
   } catch (error) {
@@ -219,7 +214,6 @@ const userStats = computed(() => {
 const initializeStore = async () => {
   // Check for existing session
   await initializeSession()
-  console.log('User store initialized - ready for authentication')
 }
 
 // Initialize store

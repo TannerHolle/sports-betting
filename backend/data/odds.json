@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-10-27T02:41:00.189Z",
+  "lastUpdated": "2025-10-27T03:46:48.120Z",
   "odds": {
     "nba": [
       {
@@ -9,26 +9,24 @@
         "awayTeam": "Los Angeles Lakers",
         "commenceTime": "2025-10-27T01:10:30Z",
         "odds": {
-          "Los Angeles Lakers_moneyline": 175,
-          "Sacramento Kings_moneyline": -230,
           "Los Angeles Lakers_spread": {
-            "line": 4.5,
-            "price": -115
+            "line": -6.5,
+            "price": -298
           },
           "Sacramento Kings_spread": {
-            "line": -4.5,
-            "price": -115
+            "line": 6.5,
+            "price": 220
           },
           "Over_total": {
-            "line": 237.5,
-            "price": -110
+            "line": 247.5,
+            "price": 240
           },
           "Under_total": {
-            "line": 237.5,
-            "price": -120
+            "line": 247.5,
+            "price": -330
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "314bcd3de3454494ecb012ef351bcb41",
@@ -37,26 +35,24 @@
         "awayTeam": "Portland Trail Blazers",
         "commenceTime": "2025-10-27T01:10:53Z",
         "odds": {
-          "Los Angeles Clippers_moneyline": -175,
-          "Portland Trail Blazers_moneyline": 135,
           "Los Angeles Clippers_spread": {
-            "line": -3.5,
-            "price": -105
+            "line": -7.5,
+            "price": -120
           },
           "Portland Trail Blazers_spread": {
-            "line": 3.5,
-            "price": -125
+            "line": 7.5,
+            "price": -110
           },
           "Over_total": {
-            "line": 235.5,
-            "price": -115
+            "line": 226.5,
+            "price": 100
           },
           "Under_total": {
-            "line": 235.5,
-            "price": -115
+            "line": 226.5,
+            "price": -130
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "5c3141a83aab2381b9837f56079156fd",
@@ -84,7 +80,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "f834a7893399a1848cb2572a2fbd03a8",
@@ -112,7 +108,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "1e70cdfd00bfa5e08be3e030eebc8d39",
@@ -140,7 +136,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "f5abc2b5aedbb8014bd140afacef4311",
@@ -168,7 +164,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "3bb045e8e56483e4687e2aad7fc77870",
@@ -196,7 +192,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "fea9b1300b0006641e6f50a613e58f88",
@@ -224,7 +220,35 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
+      },
+      {
+        "id": "5a01ca5161a08c4d7865032145759b36",
+        "sport": "nba",
+        "homeTeam": "Dallas Mavericks",
+        "awayTeam": "Oklahoma City Thunder",
+        "commenceTime": "2025-10-28T00:40:00Z",
+        "odds": {
+          "Dallas Mavericks_moneyline": 250,
+          "Oklahoma City Thunder_moneyline": -310,
+          "Dallas Mavericks_spread": {
+            "line": 8,
+            "price": -110
+          },
+          "Oklahoma City Thunder_spread": {
+            "line": -8,
+            "price": -110
+          },
+          "Over_total": {
+            "line": 226.5,
+            "price": -114
+          },
+          "Under_total": {
+            "line": 226.5,
+            "price": -106
+          }
+        },
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "f645a1acc849e1c50a8ed5f4b164fe76",
@@ -252,7 +276,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "3a6b0d7961360bd22e31e59ea415ff57",
@@ -261,26 +285,26 @@
         "awayTeam": "Denver Nuggets",
         "commenceTime": "2025-10-28T01:40:00Z",
         "odds": {
-          "Denver Nuggets_moneyline": -164,
-          "Minnesota Timberwolves_moneyline": 138,
+          "Denver Nuggets_moneyline": -190,
+          "Minnesota Timberwolves_moneyline": 160,
           "Denver Nuggets_spread": {
-            "line": -4,
+            "line": -5,
             "price": -110
           },
           "Minnesota Timberwolves_spread": {
-            "line": 4,
+            "line": 5,
             "price": -110
           },
           "Over_total": {
-            "line": 230.5,
-            "price": -108
+            "line": 229.5,
+            "price": -110
           },
           "Under_total": {
-            "line": 230.5,
-            "price": -112
+            "line": 229.5,
+            "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "a3c68330f0966b1febd54c6e5a7fb538",
@@ -308,7 +332,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "f557c9173a46a3c7c87afb4bd68f6644",
@@ -336,7 +360,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.118Z"
       },
       {
         "id": "4ca0a40cec306fd9a3c9b36b1e76500e",
@@ -364,7 +388,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.119Z"
       },
       {
         "id": "9010f7d8f26d5880c63b67355800f997",
@@ -392,7 +416,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "d54afb5b752a199f93e39afc2b39d091",
@@ -412,15 +436,15 @@
             "price": -112
           },
           "Over_total": {
-            "line": 224.5,
-            "price": -115
+            "line": 225.5,
+            "price": -105
           },
           "Under_total": {
-            "line": 224.5,
-            "price": -105
+            "line": 225.5,
+            "price": -115
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "6b9d46fb1b22af30b771b5f6b8a4c6f8",
@@ -448,7 +472,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "60b04efecd19028a2eb20c81649abaf1",
@@ -476,7 +500,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "d9b1ce3cf25e2645fdb24e89d4f1a38e",
@@ -504,7 +528,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "e7f04ed48f026208a6d078b5b3bc118b",
@@ -532,7 +556,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "df230babfc6ef1362f740fbb16136e77",
@@ -560,7 +584,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       }
     ],
     "ncaa-basketball": [
@@ -590,7 +614,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "fbec2fd73675dfd3e001ba97e90b8661",
@@ -618,7 +642,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       }
     ],
     "ncaa-football": [
@@ -648,7 +672,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "b972aaf6a19883fa0fbf06d89f86acf7",
@@ -676,7 +700,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "ef481710788d18502f9de2f9906fd74c",
@@ -704,7 +728,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "9cfd27bf66c6a8328d7ac615cbee50fc",
@@ -732,7 +756,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "1248fc45fafc31ef759edb57607c1c0a",
@@ -760,7 +784,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "812bace34e4d06fa48911a30e8b6acf8",
@@ -788,7 +812,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "56c958d4f7fedaf6a6dd660d39791acc",
@@ -816,7 +840,7 @@
             "price": -112
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "a39d31e5d3f010d7b4f68453167a174e",
@@ -844,7 +868,7 @@
             "price": -115
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "c2470d79a7b0a887cd057f8149f289c2",
@@ -872,7 +896,7 @@
             "price": -115
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "af2ced7d37b1b9c35b81d69ce26dd870",
@@ -900,7 +924,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "0de6ce3fb8d1eddd40362f63a1c9a089",
@@ -928,7 +952,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "3f5427025f543bc0aaee3f1a090a0e7b",
@@ -956,7 +980,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "30cf3214dc9b486eaffd416cf0728735",
@@ -984,7 +1008,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "661cc693646282b81a3ff474863155b1",
@@ -1012,7 +1036,7 @@
             "price": -115
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "c0bc52db8d2e691a93a72e79728f957c",
@@ -1040,7 +1064,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "3a295f4683347d18fea2de7ee64aa079",
@@ -1068,7 +1092,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "a4f262424af98c3bfad4a9ee78dd4308",
@@ -1096,7 +1120,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "67c2f115dc5ae1183a8f0d3812bdbaea",
@@ -1124,7 +1148,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "dacf20288266d28c38b2f5d2a59a4a4d",
@@ -1152,7 +1176,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "6e207b3d856ec783cd789253121c4c47",
@@ -1180,7 +1204,7 @@
             "price": -112
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "fafc61915d3429e8949bfa512a15505c",
@@ -1208,7 +1232,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "020028a27dd3acc26e8dc35eb9f65a86",
@@ -1236,7 +1260,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "d666a11a38728da38c8404862f2ca14e",
@@ -1264,7 +1288,7 @@
             "price": -108
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "d3e107e5a95bc8bdbd31b4de403f0e80",
@@ -1292,7 +1316,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "e007d238425b17b08d195dd9c64deb80",
@@ -1320,7 +1344,7 @@
             "price": -112
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "6496fb908a00a0d0df24b47b120e87c8",
@@ -1348,7 +1372,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "f53cf7187de74814bd8b0651a729b94b",
@@ -1376,7 +1400,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "f7e3b232e4a570cc7d5d4484f83f3a5c",
@@ -1404,7 +1428,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "752adb4a9d7012c1c0838961bffb7eec",
@@ -1432,7 +1456,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "c12e5ca692c0ace90c4614bd0efd665b",
@@ -1460,7 +1484,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "6231165e3a20b2247cfb4dc4d4f14d50",
@@ -1488,7 +1512,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "44c4dad3152fde5571154dc29bf30020",
@@ -1516,7 +1540,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "f27f05325cb971e8a0169da77094ac09",
@@ -1544,7 +1568,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "0a13bda89bf79d35ae4e7f26d142cbd3",
@@ -1572,7 +1596,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "35d3e354ceb275c759e3d2381e24ba87",
@@ -1600,7 +1624,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "f47ceaaef63b9125717a578648bdaab7",
@@ -1628,7 +1652,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "e7ae87b2889092ea8b3df2c3eafc6585",
@@ -1656,7 +1680,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "ea97ced3fcccbb59d54a3b1a05f1729e",
@@ -1684,7 +1708,7 @@
             "price": -112
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "c355c82023259a8a8948de47caa0be6a",
@@ -1712,7 +1736,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "5f0f820ae84368851f7e601c02282f77",
@@ -1740,7 +1764,7 @@
             "price": -115
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "759604e0d7cc42d57d5742459a0ff266",
@@ -1768,7 +1792,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "e9cc9630246eff99b50f3e471b481d70",
@@ -1796,7 +1820,7 @@
             "price": -102
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "0c6d8e4de8cd331a55b0c998f5630bee",
@@ -1824,7 +1848,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "8c6529f0e44f9c2ec4dfb637d49a6215",
@@ -1852,7 +1876,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "debf2f1ee7f3bd2c48255b4f1c06a4db",
@@ -1880,7 +1904,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "0c23a288344d38514845804a03b43fd3",
@@ -1908,7 +1932,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "c1b53247fa3559f99f93d9bd8fdb810b",
@@ -1936,7 +1960,7 @@
             "price": -115
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "ff33b4ccd0e554b0184b5e313a738c95",
@@ -1964,7 +1988,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "fa877e625753f69bd36947d9b697faae",
@@ -1992,7 +2016,7 @@
             "price": -112
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "483bce381dd0c25d1eaf721c28c486bc",
@@ -2020,7 +2044,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "0a43c1170a988e95d770ea59eff92696",
@@ -2048,7 +2072,7 @@
             "price": -105
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       },
       {
         "id": "d00a52f83db97af88e3675f61fe97985",
@@ -2076,7 +2100,7 @@
             "price": -110
           }
         },
-        "lastUpdated": "2025-10-27T02:41:00.189Z"
+        "lastUpdated": "2025-10-27T03:46:48.120Z"
       }
     ]
   }
