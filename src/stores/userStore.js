@@ -83,14 +83,24 @@ const createAccount = async (username, password) => {
 // Login user
 const login = async (username, password) => {
   try {
-    const user = await loadUserFromAPI(username)
-    if (user && user.password === password) {
+    const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+      username,
+      password
+    })
+    
+    if (response.data) {
+      currentUser.value = response.data
+      isAuthenticated.value = true
       // Save to sessionStorage for persistence
-      sessionStorage.setItem('currentUser', JSON.stringify(user))
-      return user
+      sessionStorage.setItem('currentUser', JSON.stringify(response.data))
+      return response.data
     }
   } catch (error) {
     console.error('Error during login:', error)
+    if (error.response?.status === 401) {
+      throw new Error('Invalid username or password')
+    }
+    throw new Error('Login failed')
   }
   return null
 }

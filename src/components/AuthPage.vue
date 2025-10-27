@@ -78,13 +78,46 @@
           <input 
           id="signup-password"
           v-model="signupForm.password" 
+          @input="validatePasswordStrength(signupForm.password)"
           type="password" 
           required 
-          placeholder="Choose a password"
+          placeholder="Choose a secure password"
           class="form-input"
           />
+          
+          <!-- Password Strength Indicator -->
+          <div v-if="signupForm.password" class="password-strength">
+            <div class="strength-bar">
+              <div 
+                class="strength-fill" 
+                :class="{
+                  'weak': passwordStrength.score < 40,
+                  'fair': passwordStrength.score >= 40 && passwordStrength.score < 80,
+                  'strong': passwordStrength.score >= 80
+                }"
+                :style="{ width: passwordStrength.score + '%' }"
+              ></div>
+            </div>
+            <div class="strength-text">
+              <span v-if="passwordStrength.score < 40" class="weak">Weak</span>
+              <span v-else-if="passwordStrength.score < 80" class="fair">Fair</span>
+              <span v-else class="strong">Strong</span>
+            </div>
+          </div>
+          
+          <!-- Password Requirements -->
+          <div v-if="signupForm.password" class="password-requirements">
+            <div 
+              v-for="requirement in passwordRequirements" 
+              :key="requirement.text"
+              class="requirement"
+              :class="{ 'met': requirement.met }"
+            >
+              <span class="requirement-icon">{{ requirement.met ? '✓' : '○' }}</span>
+              <span class="requirement-text">{{ requirement.text }}</span>
+            </div>
+          </div>
         </div>
-        <p class="signup-info">Not very secure so just use simple passwords</p>
         <button type="submit" class="submit-btn" :disabled="loading">
           {{ loading ? 'Creating Account...' : 'Create Account' }}
         </button>
@@ -125,6 +158,42 @@ export default {
       username: '',
       password: ''
     })
+    
+    const passwordStrength = ref({
+      score: 0,
+      feedback: []
+    })
+    
+    const passwordRequirements = ref([
+      { text: 'At least 8 characters', met: false },
+      { text: 'One lowercase letter', met: false },
+      { text: 'One uppercase letter', met: false },
+      { text: 'One number', met: false },
+      { text: 'One special character', met: false }
+    ])
+    
+    // Validate password strength
+    const validatePasswordStrength = (password) => {
+      const requirements = [
+        { text: 'At least 8 characters', met: password.length >= 8 },
+        { text: 'One lowercase letter', met: /(?=.*[a-z])/.test(password) },
+        { text: 'One uppercase letter', met: /(?=.*[A-Z])/.test(password) },
+        { text: 'One number', met: /(?=.*\d)/.test(password) },
+        { text: 'One special character', met: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password) }
+      ]
+      
+      passwordRequirements.value = requirements
+      
+      const metCount = requirements.filter(req => req.met).length
+      const score = Math.round((metCount / requirements.length) * 100)
+      
+      passwordStrength.value = {
+        score,
+        feedback: requirements.filter(req => !req.met).map(req => req.text)
+      }
+      
+      return metCount === requirements.length
+    }
 
     const handleLogin = async () => {
       loading.value = true
@@ -152,6 +221,13 @@ export default {
       loading.value = true
       error.value = ''
       successMessage.value = ''
+      
+      // Validate password strength
+      if (!validatePasswordStrength(signupForm.value.password)) {
+        error.value = 'Password does not meet security requirements'
+        loading.value = false
+        return
+      }
       
       try {
         const user = await userStore.createAccount(
@@ -200,6 +276,9 @@ export default {
       successMessage,
       loginForm,
       signupForm,
+      passwordStrength,
+      passwordRequirements,
+      validatePasswordStrength,
       handleLogin,
       handleSignup,
       goToBetting
@@ -286,15 +365,96 @@ export default {
   font-size: 1.5rem;
 }
 
-.signup-info {
-  text-align: center;
-  color: #059669;
+/* Password Strength Styles */
+.password-strength {
+  margin-top: 0.5rem;
+}
+
+.strength-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.strength-fill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-fill.weak {
+  background-color: #ef4444;
+}
+
+.strength-fill.fair {
+  background-color: #f59e0b;
+}
+
+.strength-fill.strong {
+  background-color: #10b981;
+}
+
+.strength-text {
+  font-size: 0.75rem;
   font-weight: 600;
-  margin-bottom: 1.5rem;
+  text-align: right;
+}
+
+.strength-text.weak {
+  color: #ef4444;
+}
+
+.strength-text.fair {
+  color: #f59e0b;
+}
+
+.strength-text.strong {
+  color: #10b981;
+}
+
+.password-requirements {
+  margin-top: 0.75rem;
   padding: 0.75rem;
-  background: #ecfdf5;
-  border-radius: 8px;
-  border: 1px solid #a7f3d0;
+  background-color: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.requirement {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.requirement:last-child {
+  margin-bottom: 0;
+}
+
+.requirement-icon {
+  margin-right: 0.5rem;
+  font-weight: bold;
+  width: 16px;
+  text-align: center;
+}
+
+.requirement.met .requirement-icon {
+  color: #10b981;
+}
+
+.requirement:not(.met) .requirement-icon {
+  color: #6b7280;
+}
+
+.requirement-text {
+  color: #374151;
+}
+
+.requirement.met .requirement-text {
+  color: #10b981;
+  text-decoration: line-through;
 }
 
 .form-group {

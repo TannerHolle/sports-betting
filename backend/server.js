@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs').promises;
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
 const oddsDatabase = require('./services/oddsDatabase');
 const { checkAndUpdateOdds } = require('./middleware/oddsMiddleware');
 const betResolver = require('./services/betResolver');
@@ -42,6 +43,42 @@ const loadUsers = async () => {
 const saveUsers = async (users) => {
   await ensureDataDir();
   await fs.writeFile(DATA_FILE, JSON.stringify(users, null, 2));
+};
+
+// Password validation
+const validatePassword = (password) => {
+  if (!password || password.length < 8) {
+    return { valid: false, error: 'Password must be at least 8 characters long' };
+  }
+  
+  if (!/(?=.*[a-z])/.test(password)) {
+    return { valid: false, error: 'Password must contain at least one lowercase letter' };
+  }
+  
+  if (!/(?=.*[A-Z])/.test(password)) {
+    return { valid: false, error: 'Password must contain at least one uppercase letter' };
+  }
+  
+  if (!/(?=.*\d)/.test(password)) {
+    return { valid: false, error: 'Password must contain at least one number' };
+  }
+  
+  if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password)) {
+    return { valid: false, error: 'Password must contain at least one special character' };
+  }
+  
+  return { valid: true };
+};
+
+// Hash password
+const hashPassword = async (password) => {
+  const saltRounds = 12;
+  return await bcrypt.hash(password, saltRounds);
+};
+
+// Verify password
+const verifyPassword = async (password, hashedPassword) => {
+  return await bcrypt.compare(password, hashedPassword);
 };
 
 // User validation
@@ -87,16 +124,25 @@ app.post('/api/user', async (req, res) => {
       return res.status(400).json({ error: 'Username and password are required' });
     }
     
+    // Validate password strength
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      return res.status(400).json({ error: passwordValidation.error });
+    }
+    
     const users = await loadUsers();
     
     if (users[username]) {
       return res.status(409).json({ error: 'Username already exists' });
     }
     
+    // Hash the password
+    const hashedPassword = await hashPassword(password);
+    
     const newUser = {
       id: uuidv4(),
       username,
-      password,
+      password: hashedPassword, // Store hashed password
       balance: 1000,
       totalWagered: 0,
       totalWon: 0,
@@ -109,9 +155,41 @@ app.post('/api/user', async (req, res) => {
     users[username] = newUser;
     await saveUsers(users);
     
-    res.status(201).json(newUser);
+    // Don't return the hashed password in response
+    const { password: _, ...userResponse } = newUser;
+    res.status(201).json(userResponse);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+// Login user
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+    
+    const users = await loadUsers();
+    const user = users[username];
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    
+    // Verify password
+    const isValidPassword = await verifyPassword(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    
+    // Don't return the hashed password in response
+    const { password: _, ...userResponse } = user;
+    res.json(userResponse);
+  } catch (error) {
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 

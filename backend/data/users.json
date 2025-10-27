@@ -544,5 +544,17 @@
     ],
     "createdAt": "2025-10-27T23:52:00.496Z",
     "lastUpdated": "2025-10-27T23:52:20.393Z"
+  },
+  "tan": {
+    "id": "294f2978-9cbd-4374-8db6-2b2fa510c023",
+    "username": "tan",
+    "password": "Pariveda2025!",
+    "balance": 1000,
+    "totalWagered": 0,
+    "totalWon": 0,
+    "totalLost": 0,
+    "bets": [],
+    "createdAt": "2025-10-27T23:57:10.506Z",
+    "lastUpdated": "2025-10-27T23:57:10.506Z"
   }
 }
