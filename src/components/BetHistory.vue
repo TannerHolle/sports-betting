@@ -448,8 +448,9 @@ export default {
 
 .bet-amount {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 0.75rem;
 }
 
 .bet-amount .label {
@@ -476,8 +477,9 @@ export default {
 
 .bet-odds {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 0.75rem;
 }
 
 .bet-odds .label {

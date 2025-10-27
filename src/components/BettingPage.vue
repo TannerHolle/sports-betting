@@ -6,7 +6,7 @@
         Fantasy Betting
       </h1>
       <p class="page-description">
-        Ever wanted to see how good you would be at sports betting without the risk of losing money or fear of God's wrath? Well I have so i built out a fake sportsbook. Enjoy with me
+        Experience the thrill of sports betting without the risk of becoming a degenerate gambler or eternal damnation.
       </p>
     </div>
 
@@ -14,15 +14,15 @@
     <div class="stats-dashboard" v-if="userStats">
       <div class="stat-card">
         <div class="stat-value">${{ userBalance.toLocaleString() }}</div>
-        <div class="stat-label">Current Balance</div>
-      </div>
-      <div class="stat-card" v-if="userStats.activeBets > 0">
-        <div class="stat-value">{{ userStats.activeBets }}</div>
-        <div class="stat-label">Active Bets</div>
+        <div class="stat-label">Available Cash</div>
       </div>
       <div class="stat-card" v-if="outstandingBetAmount > 0">
         <div class="stat-value">${{ outstandingBetAmount.toLocaleString() }}</div>
         <div class="stat-label">Outstanding Bets</div>
+      </div>
+      <div class="stat-card" v-if="userStats.activeBets > 0">
+        <div class="stat-value">{{ userStats.activeBets }}</div>
+        <div class="stat-label">Active Bets</div>
       </div>
       <div class="stat-card" v-if="userStats.winRate > 0">
         <div class="stat-value" :class="{ 'positive': userStats.winRate > 50, 'negative': userStats.winRate < 50 }">
@@ -46,10 +46,13 @@
     <BetHistory />
 
     <!-- Bet Resolver -->
-    <BetResolver v-if="isAdmin" />
+    <BetResolver />
 
     <!-- Admin Panel -->
     <AdminPanel v-if="isAdmin" />
+
+    <!-- Leaderboard -->
+    <Leaderboard />
 
     <!-- League Selection -->
     <div class="league-selection">
@@ -71,7 +74,7 @@
     <div class="games-section">
       <h2>Games Today Available for Betting</h2>
       <p class="section-description">
-        Scheduled and in-progress games with betting lines that are happening today (in your local timezone) are shown below. Click on any game to expand and place your bets.
+        Scheduled games with betting lines that are happening today (in your local timezone) are shown below. Click on any game to expand and place your bets.
       </p>
       
       <div v-if="error" class="error-message">
@@ -109,6 +112,7 @@ import { useUserStore } from '../stores/userStore.js'
 import BetHistory from './BetHistory.vue'
 import BetResolver from './BetResolver.vue'
 import AdminPanel from './AdminPanel.vue'
+import Leaderboard from './Leaderboard.vue'
 import NCAAFootballCard from './NCAAFootballCard.vue'
 import NFLGameCard from './NFLGameCard.vue'
 import CollegeBasketballCard from './CollegeBasketballCard.vue'
@@ -120,6 +124,7 @@ export default {
     BetHistory,
     BetResolver,
     AdminPanel,
+    Leaderboard,
     NCAAFootballCard,
     NFLGameCard,
     CollegeBasketballCard,
@@ -195,22 +200,21 @@ export default {
         const competition = game.competitions?.[0]
         const status = competition?.status
         
-        // Show games that are scheduled (not started yet) OR in progress
+        // Only show games that are scheduled (not started yet) - NO in-progress games
         const isScheduled = status?.type?.state === 'pre'
-        const isInProgress = status?.type?.state === 'in'
         
         // Check if game is today in local timezone
         const gameDate = new Date(game.date)
         const today = new Date()
         const isToday = gameDate.toDateString() === today.toDateString()
         
-        // For NBA, show scheduled and in-progress games that are today
+        // For NBA, show only scheduled games that are today
         if (activeLeague.value === 'nba') {
-          return (isScheduled || isInProgress) && isToday
+          return isScheduled && isToday
         }
         
-        // For other sports, show scheduled and in-progress games with real odds data that are today
-        return (isScheduled || isInProgress) && isToday && competition?.odds && competition.odds.length > 0
+        // For other sports, show only scheduled games with real odds data that are today
+        return isScheduled && isToday && competition?.odds && competition.odds.length > 0
       })
     })
 
