@@ -1,0 +1,36 @@
+{
+  "tannerholle": {
+    "id": "e5086941-836b-4799-bf63-856dc3807ce9",
+    "username": "tannerholle",
+    "password": "tannerholle",
+    "balance": 1095,
+    "totalWagered": 100,
+    "totalWon": 95,
+    "totalLost": 0,
+    "bets": [
+      {
+        "id": "8d809740-dddd-4dd2-9d50-2f251ef15b42",
+        "gameId": "401772817",
+        "betType": "spread",
+        "selection": "Chiefs",
+        "amount": 100,
+        "odds": "-105",
+        "potentialWin": 95,
+        "status": "won",
+        "placedAt": "2025-10-27T01:04:10.762Z",
+        "gameData": {
+          "homeTeam": "Chiefs",
+          "awayTeam": "Commanders",
+          "gameName": "Washington Commanders at Kansas City Chiefs"
+        },
+        "resolvedAt": "2025-10-27T01:04:19.519Z",
+        "actualResult": {
+          "status": "won",
+          "resolvedAt": "2025-10-27T01:04:19.511Z"
+        }
+      }
+    ],
+    "createdAt": "2025-10-27T00:50:44.822Z",
+    "lastUpdated": "2025-10-27T01:04:19.519Z"
+  }
+}
