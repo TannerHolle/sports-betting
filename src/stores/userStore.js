@@ -6,13 +6,26 @@ const currentUser = ref(null)
 const isAuthenticated = ref(false)
 
 // Check for existing session on initialization
-const initializeSession = () => {
+const initializeSession = async () => {
   const savedUser = sessionStorage.getItem('currentUser')
   if (savedUser) {
     try {
-      currentUser.value = JSON.parse(savedUser)
+      const parsedUser = JSON.parse(savedUser)
+      currentUser.value = parsedUser
       isAuthenticated.value = true
       console.log('User session restored from sessionStorage')
+      
+      // Refresh user data from API to get latest bets
+      if (parsedUser.username) {
+        try {
+          const freshData = await loadUserFromAPI(parsedUser.username)
+          if (freshData) {
+            console.log('User data refreshed from API on initialization')
+          }
+        } catch (error) {
+          console.error('Error refreshing user data on initialization:', error)
+        }
+      }
     } catch (error) {
       console.error('Error restoring user session:', error)
       sessionStorage.removeItem('currentUser')
@@ -203,9 +216,9 @@ const userStats = computed(() => {
 })
 
 // Initialize store
-const initializeStore = () => {
+const initializeStore = async () => {
   // Check for existing session
-  initializeSession()
+  await initializeSession()
   console.log('User store initialized - ready for authentication')
 }
 

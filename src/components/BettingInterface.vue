@@ -162,6 +162,41 @@ export default {
       return competitor?.team?.shortDisplayName || 'Away'
     })
 
+    // Game status and scores for live data
+    const gameInProgress = computed(() => {
+      const status = props.game.competitions?.[0]?.status
+      return status?.type?.state === 'in'
+    })
+
+    const homeScore = computed(() => {
+      const competitor = props.game.competitions?.[0]?.competitors?.find(c => c.homeAway === 'home')
+      return competitor?.score || '0'
+    })
+
+    const awayScore = computed(() => {
+      const competitor = props.game.competitions?.[0]?.competitors?.find(c => c.homeAway === 'away')
+      return competitor?.score || '0'
+    })
+
+    const statusText = computed(() => {
+      const status = props.game.competitions?.[0]?.status
+      if (status?.type?.completed) return 'Final'
+      if (status?.type?.state === 'in') {
+        return `${status.displayClock} - ${status.period}${getOrdinalSuffix(status.period)}`
+      }
+      return status?.type?.shortDetail || 'Scheduled'
+    })
+
+    const getOrdinalSuffix = (num) => {
+      if (num >= 11 && num <= 13) return 'th'
+      switch (num % 10) {
+        case 1: return 'st'
+        case 2: return 'nd'
+        case 3: return 'rd'
+        default: return 'th'
+      }
+    }
+
     // Spread options
     const spreadOptions = computed(() => {
       if (!props.betting.pointSpread) return []

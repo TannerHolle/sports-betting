@@ -367,4 +367,5 @@ export default {
   color: #059669;
   font-weight: 500;
 }
+
 </style>

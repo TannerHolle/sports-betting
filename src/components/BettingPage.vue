@@ -63,9 +63,9 @@
 
     <!-- Games with Betting -->
     <div class="games-section">
-      <h2>Games Available for Betting</h2>
+      <h2>Games Today Available for Betting</h2>
       <p class="section-description">
-        Only scheduled games with betting lines that are happening today (in your local timezone) are shown below. Click on any game to expand and place your bets.
+        Scheduled and in-progress games with betting lines that are happening today (in your local timezone) are shown below. Click on any game to expand and place your bets.
       </p>
       
       <div v-if="error" class="error-message">
@@ -174,21 +174,22 @@ export default {
         const competition = game.competitions?.[0]
         const status = competition?.status
         
-        // Only show games that are scheduled (not started yet)
+        // Show games that are scheduled (not started yet) OR in progress
         const isScheduled = status?.type?.state === 'pre'
+        const isInProgress = status?.type?.state === 'in'
         
         // Check if game is today in local timezone
         const gameDate = new Date(game.date)
         const today = new Date()
         const isToday = gameDate.toDateString() === today.toDateString()
         
-        // For NBA, show only scheduled games that are today
+        // For NBA, show scheduled and in-progress games that are today
         if (activeLeague.value === 'nba') {
-          return isScheduled && isToday
+          return (isScheduled || isInProgress) && isToday
         }
         
-        // For other sports, only show scheduled games with real odds data that are today
-        return isScheduled && isToday && competition?.odds && competition.odds.length > 0
+        // For other sports, show scheduled and in-progress games with real odds data that are today
+        return (isScheduled || isInProgress) && isToday && competition?.odds && competition.odds.length > 0
       })
     })
 

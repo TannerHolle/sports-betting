@@ -59,6 +59,19 @@
               <span class="value">{{ bet.odds }}</span>
             </div>
           </div>
+          
+          <!-- Live Game Data -->
+          <div v-if="isGameLive(bet)" class="live-game-data">
+            <div class="live-score">
+              <span class="team-score">{{ getLiveData(bet).homeTeam }} {{ getLiveData(bet).homeScore }}</span>
+              <span class="score-separator">-</span>
+              <span class="team-score">{{ getLiveData(bet).awayScore }} {{ getLiveData(bet).awayTeam }}</span>
+            </div>
+            <div class="live-status">
+              <span class="live-indicator">● LIVE</span>
+              <span class="game-time">{{ getLiveData(bet).status }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -107,6 +120,19 @@
               <span class="value">{{ bet.odds }}</span>
             </div>
           </div>
+          
+          <!-- Live Game Data for completed bets -->
+          <div v-if="isGameLive(bet)" class="live-game-data">
+            <div class="live-score">
+              <span class="team-score">{{ getLiveData(bet).homeTeam }} {{ getLiveData(bet).homeScore }}</span>
+              <span class="score-separator">-</span>
+              <span class="team-score">{{ getLiveData(bet).awayScore }} {{ getLiveData(bet).awayTeam }}</span>
+            </div>
+            <div class="live-status">
+              <span class="live-indicator">● LIVE</span>
+              <span class="game-time">{{ getLiveData(bet).status }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -114,14 +140,17 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
+import liveScoreService from '../services/liveScoreService.js'
 
 export default {
   name: 'BetHistory',
   setup() {
     const userStore = useUserStore()
     const activeTab = ref('active')
+    const liveScores = ref(new Map())
+    const refreshInterval = ref(null)
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
@@ -136,6 +165,12 @@ export default {
       return currentUser.value.bets
         .filter(bet => bet.status === 'won' || bet.status === 'lost')
         .sort((a, b) => new Date(b.resolvedAt || b.placedAt) - new Date(a.resolvedAt || a.placedAt))
+    })
+
+    // Get all bets (active + completed) for live score checking
+    const allBets = computed(() => {
+      if (!currentUser.value?.bets) return []
+      return currentUser.value.bets
     })
 
     const formatDate = (dateString) => {
@@ -157,13 +192,90 @@ export default {
       }
     }
 
+    // Check if a game is live
+    const isGameLive = (bet) => {
+      const liveData = liveScores.value.get(bet.gameId)
+      return liveData && liveData.isLive && !liveData.isCompleted
+    }
+
+    // Get live data for a bet
+    const getLiveData = (bet) => {
+      return liveScores.value.get(bet.gameId)
+    }
+
+    // Fetch live scores for all bets
+    const fetchLiveScores = async () => {
+      if (!allBets.value.length) return
+
+      try {
+        // Get unique game IDs
+        const gameIds = [...new Set(allBets.value.map(bet => bet.gameId))]
+        
+        // Determine sport (default to NBA for now, could be enhanced)
+        const sport = 'nba'
+        
+        const scores = await liveScoreService.getLiveScores(gameIds, sport)
+        liveScores.value = scores
+      } catch (error) {
+        console.error('Error fetching live scores:', error)
+      }
+    }
+
+    // Start periodic refresh for live scores
+    const startLiveScoreRefresh = () => {
+      // Initial fetch
+      fetchLiveScores()
+      
+      // Set up interval to refresh every 30 seconds
+      refreshInterval.value = setInterval(fetchLiveScores, 30000)
+    }
+
+    // Stop live score refresh
+    const stopLiveScoreRefresh = () => {
+      if (refreshInterval.value) {
+        clearInterval(refreshInterval.value)
+        refreshInterval.value = null
+      }
+    }
+
+    // Load user data when component mounts
+    onMounted(async () => {
+      console.log('BetHistory mounted - isAuthenticated:', isAuthenticated.value)
+      console.log('BetHistory mounted - currentUser:', currentUser.value)
+      
+      if (isAuthenticated.value && currentUser.value?.username) {
+        try {
+          // Refresh user data from API to get latest bets
+          const freshUserData = await userStore.loadUserFromAPI(currentUser.value.username)
+          if (freshUserData) {
+            console.log('User data refreshed in BetHistory:', freshUserData)
+            console.log('Active bets after refresh:', freshUserData.bets?.filter(bet => bet.status === 'pending'))
+            
+            // Start live score refresh after user data is loaded
+            startLiveScoreRefresh()
+          }
+        } catch (error) {
+          console.error('Error loading user data in BetHistory:', error)
+        }
+      } else {
+        console.log('Not authenticated or no username, skipping user data load')
+      }
+    })
+
+    // Clean up on unmount
+    onUnmounted(() => {
+      stopLiveScoreRefresh()
+    })
+
     return {
       activeTab,
       isAuthenticated,
       activeBets,
       completedBets,
       formatDate,
-      formatBetType
+      formatBetType,
+      isGameLive,
+      getLiveData
     }
   }
 }
@@ -411,5 +523,59 @@ export default {
     gap: 0.5rem;
     align-items: flex-start;
   }
+}
+
+/* Live Game Data Styles */
+.live-game-data {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 0.5rem;
+  border: 1px solid #f59e0b;
+}
+
+.live-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.team-score {
+  color: #92400e;
+}
+
+.score-separator {
+  color: #a16207;
+  font-weight: 500;
+}
+
+.live-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.live-indicator {
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 0.9rem;
+  animation: pulse 2s infinite;
+}
+
+.game-time {
+  font-size: 0.9rem;
+  color: #92400e;
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 </style>

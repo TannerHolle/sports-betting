@@ -3,9 +3,9 @@
     "id": "e5086941-836b-4799-bf63-856dc3807ce9",
     "username": "tannerholle",
     "password": "tannerholle",
-    "balance": 992,
-    "totalWagered": 245,
-    "totalWon": 117,
+    "balance": 984,
+    "totalWagered": 299,
+    "totalWon": 138,
     "totalLost": 0,
     "bets": [
       {
@@ -75,10 +75,10 @@
         "id": "49cbbeca-219c-445b-b91d-425124a66113",
         "gameId": "401809967",
         "betType": "moneyline",
-        "selection": "Trail Blazers",
-        "amount": 100,
-        "odds": 135,
-        "potentialWin": 135,
+        "selection": "Clippers",
+        "amount": 175,
+        "odds": -175,
+        "potentialWin": 100,
         "status": "pending",
         "placedAt": "2025-10-27T02:53:11.262Z",
         "gameData": {
@@ -95,16 +95,102 @@
         "amount": 25,
         "odds": -120,
         "potentialWin": 21,
-        "status": "pending",
+        "status": "won",
         "placedAt": "2025-10-27T02:53:34.998Z",
         "gameData": {
           "homeTeam": "Kings",
           "awayTeam": "Lakers",
           "gameName": "Los Angeles Lakers at Sacramento Kings"
+        },
+        "resolvedAt": "2025-10-27T03:24:03.561Z",
+        "actualResult": {
+          "status": "won",
+          "resolvedAt": "2025-10-27T03:24:03.553Z"
+        }
+      },
+      {
+        "id": "4a34a9ac-1b37-4b36-b948-dc436d5de85b",
+        "gameId": "401809245",
+        "betType": "moneyline",
+        "selection": "Cavaliers",
+        "amount": 14,
+        "odds": -142,
+        "potentialWin": 10,
+        "status": "pending",
+        "placedAt": "2025-10-27T03:12:21.296Z",
+        "gameData": {
+          "homeTeam": "Pistons",
+          "awayTeam": "Cavaliers",
+          "gameName": "Cleveland Cavaliers at Detroit Pistons"
+        }
+      },
+      {
+        "id": "72a5748e-fc0f-4fff-a591-98240654b3db",
+        "gameId": "401809969",
+        "betType": "moneyline",
+        "selection": "76ers",
+        "amount": 10,
+        "odds": 145,
+        "potentialWin": 15,
+        "status": "pending",
+        "placedAt": "2025-10-27T03:12:36.855Z",
+        "gameData": {
+          "homeTeam": "76ers",
+          "awayTeam": "Magic",
+          "gameName": "Orlando Magic at Philadelphia 76ers"
+        }
+      },
+      {
+        "id": "ede4854d-2383-42ce-8972-118a25881a4a",
+        "gameId": "401809970",
+        "betType": "moneyline",
+        "selection": "Bulls",
+        "amount": 10,
+        "odds": -110,
+        "potentialWin": 9,
+        "status": "pending",
+        "placedAt": "2025-10-27T03:17:19.740Z",
+        "gameData": {
+          "homeTeam": "Bulls",
+          "awayTeam": "Hawks",
+          "gameName": "Atlanta Hawks at Chicago Bulls"
+        }
+      },
+      {
+        "id": "4dbb38b8-88d1-4698-9fb5-8a976b2a08e7",
+        "gameId": "401809246",
+        "betType": "moneyline",
+        "selection": "Timberwolves",
+        "amount": 10,
+        "odds": 138,
+        "potentialWin": 14,
+        "status": "pending",
+        "placedAt": "2025-10-27T03:25:28.630Z",
+        "gameData": {
+          "homeTeam": "Timberwolves",
+          "awayTeam": "Nuggets",
+          "gameName": "Denver Nuggets at Minnesota Timberwolves",
+          "liveData": null
+        }
+      },
+      {
+        "id": "fb84acc8-a4b4-4770-a192-a06072afb7fe",
+        "gameId": "401809971",
+        "betType": "total",
+        "selection": "Over",
+        "amount": 10,
+        "odds": -110,
+        "potentialWin": 9,
+        "status": "pending",
+        "placedAt": "2025-10-27T03:29:52.464Z",
+        "gameData": {
+          "homeTeam": "Rockets",
+          "awayTeam": "Nets",
+          "gameName": "Brooklyn Nets at Houston Rockets"
         }
       }
     ],
     "createdAt": "2025-10-27T00:50:44.822Z",
-    "lastUpdated": "2025-10-27T02:53:34.998Z"
+    "lastUpdated": "2025-10-27T03:29:52.464Z"
   }
 }
