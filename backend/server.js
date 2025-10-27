@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const fs = require('fs').promises;
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const oddsDatabase = require('./services/oddsDatabase');
+const { checkAndUpdateOdds } = require('./middleware/oddsMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -239,6 +241,66 @@ app.get('/api/users', async (req, res) => {
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: 'Failed to load users' });
+  }
+});
+
+// Odds API endpoints
+
+// Get odds for a specific sport
+app.get('/api/odds/:sport', checkAndUpdateOdds, async (req, res) => {
+  try {
+    const { sport } = req.params;
+    const validSports = ['nba', 'ncaa-basketball', 'ncaa-football'];
+    
+    if (!validSports.includes(sport)) {
+      return res.status(400).json({ error: 'Invalid sport. Supported sports: nba, ncaa-basketball, ncaa-football' });
+    }
+    
+    const odds = await oddsDatabase.getOddsForSport(sport);
+    res.json(odds);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load odds' });
+  }
+});
+
+// Get all odds
+app.get('/api/odds', checkAndUpdateOdds, async (req, res) => {
+  try {
+    const allOdds = await oddsDatabase.getAllOdds();
+    res.json(allOdds);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load odds' });
+  }
+});
+
+// Get odds last update time
+app.get('/api/odds/last-update', async (req, res) => {
+  try {
+    const lastUpdate = await oddsDatabase.getLastUpdateTime();
+    res.json({ lastUpdated: lastUpdate });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get last update time' });
+  }
+});
+
+// Force update odds (admin endpoint)
+app.post('/api/odds/force-update', async (req, res) => {
+  try {
+    const oddsService = require('./services/oddsService');
+    
+    console.log('Force updating odds...');
+    const freshOdds = await oddsService.fetchAllOdds();
+    
+    const processedOdds = {};
+    for (const [sport, oddsData] of Object.entries(freshOdds)) {
+      processedOdds[sport] = oddsService.processOddsData(oddsData, sport);
+    }
+    
+    await oddsDatabase.updateOdds(processedOdds);
+    
+    res.json({ success: true, message: 'Odds updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to force update odds', details: error.message });
   }
 });
 

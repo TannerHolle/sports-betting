@@ -27,6 +27,10 @@
         </span>
         <span class="score-medium" :class="{ 'winning-score': isWinning(competitor) }">{{ competitor.score || '0' }}</span>
       </div>
+      <!-- Show if betting options are available -->
+      <div v-if="betting && gameScheduled" class="odds-indicator">
+        ✓ Odds Available - Click to expand
+      </div>
     </div>
 
     <!-- Expanded view -->
@@ -65,18 +69,8 @@
         </div>
       </div>
 
-      <!-- Live Game State -->
-      <div class="live-game-state" v-if="gameInProgress">
-        <div class="game-clock">
-          <div class="clock-display">
-            <span class="time">{{ status.displayClock || '0:00' }}</span>
-            <span class="quarter">{{ status.period }}{{ getOrdinalSuffix(status.period) }} Quarter</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Betting Information -->
-      <div class="betting-info" v-if="betting && !isCollapsed">
+      <!-- Betting Information - Only show for scheduled games -->
+      <div class="betting-info" v-if="betting && !isCollapsed && gameScheduled">
         <h4 class="betting-title">Betting Lines</h4>
         <div class="betting-lines">
           <div class="betting-line" v-if="betting.pointSpread">
@@ -121,8 +115,9 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import BettingInterface from './BettingInterface.vue'
+import oddsService from '../services/oddsService.js'
 
 export default {
   name: 'NBAGameCard',
@@ -137,81 +132,58 @@ export default {
   },
   setup(props) {
     const isCollapsed = ref(true)
+    const gameOdds = ref(null)
     const competition = computed(() => props.game.competitions?.[0])
     const competitors = computed(() => competition.value?.competitors || [])
     const venue = computed(() => competition.value?.venue?.fullName || 'TBD')
     const broadcast = computed(() => competition.value?.broadcast || competition.value?.broadcasts?.[0]?.names?.[0])
     const status = computed(() => competition.value?.status)
     
-    // Generate mock betting data for NBA games
-    const betting = computed(() => {
+    // Get team names for odds matching
+    const homeTeamName = computed(() => {
       const homeTeam = competitors.value.find(c => c.homeAway === 'home')
+      return homeTeam ? homeTeam.team.shortDisplayName : ''
+    })
+    
+    const awayTeamName = computed(() => {
       const awayTeam = competitors.value.find(c => c.homeAway === 'away')
-      if (!homeTeam || !awayTeam) return null
-      
-      // Generate realistic NBA betting lines
-      const homeScore = parseInt(homeTeam.score || 0)
-      const awayScore = parseInt(awayTeam.score || 0)
-      
-      // Mock spread (home team typically favored by 1-7 points)
-      const spread = Math.random() * 6 + 1
-      const homeSpread = Math.random() > 0.5 ? -spread : spread
-      const awaySpread = -homeSpread
-      
-      // Mock total (NBA games typically 200-250 points)
-      const total = Math.floor(Math.random() * 50) + 200
-      
-      // Mock moneyline odds
-      const homeOdds = Math.random() > 0.5 ? -110 : -120
-      const awayOdds = Math.random() > 0.5 ? 110 : 120
-      
-      return {
-        pointSpread: {
-          home: {
-            close: {
-              line: homeSpread.toFixed(1),
-              odds: homeOdds
-            }
-          },
-          away: {
-            close: {
-              line: awaySpread.toFixed(1),
-              odds: awayOdds
-            }
-          }
-        },
-        total: {
-          over: {
-            close: {
-              line: total,
-              odds: -110
-            }
-          },
-          under: {
-            close: {
-              line: total,
-              odds: -110
-            }
-          }
-        },
-        moneyline: {
-          home: {
-            close: {
-              odds: homeOdds
-            }
-          },
-          away: {
-            close: {
-              odds: awayOdds
-            }
-          }
+      return awayTeam ? awayTeam.team.shortDisplayName : ''
+    })
+    
+    // Fetch odds data for this game
+    const fetchGameOdds = async () => {
+      try {
+        const allOdds = await oddsService.getAllOdds()
+        const gameOddsData = oddsService.findGameOdds(allOdds, 'nba', homeTeamName.value, awayTeamName.value)
+        
+        if (gameOddsData) {
+          gameOdds.value = gameOddsData
         }
+      } catch (error) {
+        console.error('Error fetching game odds:', error)
       }
+    }
+    
+    // Convert odds data to betting format
+    const betting = computed(() => {
+      if (!gameOdds.value) {
+        return null
+      }
+      
+      return oddsService.convertOddsToBettingFormat(
+        gameOdds.value,
+        homeTeamName.value,
+        awayTeamName.value
+      )
     })
     
     const gameInProgress = computed(() => status.value?.type?.state === 'in')
     const gameCompleted = computed(() => status.value?.type?.completed)
     const gameScheduled = computed(() => status.value?.type?.state === 'pre')
+    
+    onMounted(() => {
+      fetchGameOdds()
+    })
     
     const statusClass = computed(() => {
       if (gameCompleted.value) return 'completed'
@@ -328,6 +300,8 @@ export default {
       broadcast,
       betting,
       gameInProgress,
+      gameCompleted,
+      gameScheduled,
       status,
       statusClass,
       statusText,
@@ -403,5 +377,13 @@ export default {
 
 .score {
   color: var(--team-primary-color, #1a1a1a);
+}
+
+.odds-indicator {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #059669;
+  font-weight: 500;
 }
 </style>

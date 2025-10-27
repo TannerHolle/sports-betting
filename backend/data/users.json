@@ -3,9 +3,9 @@
     "id": "e5086941-836b-4799-bf63-856dc3807ce9",
     "username": "tannerholle",
     "password": "tannerholle",
-    "balance": 1095,
-    "totalWagered": 100,
-    "totalWon": 95,
+    "balance": 992,
+    "totalWagered": 245,
+    "totalWon": 117,
     "totalLost": 0,
     "bets": [
       {
@@ -28,9 +28,83 @@
           "status": "won",
           "resolvedAt": "2025-10-27T01:04:19.511Z"
         }
+      },
+      {
+        "id": "4be91c1b-2f9e-4eab-9ec2-97452ac1d9b2",
+        "gameId": "401809968",
+        "betType": "moneyline",
+        "selection": "Kings",
+        "amount": 10,
+        "odds": -230,
+        "potentialWin": 4,
+        "status": "won",
+        "placedAt": "2025-10-27T02:51:50.877Z",
+        "gameData": {
+          "homeTeam": "Kings",
+          "awayTeam": "Lakers",
+          "gameName": "Los Angeles Lakers at Sacramento Kings"
+        },
+        "resolvedAt": "2025-10-27T02:52:22.057Z",
+        "actualResult": {
+          "status": "won",
+          "resolvedAt": "2025-10-27T02:52:22.049Z"
+        }
+      },
+      {
+        "id": "43a3a662-0979-4538-8641-a1d679b47842",
+        "gameId": "401809968",
+        "betType": "moneyline",
+        "selection": "Lakers",
+        "amount": 10,
+        "odds": 175,
+        "potentialWin": 18,
+        "status": "won",
+        "placedAt": "2025-10-27T02:52:10.936Z",
+        "gameData": {
+          "homeTeam": "Kings",
+          "awayTeam": "Lakers",
+          "gameName": "Los Angeles Lakers at Sacramento Kings"
+        },
+        "resolvedAt": "2025-10-27T02:52:23.496Z",
+        "actualResult": {
+          "status": "won",
+          "resolvedAt": "2025-10-27T02:52:23.489Z"
+        }
+      },
+      {
+        "id": "49cbbeca-219c-445b-b91d-425124a66113",
+        "gameId": "401809967",
+        "betType": "moneyline",
+        "selection": "Trail Blazers",
+        "amount": 100,
+        "odds": 135,
+        "potentialWin": 135,
+        "status": "pending",
+        "placedAt": "2025-10-27T02:53:11.262Z",
+        "gameData": {
+          "homeTeam": "Clippers",
+          "awayTeam": "Trail Blazers",
+          "gameName": "Portland Trail Blazers at LA Clippers"
+        }
+      },
+      {
+        "id": "456822fe-fb68-4b01-8429-9ca9d46a2df1",
+        "gameId": "401809968",
+        "betType": "total",
+        "selection": "Under",
+        "amount": 25,
+        "odds": -120,
+        "potentialWin": 21,
+        "status": "pending",
+        "placedAt": "2025-10-27T02:53:34.998Z",
+        "gameData": {
+          "homeTeam": "Kings",
+          "awayTeam": "Lakers",
+          "gameName": "Los Angeles Lakers at Sacramento Kings"
+        }
       }
     ],
     "createdAt": "2025-10-27T00:50:44.822Z",
-    "lastUpdated": "2025-10-27T01:04:19.519Z"
+    "lastUpdated": "2025-10-27T02:53:34.998Z"
   }
 }

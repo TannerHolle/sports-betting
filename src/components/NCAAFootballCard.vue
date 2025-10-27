@@ -30,6 +30,10 @@
         </span>
         <span class="score-medium" :class="{ 'winning-score': isWinning(competitor) }">{{ competitor.score || '0' }}</span>
       </div>
+      <!-- Show if betting options are available -->
+      <div v-if="betting && gameScheduled" class="odds-indicator">
+        ✓ Odds Available - Click to expand
+      </div>
     </div>
 
     <!-- Expanded view -->
@@ -85,8 +89,8 @@
         </div>
       </div>
 
-      <!-- Betting Information -->
-      <div class="betting-info" v-if="betting && !isCollapsed">
+      <!-- Betting Information - Only show for scheduled games -->
+      <div class="betting-info" v-if="betting && !isCollapsed && gameScheduled">
         <h4 class="betting-title">Betting Lines</h4>
         <div class="betting-lines">
           <div class="betting-line" v-if="betting.pointSpread">
@@ -131,8 +135,9 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import BettingInterface from './BettingInterface.vue'
+import oddsService from '../services/oddsService.js'
 
 export default {
   name: 'NCAAFootballCard',
@@ -147,13 +152,53 @@ export default {
   },
   setup(props) {
     const isCollapsed = ref(true)
+    const gameOdds = ref(null)
     const competition = computed(() => props.game.competitions?.[0])
     const competitors = computed(() => competition.value?.competitors || [])
     const venue = computed(() => competition.value?.venue?.fullName || 'TBD')
     const broadcast = computed(() => competition.value?.broadcast || competition.value?.broadcasts?.[0]?.names?.[0])
     const situation = computed(() => competition.value?.situation)
     const status = computed(() => competition.value?.status)
-    const betting = computed(() => competition.value?.odds?.[0])
+    
+    // Get team names for odds matching
+    const homeTeamName = computed(() => {
+      const homeTeam = competitors.value.find(c => c.homeAway === 'home')
+      return homeTeam ? homeTeam.team.shortDisplayName : ''
+    })
+    
+    const awayTeamName = computed(() => {
+      const awayTeam = competitors.value.find(c => c.homeAway === 'away')
+      return awayTeam ? awayTeam.team.shortDisplayName : ''
+    })
+    
+    // Fetch odds data for this game
+    const fetchGameOdds = async () => {
+      try {
+        const allOdds = await oddsService.getAllOdds()
+        const gameOddsData = oddsService.findGameOdds(allOdds, 'ncaa-football', homeTeamName.value, awayTeamName.value)
+        
+        if (gameOddsData) {
+          gameOdds.value = gameOddsData
+        }
+      } catch (error) {
+        console.error('Error fetching game odds:', error)
+      }
+    }
+    
+    // Convert odds data to betting format
+    const betting = computed(() => {
+      if (!gameOdds.value) return null
+      
+      return oddsService.convertOddsToBettingFormat(
+        gameOdds.value,
+        homeTeamName.value,
+        awayTeamName.value
+      )
+    })
+    
+    onMounted(() => {
+      fetchGameOdds()
+    })
     
     const gameInProgress = computed(() => status.value?.type?.state === 'in')
     const gameCompleted = computed(() => status.value?.type?.completed)
@@ -277,6 +322,8 @@ export default {
       situation,
       betting,
       gameInProgress,
+      gameCompleted,
+      gameScheduled,
       statusClass,
       statusText,
       getRecord,
@@ -311,5 +358,13 @@ export default {
 }
 .score {
   color: var(--team-primary-color, #1a1a1a);
+}
+
+.odds-indicator {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #059669;
+  font-weight: 500;
 }
 </style>

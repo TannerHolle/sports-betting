@@ -65,7 +65,7 @@
     <div class="games-section">
       <h2>Games Available for Betting</h2>
       <p class="section-description">
-        Only games with betting lines are shown below. Click on any game to expand and place your bets. All betting lines are real-time from ESPN.
+        Only scheduled games with betting lines that are happening today (in your local timezone) are shown below. Click on any game to expand and place your bets.
       </p>
       
       <div v-if="error" class="error-message">
@@ -168,16 +168,27 @@ export default {
       return currentSport.value?.component || 'NCAAFootballCard'
     })
 
-    // Filter games that have betting information
+    // Filter games that have betting information and are available for betting
     const gamesWithBetting = computed(() => {
       return games.value.filter(game => {
         const competition = game.competitions?.[0]
-        // For NBA, show all games (we generate mock betting data)
+        const status = competition?.status
+        
+        // Only show games that are scheduled (not started yet)
+        const isScheduled = status?.type?.state === 'pre'
+        
+        // Check if game is today in local timezone
+        const gameDate = new Date(game.date)
+        const today = new Date()
+        const isToday = gameDate.toDateString() === today.toDateString()
+        
+        // For NBA, show only scheduled games that are today
         if (activeLeague.value === 'nba') {
-          return true
+          return isScheduled && isToday
         }
-        // For other sports, only show games with real odds data
-        return competition?.odds && competition.odds.length > 0
+        
+        // For other sports, only show scheduled games with real odds data that are today
+        return isScheduled && isToday && competition?.odds && competition.odds.length > 0
       })
     })
 

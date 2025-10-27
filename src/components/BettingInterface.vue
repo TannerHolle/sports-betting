@@ -225,8 +225,13 @@ export default {
     const potentialWin = computed(() => {
       if (!selectedBet.value || !betAmount.value) return 0
       
-      const odds = selectedBet.value.odds
+      let odds = selectedBet.value.odds
       const amount = betAmount.value
+      
+      // Convert number odds to string format if needed
+      if (typeof odds === 'number') {
+        odds = odds > 0 ? `+${odds}` : `${odds}`
+      }
       
       // Handle "EVEN" odds (which means +100)
       if (odds === 'EVEN' || odds === 'even') {
@@ -346,6 +351,7 @@ export default {
   font-weight: 700;
 }
 
+
 .bet-type {
   margin-bottom: 2rem;
 }
@@ -359,7 +365,7 @@ export default {
 
 .bet-options-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
 }
 
