@@ -6,18 +6,44 @@
         Fantasy Betting
       </h1>
       <p class="page-description">
-        Practice your betting skills with $1,000 in virtual money. No real money involved!
+        Ever wanted to see how good you would be at sports betting without the risk of losing money or fear of God's wrath? Well I have so i built out a fake sportsbook. Enjoy with me
       </p>
     </div>
 
-    <!-- User Authentication -->
-    <UserAuth />
+    <!-- Quick Stats Dashboard -->
+    <div class="stats-dashboard" v-if="userStats">
+      <div class="stat-card">
+        <div class="stat-value">${{ userBalance.toLocaleString() }}</div>
+        <div class="stat-label">Current Balance</div>
+      </div>
+      <div class="stat-card" v-if="userStats.activeBets > 0">
+        <div class="stat-value">{{ userStats.activeBets }}</div>
+        <div class="stat-label">Active Bets</div>
+      </div>
+      <div class="stat-card" v-if="userStats.winRate > 0">
+        <div class="stat-value" :class="{ 'positive': userStats.winRate > 50, 'negative': userStats.winRate < 50 }">
+          {{ userStats.winRate }}%
+        </div>
+        <div class="stat-label">Win Rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ userStats.totalBets }}</div>
+        <div class="stat-label">Total Bets</div>
+      </div>
+      <div class="stat-card" v-if="userStats.currentStreak !== 0">
+        <div class="stat-value" :class="{ 'positive': userStats.currentStreak > 0, 'negative': userStats.currentStreak < 0 }">
+          {{ userStats.currentStreak > 0 ? '+' : '' }}{{ userStats.currentStreak }}
+        </div>
+        <div class="stat-label">Current Streak</div>
+      </div>
+    </div>
 
     <!-- Bet History -->
     <BetHistory />
 
     <!-- Bet Resolver -->
     <BetResolver />
+
 
     <!-- League Selection -->
     <div class="league-selection">
@@ -73,7 +99,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
-import UserAuth from './UserAuth.vue'
+import { useUserStore } from '../stores/userStore.js'
 import BetHistory from './BetHistory.vue'
 import BetResolver from './BetResolver.vue'
 import NCAAFootballCard from './NCAAFootballCard.vue'
@@ -83,7 +109,6 @@ import CollegeBasketballCard from './CollegeBasketballCard.vue'
 export default {
   name: 'BettingPage',
   components: {
-    UserAuth,
     BetHistory,
     BetResolver,
     NCAAFootballCard,
@@ -91,10 +116,15 @@ export default {
     CollegeBasketballCard
   },
   setup() {
+    const userStore = useUserStore()
     const games = ref([])
     const loading = ref(false)
     const error = ref(null)
     const activeLeague = ref('ncaa-football') // Default to NCAA Football
+
+    // User data from store
+    const userBalance = computed(() => userStore.userBalance.value)
+    const userStats = computed(() => userStore.userStats.value)
 
     // Sports configuration
     const sports = ref([
@@ -177,6 +207,8 @@ export default {
       currentSport,
       currentGameCardComponent,
       gamesWithBetting,
+      userBalance,
+      userStats,
       fetchData,
       setActiveLeague
     }
@@ -216,6 +248,55 @@ export default {
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
+}
+
+.stats-dashboard {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem auto;
+  max-width: 800px;
+  padding: 0 2rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  min-width: 150px;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value.positive {
+  color: #059669;
+}
+
+.stat-value.negative {
+  color: #dc2626;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .league-selection {
@@ -294,6 +375,15 @@ export default {
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 2rem;
   margin-bottom: 3rem;
+}
+
+.stats-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem auto;
+  max-width: 1000px;
+  padding: 0 2rem;
 }
 
 .error-message {
@@ -396,6 +486,22 @@ export default {
   .page-description {
     font-size: 1rem;
     padding: 0 1rem;
+  }
+  
+  .stats-dashboard {
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+  
+  .stat-card {
+    min-width: auto;
+    padding: 1rem;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
   }
   
   .games-section {

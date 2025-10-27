@@ -270,7 +270,7 @@ export default {
       success.value = ''
     }
 
-    const placeBet = () => {
+    const placeBet = async () => {
       if (!canPlaceBet.value) return
       
       const betData = {
@@ -287,21 +287,26 @@ export default {
         }
       }
       
-      const result = userStore.placeBet(betData)
-      
-      if (result.success) {
-        success.value = `Bet placed successfully! Potential win: $${potentialWin.value.toLocaleString()}`
-        // Reset form
-        selectedBet.value = null
-        betAmount.value = 0
-        error.value = ''
+      try {
+        const result = await userStore.placeBet(betData)
         
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          success.value = ''
-        }, 3000)
-      } else {
-        error.value = result.error || 'Failed to place bet'
+        if (result.success) {
+          success.value = `Bet placed successfully! Potential win: $${potentialWin.value.toLocaleString()}`
+          // Reset form
+          selectedBet.value = null
+          betAmount.value = 0
+          error.value = ''
+          
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            success.value = ''
+          }, 3000)
+        } else {
+          error.value = result.error || 'Failed to place bet'
+        }
+      } catch (err) {
+        error.value = 'Failed to place bet'
+        console.error('Error placing bet:', err)
       }
     }
 

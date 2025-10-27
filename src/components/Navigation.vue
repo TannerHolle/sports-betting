@@ -2,36 +2,69 @@
   <nav class="navigation">
     <div class="nav-container">
       <div class="nav-brand">
-        <span class="brand-icon">🏈</span>
-        <span class="brand-text">Sports Hub</span>
+        <span class="brand-text">Tanner's Sportsbook</span>
       </div>
       
       <div class="nav-links">
-        <!-- Show Scoreboard button only when on betting page -->
-        <button 
-          v-if="currentPage === 'betting'"
-          @click="$emit('change-page', 'scoreboard')"
-          class="nav-link"
-        >
-          <span class="nav-icon">📊</span>
-          Scoreboard
-        </button>
-        
-        <!-- Show Fantasy Betting button only when on scoreboard page -->
+        <!-- Page Navigation -->
         <button 
           v-if="currentPage === 'scoreboard'"
           @click="$emit('change-page', 'betting')"
-          class="nav-link"
+          class="nav-link primary"
         >
           <span class="nav-icon">🎯</span>
           Fantasy Betting
         </button>
+        
+        <button 
+          v-if="currentPage === 'betting'"
+          @click="$emit('change-page', 'scoreboard')"
+          class="nav-link secondary"
+        >
+          <span class="nav-icon">📊</span>
+          Scoreboard
+        </button>
+
+        <button 
+          v-if="currentPage === 'auth'"
+          @click="$emit('change-page', 'scoreboard')"
+          class="nav-link secondary"
+        >
+          <span class="nav-icon">📊</span>
+          Scoreboard
+        </button>
+
+        <!-- User Authentication -->
+        <div v-if="!isAuthenticated" class="auth-section">
+          <button 
+            @click="$emit('change-page', 'auth')"
+            class="nav-link auth-btn"
+          >
+            <span class="nav-icon">👤</span>
+            Sign In
+          </button>
+        </div>
+
+        <!-- User Info -->
+        <div v-else class="user-section">
+          <div class="user-info">
+            <div class="user-details">
+              <span class="username">{{ currentUser.username }}: ${{ userBalance.toLocaleString() }}</span>
+            </div>
+          </div>
+          <button @click="handleLogout" class="logout-btn">
+            Logout
+          </button>
+        </div>
       </div>
     </div>
   </nav>
 </template>
 
 <script>
+import { computed } from 'vue'
+import { useUserStore } from '../stores/userStore.js'
+
 export default {
   name: 'Navigation',
   props: {
@@ -40,7 +73,25 @@ export default {
       required: true
     }
   },
-  emits: ['change-page']
+  emits: ['change-page'],
+  setup() {
+    const userStore = useUserStore()
+    
+    const isAuthenticated = computed(() => userStore.isAuthenticated.value)
+    const currentUser = computed(() => userStore.currentUser.value)
+    const userBalance = computed(() => userStore.userBalance.value)
+
+    const handleLogout = () => {
+      userStore.logout()
+    }
+
+    return {
+      isAuthenticated,
+      currentUser,
+      userBalance,
+      handleLogout
+    }
+  }
 }
 </script>
 
@@ -100,6 +151,8 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1rem;
+  height: 48px;
+  box-sizing: border-box;
 }
 
 .nav-link:hover {
@@ -118,6 +171,100 @@ export default {
 .nav-link.active:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.nav-link.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  font-weight: 700;
+}
+
+.nav-link.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.nav-link.secondary {
+  background: #f8fafc;
+  color: #6b7280;
+  border: 2px solid #e2e8f0;
+}
+
+.nav-link.secondary:hover {
+  background: #e2e8f0;
+  color: #374151;
+  transform: translateY(-1px);
+}
+
+.nav-link.auth-btn {
+  background: #059669;
+  color: white;
+  border: 2px solid #059669;
+}
+
+.nav-link.auth-btn:hover {
+  background: #047857;
+  border-color: #047857;
+  transform: translateY(-1px);
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-info {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  border: 2px solid #e2e8f0;
+  height: 48px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.username {
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 0.9rem;
+}
+
+.balance {
+  font-weight: 700;
+  color: #059669;
+  font-size: 1rem;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 0.9rem;
+  height: 48px;
+  box-sizing: border-box;
+}
+
+.logout-btn:hover {
+  background: #b91c1c;
 }
 
 .nav-icon {

@@ -3,13 +3,13 @@
     <!-- Navigation -->
     <Navigation :current-page="currentPage" @change-page="setCurrentPage" />
     
-    <!-- Scoreboard Page -->
+    <!-- Scoreboard Page (Public - No Auth Required) -->
     <div v-if="currentPage === 'scoreboard'">
       <header class="header">
       <div class="container">
         <h1 class="title">
-          <span class="title-icon">🏈</span>
-          Scoreboard
+          <span class="title-icon">📊</span>
+          Live Scoreboard
         </h1>
         <div class="header-info">
           <span class="season-info">{{ seasonInfo }}</span>
@@ -106,19 +106,27 @@
     </main>
     </div>
     
-    <!-- Betting Page -->
-    <BettingPage v-if="currentPage === 'betting'" />
+    <!-- Betting Page (Protected - Auth Required) -->
+    <div v-if="currentPage === 'betting'">
+      <AuthPage v-if="!isAuthenticated" @change-page="setCurrentPage" />
+      <BettingPage v-else />
+    </div>
+    
+    <!-- Auth Page -->
+    <AuthPage v-if="currentPage === 'auth'" @change-page="setCurrentPage" />
   </div>
 </template>
 
 <script>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import axios from 'axios'
+import { useUserStore } from './stores/userStore.js'
 import NCAAFootballCard from './components/NCAAFootballCard.vue'
 import NFLGameCard from './components/NFLGameCard.vue'
 import CollegeBasketballCard from './components/CollegeBasketballCard.vue'
 import Navigation from './components/Navigation.vue'
 import BettingPage from './components/BettingPage.vue'
+import AuthPage from './components/AuthPage.vue'
 
 export default {
   name: 'App',
@@ -127,10 +135,14 @@ export default {
     NFLGameCard,
     CollegeBasketballCard,
     Navigation,
-    BettingPage
+    BettingPage,
+    AuthPage
   },
   setup() {
-    const currentPage = ref(localStorage.getItem('currentPage') || 'scoreboard')
+    const userStore = useUserStore()
+    // Initialize user session on app start
+    userStore.initializeStore()
+    const currentPage = ref(localStorage.getItem('currentPage') || 'scoreboard') // Default to scoreboard (public)
     const games = ref([])
     const loading = ref(false)
     const manualLoading = ref(false)
@@ -140,6 +152,9 @@ export default {
     const selectedFilter = ref(localStorage.getItem('selectedFilter') || 'top25')
     const selectedDate = ref('')
     const activeLeague = ref(localStorage.getItem('activeLeague') || 'ncaa-football')
+
+    // Authentication status
+    const isAuthenticated = computed(() => userStore.isAuthenticated.value)
 
     // Sports configuration
     const sports = ref([
@@ -291,8 +306,6 @@ export default {
             week: null
           }
         }
-
-        console.log('🎮 Response Data:', response.data)
         
         games.value = response.data.events || []
         
@@ -502,10 +515,10 @@ export default {
         clearInterval(refreshInterval.value)
       }
       
-      // Set up auto-refresh every 15 seconds
+      // Set up auto-refresh every 30 seconds
       refreshInterval.value = setInterval(() => {
         fetchData()
-      }, 15000) // 15 seconds
+      }, 30000) // 30 seconds
     }
 
     const stopAutoRefresh = () => {
@@ -528,13 +541,20 @@ export default {
       localStorage.setItem('currentPage', page)
     }
 
+    // Handle page change events from child components
+    const handlePageChangeEvent = (event) => {
+      setCurrentPage(event.detail)
+    }
+
     onMounted(() => {
       fetchData()
       startAutoRefresh()
+      window.addEventListener('change-page', handlePageChangeEvent)
     })
 
     onUnmounted(() => {
       stopAutoRefresh()
+      window.removeEventListener('change-page', handlePageChangeEvent)
     })
 
     return {
@@ -553,6 +573,7 @@ export default {
       currentSport,
       currentSportFilters,
       currentGameCardComponent,
+      isAuthenticated,
       fetchData,
       refreshData,
       setActiveLeague,
@@ -564,3 +585,6 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+</style>

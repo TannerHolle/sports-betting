@@ -1,71 +1,88 @@
 import { ref, computed } from 'vue'
+import axios from 'axios'
 
 // User store for managing authentication and wallet
 const currentUser = ref(null)
 const isAuthenticated = ref(false)
 
+// Check for existing session on initialization
+const initializeSession = () => {
+  const savedUser = sessionStorage.getItem('currentUser')
+  if (savedUser) {
+    try {
+      currentUser.value = JSON.parse(savedUser)
+      isAuthenticated.value = true
+      console.log('User session restored from sessionStorage')
+    } catch (error) {
+      console.error('Error restoring user session:', error)
+      sessionStorage.removeItem('currentUser')
+    }
+  }
+}
+
+// API base URL
+const API_BASE_URL = 'http://localhost:3001/api'
+
 // Default starting balance
 const STARTING_BALANCE = 1000
 
-// Load user from localStorage on initialization
-const loadUserFromStorage = () => {
-  const storedUser = localStorage.getItem('sportsBettingUser')
-  if (storedUser) {
-    try {
-      const user = JSON.parse(storedUser)
-      currentUser.value = user
+// Load user from backend API
+const loadUserFromAPI = async (username) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/user/${username}`)
+    if (response.data) {
+      currentUser.value = response.data
       isAuthenticated.value = true
-    } catch (error) {
-      console.error('Error loading user from storage:', error)
-      localStorage.removeItem('sportsBettingUser')
+      console.log('User data loaded successfully from API')
+      return response.data
+    }
+  } catch (error) {
+    if (error.response?.status === 404) {
+      console.log('User not found on server')
+    } else {
+      console.error('Error loading user from API:', error)
     }
   }
+  return null
 }
 
-// Save user to localStorage
-const saveUserToStorage = (user) => {
-  try {
-    localStorage.setItem('sportsBettingUser', JSON.stringify(user))
-  } catch (error) {
-    console.error('Error saving user to storage:', error)
-  }
-}
 
 // Create new user account
-const createAccount = (username, email) => {
-  const newUser = {
-    id: Date.now().toString(),
-    username,
-    email,
-    balance: STARTING_BALANCE,
-    totalWagered: 0,
-    totalWon: 0,
-    totalLost: 0,
-    bets: [],
-    createdAt: new Date().toISOString()
+const createAccount = async (username, password) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/user`, {
+      username,
+      password
+    })
+    
+    if (response.data) {
+      currentUser.value = response.data
+      isAuthenticated.value = true
+      // Save to sessionStorage for persistence
+      sessionStorage.setItem('currentUser', JSON.stringify(response.data))
+      console.log('User account created successfully')
+      return response.data
+    }
+  } catch (error) {
+    console.error('Error creating account:', error)
+    if (error.response?.status === 409) {
+      throw new Error('Username already exists')
+    }
+    throw new Error('Failed to create account')
   }
-  
-  currentUser.value = newUser
-  isAuthenticated.value = true
-  saveUserToStorage(newUser)
-  
-  return newUser
 }
 
 // Login user
-const login = (username) => {
-  const storedUser = localStorage.getItem('sportsBettingUser')
-  if (storedUser) {
-    try {
-      const user = JSON.parse(storedUser)
-      if (user.username === username) {
-        currentUser.value = user
-        isAuthenticated.value = true
-        return user
-      }
-    } catch (error) {
-      console.error('Error during login:', error)
+const login = async (username, password) => {
+  try {
+    const user = await loadUserFromAPI(username)
+    if (user && user.password === password) {
+      // Save to sessionStorage for persistence
+      sessionStorage.setItem('currentUser', JSON.stringify(user))
+      return user
     }
+  } catch (error) {
+    console.error('Error during login:', error)
   }
   return null
 }
@@ -74,74 +91,64 @@ const login = (username) => {
 const logout = () => {
   currentUser.value = null
   isAuthenticated.value = false
-  localStorage.removeItem('sportsBettingUser')
+  // Clear sessionStorage
+  sessionStorage.removeItem('currentUser')
 }
 
-// Update user balance
-const updateBalance = (amount) => {
+// Update user balance (now handled by backend)
+const updateBalance = async (amount) => {
   if (currentUser.value) {
-    currentUser.value.balance += amount
-    saveUserToStorage(currentUser.value)
+    try {
+      const response = await axios.put(`${API_BASE_URL}/user/${currentUser.value.username}`, {
+        balance: currentUser.value.balance + amount
+      })
+      if (response.data) {
+        currentUser.value = response.data
+      }
+    } catch (error) {
+      console.error('Error updating balance:', error)
+    }
   }
 }
 
 // Place a bet
-const placeBet = (betData) => {
-  if (!currentUser.value) return false
+const placeBet = async (betData) => {
+  if (!currentUser.value) return { success: false, error: 'User not authenticated' }
   
-  const { gameId, betType, selection, amount, odds, potentialWin } = betData
-  
-  // Check if user has enough balance
-  if (currentUser.value.balance < amount) {
-    return { success: false, error: 'Insufficient balance' }
+  try {
+    const response = await axios.post(`${API_BASE_URL}/user/${currentUser.value.username}/bet`, betData)
+    
+    if (response.data.success) {
+      currentUser.value = response.data.user
+      return { success: true, bet: response.data.bet }
+    }
+  } catch (error) {
+    console.error('Error placing bet:', error)
+    if (error.response?.data?.error) {
+      return { success: false, error: error.response.data.error }
+    }
+    return { success: false, error: 'Failed to place bet' }
   }
-  
-  const bet = {
-    id: Date.now().toString(),
-    gameId,
-    betType, // 'spread', 'moneyline', 'total'
-    selection, // team name or 'over'/'under'
-    amount,
-    odds,
-    potentialWin,
-    status: 'pending', // 'pending', 'won', 'lost'
-    placedAt: new Date().toISOString(),
-    gameData: betData.gameData
-  }
-  
-  // Deduct bet amount from balance
-  currentUser.value.balance -= amount
-  currentUser.value.totalWagered += amount
-  currentUser.value.bets.push(bet)
-  
-  saveUserToStorage(currentUser.value)
-  
-  return { success: true, bet }
 }
 
 // Resolve a bet (called when game ends)
-const resolveBet = (betId, result) => {
+const resolveBet = async (betId, result) => {
   if (!currentUser.value) return false
   
-  const bet = currentUser.value.bets.find(b => b.id === betId)
-  if (!bet) return false
-  
-  bet.status = result.status
-  bet.resolvedAt = new Date().toISOString()
-  bet.actualResult = result
-  
-  if (result.status === 'won') {
-    // When winning: add back the original wager + the winnings
-    const totalWinnings = bet.amount + bet.potentialWin
-    currentUser.value.balance += totalWinnings
-    currentUser.value.totalWon += bet.potentialWin // Only track the profit, not the returned wager
-  } else {
-    // When losing: the wager was already deducted when placing the bet
-    currentUser.value.totalLost += bet.amount
+  try {
+    const response = await axios.put(`${API_BASE_URL}/user/${currentUser.value.username}/bet/${betId}`, {
+      status: result.status,
+      actualResult: result
+    })
+    
+    if (response.data.success) {
+      currentUser.value = response.data.user
+      return true
+    }
+  } catch (error) {
+    console.error('Error resolving bet:', error)
   }
-  
-  saveUserToStorage(currentUser.value)
-  return true
+  return false
 }
 
 // Computed properties
@@ -155,18 +162,55 @@ const userStats = computed(() => {
   const winRate = completedBets.length > 0 ? ((wonBets / completedBets.length) * 100).toFixed(1) : 0
   const activeBets = bets.filter(bet => bet.status === 'pending').length
   
+  // Calculate current streak
+  const currentStreak = (() => {
+    if (completedBets.length === 0) return 0
+    
+    // Sort by resolved date (most recent first)
+    const sortedBets = [...completedBets].sort((a, b) => 
+      new Date(b.resolvedAt || b.placedAt) - new Date(a.resolvedAt || a.placedAt)
+    )
+    
+    let streak = 0
+    let isWinning = null
+    
+    for (const bet of sortedBets) {
+      if (isWinning === null) {
+        // First bet determines initial streak direction
+        isWinning = bet.status === 'won'
+        streak = isWinning ? 1 : -1
+      } else if ((bet.status === 'won') === isWinning) {
+        // Continue streak
+        streak += isWinning ? 1 : -1
+      } else {
+        // Streak broken
+        break
+      }
+    }
+    
+    return streak
+  })()
+  
   return {
     totalWagered,
     totalWon,
     totalLost,
     winRate,
     activeBets,
-    totalBets: bets.length
+    totalBets: bets.length,
+    currentStreak
   }
 })
 
 // Initialize store
-loadUserFromStorage()
+const initializeStore = () => {
+  // Check for existing session
+  initializeSession()
+  console.log('User store initialized - ready for authentication')
+}
+
+// Initialize store
+initializeStore()
 
 export const useUserStore = () => {
   return {
@@ -183,6 +227,7 @@ export const useUserStore = () => {
     updateBalance,
     placeBet,
     resolveBet,
-    loadUserFromStorage
+    loadUserFromAPI,
+    initializeStore
   }
 }
