@@ -3,10 +3,10 @@
     "id": "e5086941-836b-4799-bf63-856dc3807ce9",
     "username": "tannerholle",
     "password": "$2b$12$Ymh7yr3QTWQzogNd5iNao./q0QW4EVzZzsZrE/A4WUz8orGxHtjXi",
-    "balance": 1155,
-    "totalWagered": 469,
-    "totalWon": 270,
-    "totalLost": 30,
+    "balance": 1095,
+    "totalWagered": 569,
+    "totalWon": 290,
+    "totalLost": 170,
     "bets": [
       {
         "id": "8d809740-dddd-4dd2-9d50-2f251ef15b42",
@@ -233,12 +233,23 @@
         "odds": "-105",
         "line": -10.5,
         "potentialWin": 10,
-        "status": "pending",
+        "status": "won",
         "placedAt": "2025-10-27T03:50:36.509Z",
         "gameData": {
           "homeTeam": "Chiefs",
           "awayTeam": "Commanders",
           "gameName": "Washington Commanders at Kansas City Chiefs"
+        },
+        "sport": "nfl",
+        "resolvedAt": "2025-10-28T04:14:15.617Z",
+        "actualResult": {
+          "homeTeam": "Chiefs",
+          "awayTeam": "Commanders",
+          "homeScore": 28,
+          "awayScore": 7,
+          "totalPoints": 35,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T04:14:15.616Z"
         }
       },
       {
@@ -249,12 +260,23 @@
         "amount": 10,
         "odds": "+475",
         "potentialWin": 48,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-27T03:50:47.640Z",
         "gameData": {
           "homeTeam": "Chiefs",
           "awayTeam": "Commanders",
           "gameName": "Washington Commanders at Kansas City Chiefs"
+        },
+        "sport": "nfl",
+        "resolvedAt": "2025-10-28T04:14:15.625Z",
+        "actualResult": {
+          "homeTeam": "Chiefs",
+          "awayTeam": "Commanders",
+          "homeScore": 28,
+          "awayScore": 7,
+          "totalPoints": 35,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T04:14:15.619Z"
         }
       },
       {
@@ -266,12 +288,23 @@
         "odds": "-105",
         "line": "o48.5",
         "potentialWin": 10,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-27T03:50:52.995Z",
         "gameData": {
           "homeTeam": "Chiefs",
           "awayTeam": "Commanders",
           "gameName": "Washington Commanders at Kansas City Chiefs"
+        },
+        "sport": "nfl",
+        "resolvedAt": "2025-10-28T04:14:15.629Z",
+        "actualResult": {
+          "homeTeam": "Chiefs",
+          "awayTeam": "Commanders",
+          "homeScore": 28,
+          "awayScore": 7,
+          "totalPoints": 35,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T04:14:15.628Z"
         }
       },
       {
@@ -309,12 +342,22 @@
         "odds": 100,
         "line": -1.5,
         "potentialWin": 10,
-        "status": "pending",
+        "status": "won",
         "placedAt": "2025-10-27T03:51:19.898Z",
         "gameData": {
           "homeTeam": "Bulls",
           "awayTeam": "Hawks",
           "gameName": "Atlanta Hawks at Chicago Bulls"
+        },
+        "resolvedAt": "2025-10-28T03:22:46.829Z",
+        "actualResult": {
+          "homeTeam": "Bulls",
+          "awayTeam": "Hawks",
+          "homeScore": 128,
+          "awayScore": 123,
+          "totalPoints": 251,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T03:22:46.828Z"
         }
       },
       {
@@ -325,12 +368,22 @@
         "amount": 10,
         "odds": 160,
         "potentialWin": 16,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-27T03:51:31.761Z",
         "gameData": {
           "homeTeam": "Timberwolves",
           "awayTeam": "Nuggets",
           "gameName": "Denver Nuggets at Minnesota Timberwolves"
+        },
+        "resolvedAt": "2025-10-28T04:10:10.389Z",
+        "actualResult": {
+          "homeTeam": "Timberwolves",
+          "awayTeam": "Nuggets",
+          "homeScore": 114,
+          "awayScore": 127,
+          "totalPoints": 241,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T04:10:10.387Z"
         }
       },
       {
@@ -342,12 +395,22 @@
         "odds": -110,
         "line": 233.5,
         "potentialWin": 9,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-27T03:51:57.170Z",
         "gameData": {
           "homeTeam": "Jazz",
           "awayTeam": "Suns",
           "gameName": "Phoenix Suns at Utah Jazz"
+        },
+        "resolvedAt": "2025-10-28T04:10:10.463Z",
+        "actualResult": {
+          "homeTeam": "Jazz",
+          "awayTeam": "Suns",
+          "homeScore": 138,
+          "awayScore": 134,
+          "totalPoints": 272,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T04:10:10.462Z"
         }
       },
       {
@@ -358,17 +421,44 @@
         "amount": 100,
         "odds": 102,
         "potentialWin": 102,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-28T00:22:48.704Z",
         "gameData": {
           "homeTeam": "Jazz",
           "awayTeam": "Suns",
           "gameName": "Phoenix Suns at Utah Jazz"
+        },
+        "resolvedAt": "2025-10-28T04:10:10.465Z",
+        "actualResult": {
+          "homeTeam": "Jazz",
+          "awayTeam": "Suns",
+          "homeScore": 138,
+          "awayScore": 134,
+          "totalPoints": 272,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T04:10:10.464Z"
+        }
+      },
+      {
+        "id": "b0f30e0c-0ec3-4cfa-b292-370de08df429",
+        "gameId": "401809979",
+        "betType": "total",
+        "selection": "Under",
+        "amount": 100,
+        "odds": -110,
+        "line": 236.5,
+        "potentialWin": 91,
+        "status": "pending",
+        "placedAt": "2025-10-28T04:22:56.429Z",
+        "gameData": {
+          "homeTeam": "Heat",
+          "awayTeam": "Hornets",
+          "gameName": "Charlotte Hornets at Miami Heat"
         }
       }
     ],
     "createdAt": "2025-10-27T00:50:44.822Z",
-    "lastUpdated": "2025-10-28T01:44:52.506Z"
+    "lastUpdated": "2025-10-28T04:22:56.429Z"
   },
   "tanner": {
     "id": "5a2e4e38-8944-42d8-9386-0940ae719b96",
@@ -377,7 +467,7 @@
     "balance": 81,
     "totalWagered": 1350,
     "totalWon": 181,
-    "totalLost": 950,
+    "totalLost": 1100,
     "bets": [
       {
         "id": "dbeb4dcf-f74f-4b27-845f-4c21f9b96806",
@@ -513,12 +603,23 @@
         "amount": 100,
         "odds": "+500",
         "potentialWin": 500,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-27T23:50:14.740Z",
         "gameData": {
           "homeTeam": "Chiefs",
           "awayTeam": "Commanders",
           "gameName": "Washington Commanders at Kansas City Chiefs"
+        },
+        "sport": "nfl",
+        "resolvedAt": "2025-10-28T04:14:15.630Z",
+        "actualResult": {
+          "homeTeam": "Chiefs",
+          "awayTeam": "Commanders",
+          "homeScore": 28,
+          "awayScore": 7,
+          "totalPoints": 35,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T04:14:15.630Z"
         }
       },
       {
@@ -530,17 +631,28 @@
         "odds": "-105",
         "line": "o48.5",
         "potentialWin": 48,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-27T23:50:21.641Z",
         "gameData": {
           "homeTeam": "Chiefs",
           "awayTeam": "Commanders",
           "gameName": "Washington Commanders at Kansas City Chiefs"
+        },
+        "sport": "nfl",
+        "resolvedAt": "2025-10-28T04:14:15.632Z",
+        "actualResult": {
+          "homeTeam": "Chiefs",
+          "awayTeam": "Commanders",
+          "homeScore": 28,
+          "awayScore": 7,
+          "totalPoints": 35,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T04:14:15.631Z"
         }
       }
     ],
     "createdAt": "2025-10-27T03:54:42.060Z",
-    "lastUpdated": "2025-10-27T23:50:21.641Z"
+    "lastUpdated": "2025-10-28T04:14:15.632Z"
   },
   "holle": {
     "id": "4009ea3b-0f49-4a81-a1db-1575c13efd35",
@@ -549,7 +661,7 @@
     "balance": 500,
     "totalWagered": 500,
     "totalWon": 0,
-    "totalLost": 0,
+    "totalLost": 500,
     "bets": [
       {
         "id": "d6d54769-ed0b-4ad1-aa95-fd1c4c37c5fd",
@@ -559,17 +671,28 @@
         "amount": 500,
         "odds": "+500",
         "potentialWin": 2500,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-27T23:52:20.393Z",
         "gameData": {
           "homeTeam": "Chiefs",
           "awayTeam": "Commanders",
           "gameName": "Washington Commanders at Kansas City Chiefs"
+        },
+        "sport": "nfl",
+        "resolvedAt": "2025-10-28T04:14:15.634Z",
+        "actualResult": {
+          "homeTeam": "Chiefs",
+          "awayTeam": "Commanders",
+          "homeScore": 28,
+          "awayScore": 7,
+          "totalPoints": 35,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T04:14:15.633Z"
         }
       }
     ],
     "createdAt": "2025-10-27T23:52:00.496Z",
-    "lastUpdated": "2025-10-27T23:52:20.393Z"
+    "lastUpdated": "2025-10-28T04:14:15.634Z"
   },
   "tan": {
     "id": "294f2978-9cbd-4374-8db6-2b2fa510c023",

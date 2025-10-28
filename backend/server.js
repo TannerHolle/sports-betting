@@ -239,7 +239,7 @@ app.post('/api/user/:username/bet', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    const { gameId, betType, selection, amount, odds, line, potentialWin, gameData } = betData;
+    const { gameId, betType, selection, amount, odds, line, potentialWin, sport, gameData } = betData;
     
     if (user.balance < amount) {
       return res.status(400).json({ error: 'Insufficient balance' });
@@ -254,6 +254,7 @@ app.post('/api/user/:username/bet', async (req, res) => {
       odds,
       line, // Store the line (spread or total)
       potentialWin,
+      sport, // Store the sport
       status: 'pending',
       placedAt: new Date().toISOString(),
       gameData
