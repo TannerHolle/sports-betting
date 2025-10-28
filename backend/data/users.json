@@ -3,8 +3,8 @@
     "id": "e5086941-836b-4799-bf63-856dc3807ce9",
     "username": "tannerholle",
     "password": "$2b$12$Ymh7yr3QTWQzogNd5iNao./q0QW4EVzZzsZrE/A4WUz8orGxHtjXi",
-    "balance": 1095,
-    "totalWagered": 569,
+    "balance": 930,
+    "totalWagered": 734,
     "totalWon": 290,
     "totalLost": 170,
     "bets": [
@@ -455,10 +455,43 @@
           "awayTeam": "Hornets",
           "gameName": "Charlotte Hornets at Miami Heat"
         }
+      },
+      {
+        "id": "8096bd94-a67e-45ee-8d9a-ea6628dec4c8",
+        "gameId": "401809980",
+        "betType": "total",
+        "selection": "Under",
+        "amount": 50,
+        "odds": -110,
+        "line": 231.5,
+        "potentialWin": 45,
+        "status": "pending",
+        "placedAt": "2025-10-28T04:26:58.874Z",
+        "gameData": {
+          "homeTeam": "Bucks",
+          "awayTeam": "Knicks",
+          "gameName": "New York Knicks at Milwaukee Bucks"
+        }
+      },
+      {
+        "id": "118dc0e1-cd51-4203-971a-ef9b780b03d2",
+        "gameId": "401809982",
+        "betType": "moneyline",
+        "selection": "Warriors",
+        "amount": 115,
+        "odds": -115,
+        "potentialWin": 100,
+        "status": "pending",
+        "placedAt": "2025-10-28T04:27:17.827Z",
+        "gameData": {
+          "homeTeam": "Warriors",
+          "awayTeam": "Clippers",
+          "gameName": "LA Clippers at Golden State Warriors"
+        }
       }
     ],
     "createdAt": "2025-10-27T00:50:44.822Z",
-    "lastUpdated": "2025-10-28T04:22:56.429Z"
+    "lastUpdated": "2025-10-28T04:27:17.827Z"
   },
   "tanner": {
     "id": "5a2e4e38-8944-42d8-9386-0940ae719b96",
