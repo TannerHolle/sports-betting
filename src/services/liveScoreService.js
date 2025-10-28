@@ -91,6 +91,12 @@ class LiveScoreService {
     if (status.type?.state === 'in') {
       const time = status.displayClock || '0:00'
       const period = status.period || 1
+      
+      // Check for halftime (0 seconds in 2nd quarter for basketball and football)
+      if (time === '0:00' && period === 2 && (status.type?.name?.toLowerCase().includes('basketball') || status.type?.name?.toLowerCase().includes('football'))) {
+        return 'HALFTIME'
+      }
+      
       const periodText = this.getPeriodText(period, status.type?.name)
       return `${time} - ${periodText}`
     }

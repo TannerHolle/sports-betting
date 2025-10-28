@@ -91,7 +91,8 @@
           :is="currentGameCardComponent"
           v-for="game in gamesWithBetting" 
           :key="game.id" 
-          :game="game" 
+          :game="game"
+          :sport="activeLeague"
         />
       </div>
     </div>
@@ -105,7 +106,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import axios from 'axios'
 import { useUserStore } from '../stores/userStore.js'
 import BetHistory from './BetHistory.vue'
@@ -135,6 +136,7 @@ export default {
     const loading = ref(false)
     const error = ref(null)
     const activeLeague = ref('ncaa-football') // Default to NCAA Football
+    const refreshInterval = ref(null)
 
     // User data from store
     const userBalance = computed(() => userStore.userBalance.value)
@@ -217,8 +219,10 @@ export default {
       })
     })
 
-    const fetchData = async () => {
-      loading.value = true
+    const fetchData = async (showLoading = true) => {
+      if (showLoading) {
+        loading.value = true
+      }
       error.value = null
       
       try {
@@ -235,17 +239,42 @@ export default {
         error.value = err.message || 'Failed to fetch data'
         console.error('Error fetching data:', err)
       } finally {
-        loading.value = false
+        if (showLoading) {
+          loading.value = false
+        }
       }
     }
 
     const setActiveLeague = (league) => {
       activeLeague.value = league
-      fetchData()
+      // Restart refresh with new league
+      stopLiveRefresh()
+      startLiveRefresh()
+    }
+
+    // Start periodic refresh for live games
+    const startLiveRefresh = () => {
+      // Initial fetch with loading
+      fetchData(true)
+      
+      // Set up interval to refresh every 30 seconds (without loading indicator)
+      refreshInterval.value = setInterval(() => fetchData(false), 30000)
+    }
+
+    // Stop live refresh
+    const stopLiveRefresh = () => {
+      if (refreshInterval.value) {
+        clearInterval(refreshInterval.value)
+        refreshInterval.value = null
+      }
     }
 
     onMounted(() => {
-      fetchData()
+      startLiveRefresh()
+    })
+
+    onUnmounted(() => {
+      stopLiveRefresh()
     })
 
     return {

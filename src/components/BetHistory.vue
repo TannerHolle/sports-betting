@@ -203,19 +203,78 @@ export default {
       return liveScores.value.get(bet.gameId)
     }
 
+    // Get sport from bet data (now stored with each bet)
+    const getSportFromBet = (bet) => {
+      // Use stored sport if available, fallback to team name detection for old bets
+      if (bet.sport) {
+        return bet.sport
+      }
+      
+      // Fallback for old bets without sport data
+      const homeTeam = bet.gameData?.homeTeam?.toLowerCase() || ''
+      const awayTeam = bet.gameData?.awayTeam?.toLowerCase() || ''
+      
+      // NFL teams
+      const nflTeams = ['commanders', 'chiefs', 'cowboys', 'giants', 'eagles', 'washington', 'kansas city', 'dallas', 'new york', 'philadelphia', 'patriots', 'bills', 'dolphins', 'jets', 'ravens', 'bengals', 'browns', 'steelers', 'texans', 'colts', 'jaguars', 'titans', 'broncos', 'raiders', 'chargers', 'cardinals', 'rams', '49ers', 'seahawks', 'packers', 'bears', 'lions', 'vikings', 'falcons', 'panthers', 'saints', 'buccaneers']
+      if (nflTeams.some(team => homeTeam.includes(team) || awayTeam.includes(team))) {
+        return 'nfl'
+      }
+      
+      // NBA teams
+      const nbaTeams = ['lakers', 'kings', 'clippers', 'trail blazers', 'cavaliers', 'pistons', '76ers', 'magic', 'bulls', 'hawks', 'timberwolves', 'nuggets', 'warriors', 'celtics', 'heat', 'knicks', 'nets', 'raptors', 'bucks', 'pacers', 'hornets', 'wizards', 'thunder', 'mavericks', 'rockets', 'grizzlies', 'pelicans', 'spurs', 'suns', 'jazz', 'blazers']
+      if (nbaTeams.some(team => homeTeam.includes(team) || awayTeam.includes(team))) {
+        return 'nba'
+      }
+      
+      // NCAA Basketball teams
+      const ncaaBasketballTeams = ['duke', 'kentucky', 'north carolina', 'kansas', 'villanova', 'gonzaga', 'michigan state', 'michigan', 'ohio state', 'indiana', 'purdue', 'wisconsin', 'maryland', 'illinois', 'iowa', 'minnesota', 'nebraska', 'northwestern', 'rutgers', 'penn state', 'ucla', 'usc', 'stanford', 'california', 'arizona', 'arizona state', 'oregon', 'oregon state', 'washington', 'washington state', 'colorado', 'utah', 'texas', 'texas tech', 'baylor', 'tcu', 'oklahoma', 'oklahoma state', 'kansas state', 'iowa state', 'west virginia', 'syracuse', 'louisville', 'notre dame', 'pittsburgh', 'boston college', 'clemson', 'florida state', 'miami', 'north carolina state', 'wake forest', 'georgia tech', 'virginia', 'virginia tech', 'florida', 'georgia', 'south carolina', 'tennessee', 'vanderbilt', 'auburn', 'alabama', 'mississippi state', 'ole miss', 'lsu', 'arkansas', 'missouri', 'texas a&m']
+      if (ncaaBasketballTeams.some(team => homeTeam.includes(team) || awayTeam.includes(team))) {
+        return 'ncaa-basketball'
+      }
+      
+      // NCAA Football teams
+      const ncaaFootballTeams = ['alabama', 'auburn', 'georgia', 'florida', 'tennessee', 'lsu', 'texas a&m', 'ole miss', 'mississippi state', 'arkansas', 'missouri', 'kentucky', 'vanderbilt', 'south carolina', 'ohio state', 'michigan', 'penn state', 'michigan state', 'wisconsin', 'iowa', 'minnesota', 'nebraska', 'northwestern', 'illinois', 'purdue', 'indiana', 'maryland', 'rutgers', 'oklahoma', 'texas', 'oklahoma state', 'texas tech', 'baylor', 'tcu', 'kansas state', 'iowa state', 'west virginia', 'kansas', 'clemson', 'florida state', 'miami', 'north carolina', 'north carolina state', 'duke', 'wake forest', 'georgia tech', 'virginia', 'virginia tech', 'boston college', 'pittsburgh', 'syracuse', 'louisville', 'notre dame', 'usc', 'ucla', 'stanford', 'california', 'washington', 'washington state', 'oregon', 'oregon state', 'arizona', 'arizona state', 'colorado', 'utah', 'byu', 'boise state', 'fresno state', 'san diego state', 'utah state', 'hawaii', 'nevada', 'unlv', 'new mexico', 'new mexico state', 'wyoming', 'air force', 'colorado state', 'troy', 'appalachian state', 'coastal carolina', 'georgia southern', 'georgia state', 'marshall', 'old dominion', 'james madison', 'liberty', 'florida atlantic', 'florida international', 'charlotte', 'middle tennessee', 'western kentucky', 'louisiana', 'louisiana monroe', 'south alabama', 'texas state', 'arkansas state', 'ulm', 'tulane', 'southern miss', 'rice', 'north texas', 'utep', 'utsa', 'houston', 'smu', 'tulsa', 'memphis', 'east carolina', 'temple', 'south florida', 'ucf', 'cincinnati', 'navy', 'army', 'air force']
+      if (ncaaFootballTeams.some(team => homeTeam.includes(team) || awayTeam.includes(team))) {
+        return 'ncaa-football'
+      }
+      
+      // Default to NBA if we can't determine
+      return 'nba'
+    }
+
     // Fetch live scores for all bets
     const fetchLiveScores = async () => {
       if (!allBets.value.length) return
 
       try {
-        // Get unique game IDs
-        const gameIds = [...new Set(allBets.value.map(bet => bet.gameId))]
+        // Group bets by sport
+        const betsBySport = {}
+        allBets.value.forEach(bet => {
+          const sport = getSportFromBet(bet)
+          if (!betsBySport[sport]) {
+            betsBySport[sport] = []
+          }
+          betsBySport[sport].push(bet)
+        })
+
+        // Fetch live scores for each sport
+        const allScores = new Map()
+        for (const [sport, bets] of Object.entries(betsBySport)) {
+          const gameIds = [...new Set(bets.map(bet => bet.gameId))]
+          if (gameIds.length > 0) {
+            try {
+              const scores = await liveScoreService.getLiveScores(gameIds, sport)
+              // Merge scores into the main map
+              scores.forEach((data, gameId) => {
+                allScores.set(gameId, data)
+              })
+            } catch (error) {
+              console.error(`Error fetching live scores for ${sport}:`, error)
+            }
+          }
+        }
         
-        // Determine sport (default to NBA for now, could be enhanced)
-        const sport = 'nba'
-        
-        const scores = await liveScoreService.getLiveScores(gameIds, sport)
-        liveScores.value = scores
+        liveScores.value = allScores
       } catch (error) {
         console.error('Error fetching live scores:', error)
       }

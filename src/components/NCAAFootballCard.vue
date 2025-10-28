@@ -115,7 +115,7 @@
         </div>
         
         <!-- Betting Interface -->
-        <BettingInterface :game="game" :betting="betting" />
+        <BettingInterface :game="game" :betting="betting" :sport="sport" />
       </div>
 
       <div class="game-actions">
@@ -148,6 +148,10 @@ export default {
   props: {
     game: {
       type: Object,
+      required: true
+    },
+    sport: {
+      type: String,
       required: true
     }
   },

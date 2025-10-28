@@ -138,6 +138,10 @@ export default {
     betting: {
       type: Object,
       required: true
+    },
+    sport: {
+      type: String,
+      required: true
     }
   },
   setup(props) {
@@ -327,6 +331,7 @@ export default {
         odds: selectedBet.value.odds,
         line: selectedBet.value.line, // Include the line (spread or total)
         potentialWin: potentialWin.value,
+        sport: props.sport, // Include the sport
         gameData: {
           homeTeam: homeTeam.value,
           awayTeam: awayTeam.value,
