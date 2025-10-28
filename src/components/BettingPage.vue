@@ -67,7 +67,7 @@
     <div class="games-section">
       <h2>Games Today Available for Betting</h2>
       <p class="section-description">
-        Scheduled games with betting lines that are happening today (in your local timezone) are shown below. Click on any game to expand and place your bets.
+        Scheduled games with betting lines that are happening today are shown below. Click on any game to expand and place your bets.
       </p>
       
       <div v-if="error" class="error-message">
