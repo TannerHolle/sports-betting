@@ -134,6 +134,7 @@
 import { computed, ref, onMounted } from 'vue'
 import BettingInterface from './BettingInterface.vue'
 import oddsService from '../services/oddsService.js'
+import { convertToLocalTime, formatRelativeTime } from '../utils/timezoneUtils.js'
 
 export default {
   name: 'CollegeBasketballCard',
@@ -210,7 +211,12 @@ export default {
       if (gameInProgress.value) {
         return `${status.value.displayClock} - ${status.value.period}${getOrdinalSuffix(status.value.period)}`
       }
-      return status.value?.type?.shortDetail || 'Scheduled'
+      // Convert scheduled game time to user's local timezone
+      const shortDetail = status.value?.type?.shortDetail
+      if (shortDetail && shortDetail.includes('PM') || shortDetail?.includes('AM')) {
+        return formatRelativeTime(shortDetail)
+      }
+      return shortDetail || 'Scheduled'
     })
 
     const getRecord = (records) => {

@@ -34,7 +34,7 @@
           <div class="bet-header">
             <div class="bet-game">
               <h4>{{ bet.gameData.gameName }}</h4>
-              <span class="bet-date">{{ formatDate(bet.placedAt) }}</span>
+              <span class="bet-date">Bet placed at {{ formatDate(bet.placedAt) }}</span>
             </div>
             <div class="bet-status pending">Pending</div>
           </div>

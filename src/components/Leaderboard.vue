@@ -22,7 +22,7 @@
         <div class="user-info">
           <div class="username">{{ user.username }}</div>
           <div class="user-stats">
-            <span class="stat">${{ user.balance.toLocaleString() }} cash</span>
+            <span class="stat">${{ user.totalCash.toLocaleString() }} total cash</span>
             <span class="stat">${{ user.totalWon.toLocaleString() }} won</span>
             <span class="stat">${{ user.totalLost.toLocaleString() }} lost</span>
             <span class="stat">{{ user.winRate }}% win rate</span>
@@ -86,10 +86,17 @@ export default {
             const completedBets = user.bets?.filter(bet => bet.status === 'won' || bet.status === 'lost') || []
             const wonBets = completedBets.filter(bet => bet.status === 'won').length
             const winRate = completedBets.length > 0 ? Math.round((wonBets / completedBets.length) * 100) : 0
+            
+            // Calculate outstanding bets (pending bets)
+            const outstandingBets = user.bets?.filter(bet => bet.status === 'pending') || []
+            const outstandingAmount = outstandingBets.reduce((sum, bet) => sum + (bet.amount || 0), 0)
+            const totalCash = balance + outstandingAmount  // Available cash + outstanding bets
 
             return {
               username: user.username,
               balance,
+              outstandingAmount,
+              totalCash,
               netProfit,
               totalWon,
               totalLost,

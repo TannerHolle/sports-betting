@@ -134,6 +134,7 @@
 <script>
 import { computed, ref } from 'vue'
 import BettingInterface from './BettingInterface.vue'
+import { convertToLocalTime, formatRelativeTime } from '../utils/timezoneUtils.js'
 
 export default {
   name: 'NFLGameCard',
@@ -172,7 +173,12 @@ export default {
         const quarter = `${status.value?.period || 1}${getOrdinalSuffix(status.value?.period || 1)}`
         return `${time} - ${quarter} Quarter`
       }
-      return status.value?.type?.shortDetail || 'Scheduled'
+      // Convert scheduled game time to user's local timezone
+      const shortDetail = status.value?.type?.shortDetail
+      if (shortDetail && shortDetail.includes('PM') || shortDetail?.includes('AM')) {
+        return formatRelativeTime(shortDetail)
+      }
+      return shortDetail || 'Scheduled'
     })
 
     const getRecord = (records) => {

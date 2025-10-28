@@ -49,7 +49,7 @@
         <div v-else class="user-section">
           <div class="user-info">
             <div class="user-details">
-              <span class="username">{{ currentUser.username }}: ${{ userBalance.toLocaleString() }}</span>
+              <span class="username">{{ currentUser.username }}: ${{ totalCash.toLocaleString() }}</span>
             </div>
           </div>
           <button @click="handleLogout" class="logout-btn">
@@ -80,6 +80,16 @@ export default {
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
     const userBalance = computed(() => userStore.userBalance.value)
+    
+    // Calculate total cash (available + outstanding bets)
+    const totalCash = computed(() => {
+      if (!currentUser.value?.bets) return userBalance.value
+      
+      const outstandingBets = currentUser.value.bets.filter(bet => bet.status === 'pending')
+      const outstandingAmount = outstandingBets.reduce((sum, bet) => sum + (bet.amount || 0), 0)
+      
+      return userBalance.value + outstandingAmount
+    })
 
     const handleLogout = () => {
       userStore.logout()
@@ -89,6 +99,7 @@ export default {
       isAuthenticated,
       currentUser,
       userBalance,
+      totalCash,
       handleLogout
     }
   }

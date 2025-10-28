@@ -2,7 +2,7 @@
   "tannerholle": {
     "id": "e5086941-836b-4799-bf63-856dc3807ce9",
     "username": "tannerholle",
-    "password": "tannerholle",
+    "password": "$2b$12$Ymh7yr3QTWQzogNd5iNao./q0QW4EVzZzsZrE/A4WUz8orGxHtjXi",
     "balance": 1238,
     "totalWagered": 369,
     "totalWon": 263,
@@ -347,7 +347,7 @@
   "tanner": {
     "id": "5a2e4e38-8944-42d8-9386-0940ae719b96",
     "username": "tanner",
-    "password": "tannerholle",
+    "password": "$2b$12$lhkrEDX3L4ean1mRdgeV7uPYVQR5eDhQ43/aH7oGpv95swunFyrD.",
     "balance": 81,
     "totalWagered": 1350,
     "totalWon": 181,
@@ -519,7 +519,7 @@
   "holle": {
     "id": "4009ea3b-0f49-4a81-a1db-1575c13efd35",
     "username": "holle",
-    "password": "tannerholle",
+    "password": "$2b$12$D1GB6Dj3/.UNDoWipX6qDOVhbvkJlgDNmSWkSB9bKcOkaUJ2IINiu",
     "balance": 500,
     "totalWagered": 500,
     "totalWon": 0,
@@ -548,7 +548,7 @@
   "tan": {
     "id": "294f2978-9cbd-4374-8db6-2b2fa510c023",
     "username": "tan",
-    "password": "Pariveda2025!",
+    "password": "$2b$12$NAvfAgL9a8EB6fY/4oUbc.7xxLk60lhA5qrC.MpkMHL0m6zf9dHxa",
     "balance": 1000,
     "totalWagered": 0,
     "totalWon": 0,

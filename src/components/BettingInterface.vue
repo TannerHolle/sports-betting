@@ -126,6 +126,7 @@
 <script>
 import { ref, computed } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
+import { convertToLocalTime, formatRelativeTime } from '../utils/timezoneUtils.js'
 
 export default {
   name: 'BettingInterface',
@@ -184,7 +185,12 @@ export default {
       if (status?.type?.state === 'in') {
         return `${status.displayClock} - ${status.period}${getOrdinalSuffix(status.period)}`
       }
-      return status?.type?.shortDetail || 'Scheduled'
+      // Convert scheduled game time to user's local timezone
+      const shortDetail = status?.type?.shortDetail
+      if (shortDetail && shortDetail.includes('PM') || shortDetail?.includes('AM')) {
+        return formatRelativeTime(shortDetail)
+      }
+      return shortDetail || 'Scheduled'
     })
 
     const getOrdinalSuffix = (num) => {
