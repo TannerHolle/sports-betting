@@ -42,7 +42,7 @@
           <div class="bet-details">
             <div class="bet-type-info">
               <span class="bet-type">{{ formatBetType(bet.betType) }}</span>
-              <span class="bet-selection">{{ bet.selection }}</span>
+              <span class="bet-selection">{{ formatBetSelection(bet) }}</span>
             </div>
             <div class="bet-amounts">
               <div class="bet-amount">
@@ -101,7 +101,7 @@
           <div class="bet-details">
             <div class="bet-type-info">
               <span class="bet-type">{{ formatBetType(bet.betType) }}</span>
-              <span class="bet-selection">{{ bet.selection }}</span>
+              <span class="bet-selection">{{ formatBetSelection(bet) }}</span>
             </div>
             <div class="bet-amounts">
               <div class="bet-amount">
@@ -190,6 +190,35 @@ export default {
         case 'total': return 'Total Points'
         default: return betType
       }
+    }
+
+    const formatBetSelection = (bet) => {
+      // For over/under bets, include the line amount
+      if (bet.betType === 'total' && bet.line) {
+        // Handle both string and number line values
+        let lineNumber
+        if (typeof bet.line === 'string') {
+          // Extract the number from the line (e.g., "o48.5" -> "48.5")
+          lineNumber = bet.line.replace(/[ou]/i, '')
+        } else if (typeof bet.line === 'number') {
+          // Use the number directly
+          lineNumber = bet.line.toString()
+        } else {
+          // Fallback to just the selection
+          return bet.selection
+        }
+        return `${bet.selection} (${lineNumber})`
+      }
+      
+      // For spread bets, include the line amount
+      if (bet.betType === 'spread' && bet.line) {
+        const lineNumber = Math.abs(parseFloat(bet.line))
+        const sign = parseFloat(bet.line) > 0 ? '+' : ''
+        return `${bet.selection} (${sign}${lineNumber})`
+      }
+      
+      // For moneyline and other bets, just return the selection
+      return bet.selection
     }
 
     // Check if a game is live
@@ -325,6 +354,7 @@ export default {
       completedBets,
       formatDate,
       formatBetType,
+      formatBetSelection,
       isGameLive,
       getLiveData
     }

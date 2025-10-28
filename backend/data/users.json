@@ -3,9 +3,9 @@
     "id": "e5086941-836b-4799-bf63-856dc3807ce9",
     "username": "tannerholle",
     "password": "$2b$12$Ymh7yr3QTWQzogNd5iNao./q0QW4EVzZzsZrE/A4WUz8orGxHtjXi",
-    "balance": 1138,
+    "balance": 1155,
     "totalWagered": 469,
-    "totalWon": 263,
+    "totalWon": 270,
     "totalLost": 30,
     "bets": [
       {
@@ -282,12 +282,22 @@
         "amount": 10,
         "odds": -142,
         "potentialWin": 7,
-        "status": "pending",
+        "status": "won",
         "placedAt": "2025-10-27T03:51:06.203Z",
         "gameData": {
           "homeTeam": "Pistons",
           "awayTeam": "Cavaliers",
           "gameName": "Cleveland Cavaliers at Detroit Pistons"
+        },
+        "resolvedAt": "2025-10-28T01:44:52.506Z",
+        "actualResult": {
+          "homeTeam": "Pistons",
+          "awayTeam": "Cavaliers",
+          "homeScore": 95,
+          "awayScore": 116,
+          "totalPoints": 211,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-28T01:44:52.505Z"
         }
       },
       {
@@ -358,7 +368,7 @@
       }
     ],
     "createdAt": "2025-10-27T00:50:44.822Z",
-    "lastUpdated": "2025-10-28T00:22:48.704Z"
+    "lastUpdated": "2025-10-28T01:44:52.506Z"
   },
   "tanner": {
     "id": "5a2e4e38-8944-42d8-9386-0940ae719b96",
