@@ -2,11 +2,10 @@
   <div class="betting-page">
     <div class="page-header">
       <h1 class="page-title">
-        <span class="title-icon">🎯</span>
-        Fantasy Betting
+        Betting Summary
       </h1>
       <p class="page-description">
-        Experience the thrill of sports betting without the risk of becoming a degenerate gambler or eternal damnation.
+        Aren't you glad this isnt real money?
       </p>
     </div>
 
@@ -46,7 +45,7 @@
     <BetHistory />
 
     <!-- Bet Resolver -->
-    <BetResolver />
+    <BetResolver v-if="isAdmin" />
 
     <!-- Admin Panel -->
     <AdminPanel v-if="isAdmin" />
