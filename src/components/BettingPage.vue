@@ -44,12 +44,6 @@
     <!-- Bet History -->
     <BetHistory />
 
-    <!-- Bet Resolver -->
-    <BetResolver v-if="isAdmin" />
-
-    <!-- Admin Panel -->
-    <AdminPanel v-if="isAdmin" />
-
     <!-- Leaderboard -->
     <Leaderboard />
 
@@ -101,6 +95,12 @@
         />
       </div>
     </div>
+
+    <!-- Bet Resolver -->
+    <BetResolver v-if="isAdmin" />
+
+    <!-- Admin Panel -->
+    <AdminPanel v-if="isAdmin" />
   </div>
 </template>
 

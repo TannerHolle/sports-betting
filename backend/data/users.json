@@ -3,8 +3,8 @@
     "id": "e5086941-836b-4799-bf63-856dc3807ce9",
     "username": "tannerholle",
     "password": "$2b$12$Ymh7yr3QTWQzogNd5iNao./q0QW4EVzZzsZrE/A4WUz8orGxHtjXi",
-    "balance": 1238,
-    "totalWagered": 369,
+    "balance": 1138,
+    "totalWagered": 469,
     "totalWon": 263,
     "totalLost": 30,
     "bets": [
@@ -339,10 +339,26 @@
           "awayTeam": "Suns",
           "gameName": "Phoenix Suns at Utah Jazz"
         }
+      },
+      {
+        "id": "0a1de2b3-5553-4bae-808c-382fe1ebb52a",
+        "gameId": "401809975",
+        "betType": "moneyline",
+        "selection": "Suns",
+        "amount": 100,
+        "odds": 102,
+        "potentialWin": 102,
+        "status": "pending",
+        "placedAt": "2025-10-28T00:22:48.704Z",
+        "gameData": {
+          "homeTeam": "Jazz",
+          "awayTeam": "Suns",
+          "gameName": "Phoenix Suns at Utah Jazz"
+        }
       }
     ],
     "createdAt": "2025-10-27T00:50:44.822Z",
-    "lastUpdated": "2025-10-27T03:51:57.170Z"
+    "lastUpdated": "2025-10-28T00:22:48.704Z"
   },
   "tanner": {
     "id": "5a2e4e38-8944-42d8-9386-0940ae719b96",

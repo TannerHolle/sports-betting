@@ -1,36 +1,39 @@
 <template>
-  <div class="bet-resolver" v-if="isAuthenticated && activeBets.length > 0">
+  <div class="bet-resolver" v-if="isAuthenticated && allOutstandingBets.length > 0">
     <div class="resolver-header">
-      <h3>Resolve Bets</h3>
+      <h3>Admin: Resolve All Outstanding Bets</h3>
       <p class="resolver-description">
-        Manually resolve your active bets based on game results. This is for demonstration purposes.
+        Manually resolve outstanding bets from all users. Use this to test bet resolution or handle edge cases.
       </p>
     </div>
 
     <div class="bets-to-resolve">
       <div 
-        v-for="bet in activeBets" 
-        :key="bet.id"
+        v-for="betWithUser in allOutstandingBets" 
+        :key="`${betWithUser.user.username}-${betWithUser.bet.id}`"
         class="bet-to-resolve"
       >
         <div class="bet-info">
-          <h4>{{ bet.gameData.gameName }}</h4>
+          <div class="bet-header">
+            <h4>{{ betWithUser.bet.gameData?.gameName || 'Game Data Unavailable' }}</h4>
+            <span class="bet-owner">Owner: {{ betWithUser.user.username }}</span>
+          </div>
           <div class="bet-details">
-            <span class="bet-type">{{ formatBetType(bet.betType) }}</span>
-            <span class="bet-selection">{{ bet.selection }}</span>
-            <span class="bet-amount">${{ bet.amount.toLocaleString() }}</span>
+            <span class="bet-type">{{ formatBetType(betWithUser.bet.betType) }}</span>
+            <span class="bet-selection">{{ betWithUser.bet.selection }}</span>
+            <span class="bet-amount">${{ betWithUser.bet.amount.toLocaleString() }}</span>
           </div>
         </div>
         
         <div class="resolution-controls">
           <button 
-            @click="resolveBet(bet.id, 'won')"
+            @click="resolveBet(betWithUser.bet.id, betWithUser.user.username, 'won')"
             class="resolve-btn won"
           >
             Won
           </button>
           <button 
-            @click="resolveBet(bet.id, 'lost')"
+            @click="resolveBet(betWithUser.bet.id, betWithUser.user.username, 'lost')"
             class="resolve-btn lost"
           >
             Lost
@@ -46,21 +49,47 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
+import axios from 'axios'
 
 export default {
   name: 'BetResolver',
   setup() {
     const userStore = useUserStore()
     const resolutionMessage = ref('')
+    const allUsers = ref({})
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
 
-    const activeBets = computed(() => {
-      if (!currentUser.value?.bets) return []
-      return currentUser.value.bets.filter(bet => bet.status === 'pending')
+    // Fetch all users' data
+    const fetchAllUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/users')
+        allUsers.value = response.data
+      } catch (error) {
+        console.error('Error fetching all users:', error)
+      }
+    }
+
+    // Get all outstanding bets from all users
+    const allOutstandingBets = computed(() => {
+      const betsWithUsers = []
+      
+      Object.values(allUsers.value).forEach(user => {
+        if (user.bets) {
+          const outstandingBets = user.bets.filter(bet => bet.status === 'pending')
+          outstandingBets.forEach(bet => {
+            betsWithUsers.push({
+              bet: bet,
+              user: user
+            })
+          })
+        }
+      })
+      
+      return betsWithUsers
     })
 
     const formatBetType = (betType) => {
@@ -72,46 +101,61 @@ export default {
       }
     }
 
-    const resolveBet = (betId, result) => {
-      const resultData = {
-        status: result,
-        resolvedAt: new Date().toISOString()
-      }
-      
-      const success = userStore.resolveBet(betId, resultData)
-      
-      if (success) {
-        const bet = currentUser.value.bets.find(b => b.id === betId)
-        if (bet) {
-          if (result === 'won') {
-            const totalWinnings = bet.amount + bet.potentialWin
-            resolutionMessage.value = {
-              type: 'success',
-              text: `🎉 Bet won! You earned $${bet.potentialWin.toLocaleString()} profit (total return: $${totalWinnings.toLocaleString()})!`
-            }
-          } else {
-            resolutionMessage.value = {
-              type: 'error',
-              text: `😞 Bet lost. You lost $${bet.amount.toLocaleString()}.`
-            }
-          }
+    const resolveBet = async (betId, username, result) => {
+      try {
+        const resultData = {
+          status: result,
+          resolvedAt: new Date().toISOString()
         }
         
-        // Clear message after 3 seconds
-        setTimeout(() => {
-          resolutionMessage.value = ''
-        }, 3000)
-      } else {
+        // Call the backend to resolve the bet for the specific user
+        const response = await axios.put(`http://localhost:3001/api/user/${username}/bet/${betId}`, resultData)
+        
+        if (response.data) {
+          // Find the bet to show details
+          const user = allUsers.value[username]
+          const bet = user?.bets?.find(b => b.id === betId)
+          
+          if (bet) {
+            if (result === 'won') {
+              const totalWinnings = bet.amount + bet.potentialWin
+              resolutionMessage.value = {
+                type: 'success',
+                text: `🎉 ${username}'s bet won! Earned $${bet.potentialWin.toLocaleString()} profit (total return: $${totalWinnings.toLocaleString()})!`
+              }
+            } else {
+              resolutionMessage.value = {
+                type: 'error',
+                text: `😞 ${username}'s bet lost. Lost $${bet.amount.toLocaleString()}.`
+              }
+            }
+          }
+          
+          // Refresh the users data to get updated bet statuses
+          await fetchAllUsers()
+        }
+      } catch (error) {
+        console.error('Error resolving bet:', error)
         resolutionMessage.value = {
           type: 'error',
           text: 'Failed to resolve bet. Please try again.'
         }
       }
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        resolutionMessage.value = ''
+      }, 3000)
     }
+
+    // Fetch users when component mounts
+    onMounted(() => {
+      fetchAllUsers()
+    })
 
     return {
       isAuthenticated,
-      activeBets,
+      allOutstandingBets,
       resolutionMessage,
       formatBetType,
       resolveBet
@@ -165,11 +209,27 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.bet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
 .bet-info h4 {
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   color: #1a1a1a;
   font-size: 1.1rem;
   font-weight: 600;
+}
+
+.bet-owner {
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .bet-details {
