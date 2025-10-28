@@ -404,6 +404,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Sports Betting Backend running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
   
-  // Start automatic bet resolution (checks every 5 minutes)
-  betResolver.startAutoResolution(5);
+  // Start automatic bet resolution (checks every 1 minutes)
+  betResolver.startAutoResolution(1);
 });

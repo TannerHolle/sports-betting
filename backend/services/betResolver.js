@@ -235,8 +235,11 @@ class BetResolver {
 
     // Process each game
     for (const [gameId, bets] of Object.entries(betsByGame)) {
-      // Get game data (assuming NBA for now - you could enhance this)
-      const gameData = await this.getLiveGameData(gameId, 'nba');
+      // Determine sport from the first bet (all bets for same game should have same sport)
+      const sport = bets[0]?.sport || 'nba'; // Default to NBA for old bets
+      
+      // Get game data for the correct sport
+      const gameData = await this.getLiveGameData(gameId, sport);
       
       if (!gameData) {
         continue;
