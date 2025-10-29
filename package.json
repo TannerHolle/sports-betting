@@ -2,7 +2,7 @@
   "name": "college-football-scoreboard",
   "version": "1.0.0",
   "description": "Vue.js app for displaying college football scores from ESPN API",
-  "main": "index.js",
+  "main": "backend/server.js",
   "scripts": {
     "dev": "vite --mode development",
     "build": "vite build --mode production",

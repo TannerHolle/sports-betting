@@ -20,6 +20,10 @@ const USE_MONGODB = process.env.MONGODB_URI && process.env.NODE_ENV === 'product
 let User, Bet, connectDB;
 if (USE_MONGODB) {
   try {
+    const mongoose = require('mongoose');
+    // Suppress mongoose deprecation warning
+    mongoose.set('strictQuery', false);
+    
     connectDB = require('./config/database');
     User = require('./models/User');
     Bet = require('./models/Bet');
