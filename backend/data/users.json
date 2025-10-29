@@ -3,8 +3,8 @@
     "id": "e5086941-836b-4799-bf63-856dc3807ce9",
     "username": "tannerholle",
     "password": "$2b$12$Ymh7yr3QTWQzogNd5iNao./q0QW4EVzZzsZrE/A4WUz8orGxHtjXi",
-    "balance": 930,
-    "totalWagered": 734,
+    "balance": 816,
+    "totalWagered": 848,
     "totalWon": 290,
     "totalLost": 170,
     "bets": [
@@ -488,10 +488,27 @@
           "awayTeam": "Clippers",
           "gameName": "LA Clippers at Golden State Warriors"
         }
+      },
+      {
+        "id": "53c7e982-6cba-4272-afe1-9a721c02bb4d",
+        "gameId": "401809981",
+        "betType": "total",
+        "selection": "Over",
+        "amount": 114,
+        "odds": -114,
+        "line": 226.5,
+        "potentialWin": 100,
+        "status": "pending",
+        "placedAt": "2025-10-28T23:39:36.717Z",
+        "gameData": {
+          "homeTeam": "Thunder",
+          "awayTeam": "Kings",
+          "gameName": "Sacramento Kings at Oklahoma City Thunder"
+        }
       }
     ],
     "createdAt": "2025-10-27T00:50:44.822Z",
-    "lastUpdated": "2025-10-28T04:27:17.827Z"
+    "lastUpdated": "2025-10-28T23:39:36.717Z"
   },
   "tanner": {
     "id": "5a2e4e38-8944-42d8-9386-0940ae719b96",
