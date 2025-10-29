@@ -3,9 +3,9 @@
     "id": "e5086941-836b-4799-bf63-856dc3807ce9",
     "username": "tannerholle",
     "password": "$2b$12$Ymh7yr3QTWQzogNd5iNao./q0QW4EVzZzsZrE/A4WUz8orGxHtjXi",
-    "balance": 881,
+    "balance": 976,
     "totalWagered": 998,
-    "totalWon": 390,
+    "totalWon": 435,
     "totalLost": 434,
     "bets": [
       {
@@ -556,13 +556,14 @@
         "line": 233.5,
         "potentialWin": 45,
         "sport": "nba",
-        "status": "pending",
+        "status": "won",
         "placedAt": "2025-10-29T22:33:05.037Z",
         "gameData": {
           "homeTeam": "Celtics",
           "awayTeam": "Cavaliers",
           "gameName": "Cleveland Cavaliers at Boston Celtics"
-        }
+        },
+        "resolvedAt": "2025-10-29T22:49:25.234Z"
       },
       {
         "id": "420b1f42-dc6b-499d-857d-de99acc38b06",
@@ -583,7 +584,7 @@
       }
     ],
     "createdAt": "2025-10-27T00:50:44.822Z",
-    "lastUpdated": "2025-10-29T22:33:25.053Z"
+    "lastUpdated": "2025-10-29T22:49:25.234Z"
   },
   "tanner": {
     "id": "5a2e4e38-8944-42d8-9386-0940ae719b96",
