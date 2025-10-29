@@ -32,7 +32,7 @@ const initializeSession = async () => {
 }
 
 // API base URL
-const API_BASE_URL = 'http://localhost:3001/api'
+const API_BASE_URL = 'https://sports-betting-np5a.onrender.com/api'
 
 // Default starting balance
 const STARTING_BALANCE = 1000
