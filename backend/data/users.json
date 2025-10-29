@@ -3,10 +3,10 @@
     "id": "e5086941-836b-4799-bf63-856dc3807ce9",
     "username": "tannerholle",
     "password": "$2b$12$Ymh7yr3QTWQzogNd5iNao./q0QW4EVzZzsZrE/A4WUz8orGxHtjXi",
-    "balance": 816,
-    "totalWagered": 848,
-    "totalWon": 290,
-    "totalLost": 170,
+    "balance": 881,
+    "totalWagered": 998,
+    "totalWon": 390,
+    "totalLost": 434,
     "bets": [
       {
         "id": "8d809740-dddd-4dd2-9d50-2f251ef15b42",
@@ -448,12 +448,22 @@
         "odds": -110,
         "line": 236.5,
         "potentialWin": 91,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-28T04:22:56.429Z",
         "gameData": {
           "homeTeam": "Heat",
           "awayTeam": "Hornets",
           "gameName": "Charlotte Hornets at Miami Heat"
+        },
+        "resolvedAt": "2025-10-29T01:57:44.370Z",
+        "actualResult": {
+          "homeTeam": "Heat",
+          "awayTeam": "Hornets",
+          "homeScore": 144,
+          "awayScore": 117,
+          "totalPoints": 261,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-29T01:57:44.369Z"
         }
       },
       {
@@ -465,12 +475,22 @@
         "odds": -110,
         "line": 231.5,
         "potentialWin": 45,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-28T04:26:58.874Z",
         "gameData": {
           "homeTeam": "Bucks",
           "awayTeam": "Knicks",
           "gameName": "New York Knicks at Milwaukee Bucks"
+        },
+        "resolvedAt": "2025-10-29T02:34:44.526Z",
+        "actualResult": {
+          "homeTeam": "Bucks",
+          "awayTeam": "Knicks",
+          "homeScore": 121,
+          "awayScore": 111,
+          "totalPoints": 232,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-29T02:34:44.523Z"
         }
       },
       {
@@ -481,12 +501,22 @@
         "amount": 115,
         "odds": -115,
         "potentialWin": 100,
-        "status": "pending",
+        "status": "won",
         "placedAt": "2025-10-28T04:27:17.827Z",
         "gameData": {
           "homeTeam": "Warriors",
           "awayTeam": "Clippers",
           "gameName": "LA Clippers at Golden State Warriors"
+        },
+        "resolvedAt": "2025-10-29T05:25:45.077Z",
+        "actualResult": {
+          "homeTeam": "Warriors",
+          "awayTeam": "Clippers",
+          "homeScore": 98,
+          "awayScore": 79,
+          "totalPoints": 177,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-29T05:25:45.076Z"
         }
       },
       {
@@ -498,17 +528,62 @@
         "odds": -114,
         "line": 226.5,
         "potentialWin": 100,
-        "status": "pending",
+        "status": "lost",
         "placedAt": "2025-10-28T23:39:36.717Z",
         "gameData": {
           "homeTeam": "Thunder",
           "awayTeam": "Kings",
           "gameName": "Sacramento Kings at Oklahoma City Thunder"
+        },
+        "resolvedAt": "2025-10-29T02:18:44.485Z",
+        "actualResult": {
+          "homeTeam": "Thunder",
+          "awayTeam": "Kings",
+          "homeScore": 107,
+          "awayScore": 101,
+          "totalPoints": 208,
+          "gameStatus": "Final",
+          "resolvedAt": "2025-10-29T02:18:44.484Z"
+        }
+      },
+      {
+        "id": "a0206bc9-3542-42bb-960d-a3dc5ce997a6",
+        "gameId": "401809983",
+        "betType": "total",
+        "selection": "Over",
+        "amount": 50,
+        "odds": -110,
+        "line": 233.5,
+        "potentialWin": 45,
+        "sport": "nba",
+        "status": "pending",
+        "placedAt": "2025-10-29T22:33:05.037Z",
+        "gameData": {
+          "homeTeam": "Celtics",
+          "awayTeam": "Cavaliers",
+          "gameName": "Cleveland Cavaliers at Boston Celtics"
+        }
+      },
+      {
+        "id": "420b1f42-dc6b-499d-857d-de99acc38b06",
+        "gameId": "401809990",
+        "betType": "moneyline",
+        "selection": "Jazz",
+        "amount": 100,
+        "odds": 130,
+        "potentialWin": 130,
+        "sport": "nba",
+        "status": "pending",
+        "placedAt": "2025-10-29T22:33:25.053Z",
+        "gameData": {
+          "homeTeam": "Jazz",
+          "awayTeam": "Trail Blazers",
+          "gameName": "Portland Trail Blazers at Utah Jazz"
         }
       }
     ],
     "createdAt": "2025-10-27T00:50:44.822Z",
-    "lastUpdated": "2025-10-28T23:39:36.717Z"
+    "lastUpdated": "2025-10-29T22:33:25.053Z"
   },
   "tanner": {
     "id": "5a2e4e38-8944-42d8-9386-0940ae719b96",
