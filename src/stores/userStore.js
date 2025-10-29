@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE_URL } from '../config/api.js'
 
 // User store for managing authentication and wallet
 const currentUser = ref(null)
@@ -30,9 +31,6 @@ const initializeSession = async () => {
     }
   }
 }
-
-// API base URL
-const API_BASE_URL = 'https://sports-betting-np5a.onrender.com/api'
 
 // Default starting balance
 const STARTING_BALANCE = 1000
