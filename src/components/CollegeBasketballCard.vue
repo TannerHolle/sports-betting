@@ -55,7 +55,7 @@
             <div class="team-details">
               <div class="team-name">{{ competitor.team.shortDisplayName }}</div>
               <div class="team-record">{{ getRecord(competitor.records) }}</div>
-              <div class="team-rank" v-if="competitor.curatedRank">
+              <div class="team-rank" v-if="competitor.curatedRank && competitor.curatedRank.current <= 25">
                 #{{ competitor.curatedRank.current }}
               </div>
             </div>
