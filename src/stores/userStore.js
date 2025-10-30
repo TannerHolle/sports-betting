@@ -42,6 +42,8 @@ const loadUserFromAPI = async (username) => {
     if (response.data) {
       currentUser.value = response.data
       isAuthenticated.value = true
+      // Persist latest user state
+      sessionStorage.setItem('currentUser', JSON.stringify(response.data))
       return response.data
     }
   } catch (error) {
@@ -135,7 +137,8 @@ const placeBet = async (betData) => {
     const response = await axios.post(`${API_BASE_URL}/user/${currentUser.value.username}/bet`, betData)
     
     if (response.data.success) {
-      currentUser.value = response.data.user
+      // Re-fetch full user to ensure bets/history are up to date
+      await loadUserFromAPI(currentUser.value.username)
       return { success: true, bet: response.data.bet }
     }
   } catch (error) {
@@ -158,7 +161,8 @@ const resolveBet = async (betId, result) => {
     })
     
     if (response.data.success) {
-      currentUser.value = response.data.user
+      // Refresh full user after resolve to keep stats and history accurate
+      await loadUserFromAPI(currentUser.value.username)
       return true
     }
   } catch (error) {
