@@ -195,9 +195,10 @@ export default {
       return currentSport.value?.component || 'NCAAFootballCard'
     })
 
-    // Filter games that have betting information and are available for betting
+    // Filter games that have betting information and are available for betting,
+    // then sort NCAA games by best Top 25 rank (ascending)
     const gamesWithBetting = computed(() => {
-      return games.value.filter(game => {
+      const filtered = games.value.filter(game => {
         const competition = game.competitions?.[0]
         const status = competition?.status
         
@@ -217,6 +218,21 @@ export default {
         // For other sports, show only scheduled games with real odds data that are today
         return isScheduled && isToday && competition?.odds && competition.odds.length > 0
       })
+
+      // Sort by rank for NCAA Football/Basketball
+      if (activeLeague.value === 'ncaa-football' || activeLeague.value === 'ncaa-basketball') {
+        const getBestTop25Rank = (game) => {
+          const competitors = game.competitions?.[0]?.competitors || []
+          const ranks = competitors
+            .map(c => c.curatedRank?.current)
+            .filter(r => typeof r === 'number' && r >= 1 && r <= 25)
+          return ranks.length ? Math.min(...ranks) : Number.POSITIVE_INFINITY
+        }
+
+        return [...filtered].sort((a, b) => getBestTop25Rank(a) - getBestTop25Rank(b))
+      }
+
+      return filtered
     })
 
     const fetchData = async (showLoading = true) => {

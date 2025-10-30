@@ -259,7 +259,7 @@ export default {
     const filteredGames = computed(() => {
       if (!games.value.length) return []
       
-      return games.value.filter(game => {
+      const filtered = games.value.filter(game => {
         const competition = game.competitions?.[0]
         if (!competition) return false
         
@@ -278,6 +278,21 @@ export default {
             return true
         }
       })
+
+      // Sort NCAA games by best Top 25 rank (ascending); others unchanged
+      if (activeLeague.value === 'ncaa-football' || activeLeague.value === 'ncaa-basketball') {
+        const getBestTop25Rank = (game) => {
+          const competitors = game.competitions?.[0]?.competitors || []
+          const ranks = competitors
+            .map(c => c.curatedRank?.current)
+            .filter(r => typeof r === 'number' && r >= 1 && r <= 25)
+          return ranks.length ? Math.min(...ranks) : Number.POSITIVE_INFINITY
+        }
+
+        return [...filtered].sort((a, b) => getBestTop25Rank(a) - getBestTop25Rank(b))
+      }
+
+      return filtered
     })
 
     const fetchData = async (isManual = false) => {
