@@ -10,7 +10,7 @@
     <div class="bets-to-resolve">
       <div 
         v-for="betWithUser in allOutstandingBets" 
-        :key="`${betWithUser.user.username}-${betWithUser.bet.id}`"
+        :key="`${betWithUser.user.username}-${betWithUser.bet._id}`"
         class="bet-to-resolve"
       >
         <div class="bet-info">
@@ -27,7 +27,7 @@
         
         <div class="resolution-controls">
           <button 
-            @click="resolveBet(betWithUser.bet.id, betWithUser.user.username, 'won')"
+            @click="resolveBet(betWithUser.bet._id, betWithUser.user.username, 'won')"
             class="resolve-btn won"
           >
             Won
@@ -107,6 +107,10 @@ export default {
           status: result,
           resolvedAt: new Date().toISOString()
         }
+
+        console.log(resultData)
+        console.log(username)
+        console.log(betId)
         
         // Call the backend to resolve the bet for the specific user
         const response = await axios.put(`http://localhost:3001/api/user/${username}/bet/${betId}`, resultData)

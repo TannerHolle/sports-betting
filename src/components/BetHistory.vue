@@ -28,7 +28,7 @@
       <div v-else class="bets-list">
         <div 
           v-for="bet in activeBets" 
-          :key="bet.id"
+          :key="bet._id"
           class="bet-card active"
         >
           <div class="bet-header">
@@ -84,7 +84,7 @@
       <div v-else class="bets-list">
         <div 
           v-for="bet in completedBets" 
-          :key="bet.id"
+          :key="bet._id"
           class="bet-card"
           :class="bet.status"
         >
