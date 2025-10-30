@@ -30,6 +30,10 @@
         </span>
         <span class="score-medium" :class="{ 'winning-score': isWinning(competitor) }">{{ competitor.score || '0' }}</span>
       </div>
+      <!-- Show if betting options are available -->
+      <div v-if="betting && gameScheduled" class="odds-indicator">
+        ✓ Odds Available - Click to expand
+      </div>
     </div>
 
     <!-- Expanded view -->
@@ -288,6 +292,7 @@ export default {
       broadcast,
       situation,
       betting,
+      gameScheduled,
       statusClass,
       statusText,
       getRecord,
@@ -386,6 +391,14 @@ export default {
   font-size: 0.7rem;
   font-weight: 600;
   margin-left: 6px;
+}
+
+.odds-indicator {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #059669;
+  font-weight: 500;
 }
 
 </style>
