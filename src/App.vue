@@ -100,6 +100,7 @@
             v-for="game in filteredGames" 
             :key="game.id" 
             :game="game" 
+            :sport="activeLeague"
           />
         </div>
       </div>
