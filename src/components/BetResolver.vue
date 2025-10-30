@@ -33,7 +33,7 @@
             Won
           </button>
           <button 
-            @click="resolveBet(betWithUser.bet.id, betWithUser.user.username, 'lost')"
+            @click="resolveBet(betWithUser.bet._id, betWithUser.user.username, 'lost')"
             class="resolve-btn lost"
           >
             Lost
@@ -116,6 +116,10 @@ export default {
         const response = await axios.put(`http://localhost:3001/api/user/${username}/bet/${betId}`, resultData)
         
         if (response.data) {
+          // If the resolved user is the currently logged-in user, refresh their data
+          if (currentUser.value?.username === username) {
+            await userStore.loadUserFromAPI(username)
+          }
           // Find the bet to show details
           const user = allUsers.value[username]
           const bet = user?.bets?.find(b => b.id === betId)
