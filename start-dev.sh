@@ -51,7 +51,7 @@ echo ""
 echo "✅ Both servers are starting up!"
 echo ""
 echo "📊 Backend API: http://localhost:3001"
-echo "🌐 Frontend App: http://localhost:5173"
+echo "🌐 Frontend App: http://localhost:3000"
 echo ""
 echo "Press Ctrl+C to stop both servers"
 

@@ -2,26 +2,17 @@
   "name": "college-football-scoreboard",
   "version": "1.0.0",
   "description": "Vue.js app for displaying college football scores from ESPN API",
-  "main": "index.js",
+  
   "scripts": {
     "dev": "vite --mode development",
     "build": "vite build --mode production",
     "preview": "vite preview",
-    "start": "./start-dev.sh",
-    "backend": "cd backend && npm start",
-    "backend:dev": "cd backend && npm run dev",
-    "backend:local": "cd backend && npm run local"
+    "start": "./start-dev.sh"
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
-    "axios": "^1.6.0",
-    "vue": "^3.3.4",
-    "bcrypt": "^6.0.0",
-    "body-parser": "^1.20.2",
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "mongoose": "^6.12.0",
-    "uuid": "^9.0.0"
+    "axios": "^1.5.0",
+    "vue": "^3.3.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.3.4",
