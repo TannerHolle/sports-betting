@@ -20,11 +20,11 @@ fi
 echo "✅ Node.js and npm are installed"
 
 # Install backend dependencies if needed
-if [ ! -d "backend/node_modules" ]; then
+if [ ! -d "../sports-betting-backend/node_modules" ]; then
     echo "📦 Installing backend dependencies..."
-    cd backend
+    cd ../sports-betting-backend
     npm install
-    cd ..
+    cd ../sports-betting
 fi
 
 # Install frontend dependencies if needed
@@ -35,7 +35,7 @@ fi
 
 echo ""
 echo "🎯 Starting Backend Server..."
-cd backend
+cd ../sports-betting-backend
 npm start &
 BACKEND_PID=$!
 
@@ -43,7 +43,7 @@ BACKEND_PID=$!
 sleep 3
 
 echo "🎯 Starting Frontend Development Server..."
-cd ..
+cd ../sports-betting
 npm run dev &
 FRONTEND_PID=$!
 
