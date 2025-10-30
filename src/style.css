@@ -681,8 +681,45 @@ body {
     text-align: center;
   }
 
+  /* Make league tabs mobile-friendly with horizontal scroll */
+  .tab-buttons {
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 8px;
+  }
+
+  .tab-buttons::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    border-bottom-width: 2px;
+  }
+
   .title {
     font-size: 1.5rem;
+  }
+
+  /* Stack filters vertically and make inputs full-width */
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .filter-group {
+    justify-content: space-between;
+  }
+
+  .filter-select,
+  .date-input {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
   }
 
   .game-card {
@@ -719,6 +756,15 @@ body {
 
   .header {
     padding: 16px 0;
+  }
+
+  .season-info {
+    font-size: 0.95rem;
+  }
+
+  .header-buttons {
+    width: 100%;
+    justify-content: center;
   }
 
   .main {
