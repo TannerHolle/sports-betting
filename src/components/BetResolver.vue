@@ -52,6 +52,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import axios from 'axios'
+import { API_BASE_URL } from '../config/api.js'
 
 export default {
   name: 'BetResolver',
@@ -66,7 +67,7 @@ export default {
     // Fetch all users' data
     const fetchAllUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/users')
+        const response = await axios.get(`${API_BASE_URL}/users`)
         allUsers.value = response.data
       } catch (error) {
         console.error('Error fetching all users:', error)
@@ -113,7 +114,7 @@ export default {
         console.log(betId)
         
         // Call the backend to resolve the bet for the specific user
-        const response = await axios.put(`http://localhost:3001/api/user/${username}/bet/${betId}`, resultData)
+        const response = await axios.put(`${API_BASE_URL}/user/${username}/bet/${betId}`, resultData)
         
         if (response.data) {
           // If the resolved user is the currently logged-in user, refresh their data

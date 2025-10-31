@@ -53,6 +53,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import axios from 'axios'
+import { API_BASE_URL } from '../config/api.js'
 
 export default {
   name: 'Leaderboard',
@@ -72,7 +73,7 @@ export default {
     const fetchLeaderboard = async () => {
       loading.value = true
       try {
-        const response = await axios.get('http://localhost:3001/api/users')
+        const response = await axios.get(`${API_BASE_URL}/users`)
         const users = response.data
 
         // Calculate leaderboard data

@@ -49,6 +49,7 @@
 import { ref, computed } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import axios from 'axios'
+import { API_BASE_URL } from '../config/api.js'
 
 export default {
   name: 'AdminPanel',
@@ -66,7 +67,7 @@ export default {
       resolveMessage.value = ''
       
       try {
-        const response = await axios.post('http://localhost:3001/api/bets/force-resolve')
+        const response = await axios.post(`${API_BASE_URL}/bets/force-resolve`)
         
         if (response.data.success) {
           resolveMessage.value = {
@@ -100,7 +101,7 @@ export default {
       oddsMessage.value = ''
       
       try {
-        const response = await axios.post('http://localhost:3001/api/odds/force-update')
+        const response = await axios.post(`${API_BASE_URL}/odds/force-update`)
         
         if (response.data.success) {
           oddsMessage.value = {

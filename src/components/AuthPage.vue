@@ -192,10 +192,8 @@ export default {
     
     const passwordRequirements = ref([
       { text: 'At least 8 characters', met: false },
-      { text: 'One lowercase letter', met: false },
       { text: 'One uppercase letter', met: false },
-      { text: 'One number', met: false },
-      { text: 'One special character', met: false }
+      { text: 'One number', met: false }
     ])
     
     const showLoginPassword = ref(false)
@@ -205,10 +203,8 @@ export default {
     const validatePasswordStrength = (password) => {
       const requirements = [
         { text: 'At least 8 characters', met: password.length >= 8 },
-        { text: 'One lowercase letter', met: /(?=.*[a-z])/.test(password) },
         { text: 'One uppercase letter', met: /(?=.*[A-Z])/.test(password) },
-        { text: 'One number', met: /(?=.*\d)/.test(password) },
-        { text: 'One special character', met: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password) }
+        { text: 'One number', met: /(?=.*\d)/.test(password) }
       ]
       
       passwordRequirements.value = requirements
