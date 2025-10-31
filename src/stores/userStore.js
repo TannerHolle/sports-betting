@@ -60,7 +60,7 @@ const loadUserFromAPI = async (username) => {
 const createAccount = async (username, password) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/user`, {
-      username,
+      username: username.toLowerCase(),
       password
     })
     
@@ -84,7 +84,7 @@ const createAccount = async (username, password) => {
 const login = async (username, password) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/auth/login`, {
-      username,
+      username: username.toLowerCase(),
       password
     })
     

@@ -1,7 +1,7 @@
 <template>
   <div class="leaderboard" v-if="isAuthenticated">
     <div class="leaderboard-header">
-      <h3>🏆 Leaderboard</h3>
+      <h3>🏆 Worldwide Leaderboard</h3>
       <p class="leaderboard-description">
         Top performers by total winnings
       </p>
@@ -15,7 +15,7 @@
         :class="{ 'current-user': user.username === currentUser?.username }"
       >
         <div class="rank">
-          <span class="rank-number">{{ index + 1 }}</span>
+          <span class="rank-number">{{ user.displayRank }}</span>
           <span class="rank-medal" v-if="index < 3">{{ getMedal(index) }}</span>
         </div>
         
@@ -76,8 +76,8 @@ export default {
         const response = await axios.get(`${API_BASE_URL}/users`)
         const users = response.data
 
-        // Calculate leaderboard data
-        const leaderboardData = Object.values(users)
+        // Calculate leaderboard data for all users
+        const allLeaderboardData = Object.values(users)
           .map(user => {
             const totalWon = user.totalWon || 0
             const totalLost = user.totalLost || 0
@@ -108,7 +108,45 @@ export default {
           })
           .filter(user => user.completedBets > 0) // Only show users with completed bets
           .sort((a, b) => b.netProfit - a.netProfit) // Sort by net profit
-          .slice(0, 5) // Top 5
+
+        // Find current user's actual rank (1-based)
+        const currentUsername = currentUser.value?.username
+        const currentUserRank = currentUsername 
+          ? allLeaderboardData.findIndex(user => user.username === currentUsername) + 1
+          : null
+
+        // Get top 3
+        const top3 = allLeaderboardData.slice(0, 3)
+        
+        // Check if current user is in top 3
+        const currentUserInTop3 = currentUsername && top3.some(user => user.username === currentUsername)
+        
+        // Build display list: top 3 + current user if not in top 3
+        let displayList = [...top3]
+        
+        if (currentUserRank && !currentUserInTop3 && currentUserRank > 3) {
+          // Find current user in full list and add them as 4th entry
+          const currentUserData = allLeaderboardData.find(user => user.username === currentUsername)
+          if (currentUserData) {
+            displayList.push(currentUserData)
+          }
+        }
+
+        // Add displayRank to each entry
+        const leaderboardData = displayList.map((user, index) => {
+          // If this is the 4th entry and it's the current user, show their actual rank
+          if (index === 3 && user.username === currentUsername && currentUserRank) {
+            return {
+              ...user,
+              displayRank: currentUserRank
+            }
+          }
+          // Otherwise show position in display list (1, 2, 3)
+          return {
+            ...user,
+            displayRank: index + 1
+          }
+        })
 
         leaderboard.value = leaderboardData
       } catch (error) {
