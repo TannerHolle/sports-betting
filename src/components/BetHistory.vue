@@ -34,7 +34,7 @@
           <div class="bet-header">
             <div class="bet-game">
               <h4>{{ bet.gameData.gameName }}</h4>
-              <span class="bet-date">Bet placed at {{ formatDate(bet.placedAt) }}</span>
+              <span class="bet-date">Bet placed at {{ formatDate(bet.createdAt) }}</span>
             </div>
             <div class="bet-status pending">Pending</div>
           </div>
@@ -91,7 +91,7 @@
           <div class="bet-header">
             <div class="bet-game">
               <h4>{{ bet.gameData.gameName }}</h4>
-              <span class="bet-date">{{ formatDate(bet.placedAt) }}</span>
+              <span class="bet-date">{{ formatDate(bet.createdAt) }}</span>
             </div>
             <div class="bet-status" :class="bet.status">
               {{ bet.status === 'won' ? 'Won' : 'Lost' }}
@@ -164,7 +164,7 @@ export default {
       if (!currentUser.value?.bets) return []
       return currentUser.value.bets
         .filter(bet => bet.status === 'won' || bet.status === 'lost')
-        .sort((a, b) => new Date(b.resolvedAt || b.placedAt) - new Date(a.resolvedAt || a.placedAt))
+        .sort((a, b) => new Date(b.resolvedAt || b.createdAt) - new Date(a.resolvedAt || a.createdAt))
     })
 
     // Get all bets (active + completed) for live score checking
@@ -174,7 +174,17 @@ export default {
     })
 
     const formatDate = (dateString) => {
+      if (!dateString) {
+        return 'Unknown date'
+      }
+      
       const date = new Date(dateString)
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Invalid date'
+      }
+      
       return date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',

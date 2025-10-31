@@ -188,7 +188,7 @@ const userStats = computed(() => {
     
     // Sort by resolved date (most recent first)
     const sortedBets = [...completedBets].sort((a, b) => 
-      new Date(b.resolvedAt || b.placedAt) - new Date(a.resolvedAt || a.placedAt)
+      new Date(b.resolvedAt || b.createdAt) - new Date(a.resolvedAt || a.createdAt)
     )
     
     let streak = 0
