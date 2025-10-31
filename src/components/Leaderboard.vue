@@ -115,17 +115,17 @@ export default {
           ? allLeaderboardData.findIndex(user => user.username === currentUsername) + 1
           : null
 
-        // Get top 3
-        const top3 = allLeaderboardData.slice(0, 3)
+        // Get top 5
+        const top5 = allLeaderboardData.slice(0, 5)
         
-        // Check if current user is in top 3
-        const currentUserInTop3 = currentUsername && top3.some(user => user.username === currentUsername)
+        // Check if current user is in top 5
+        const currentUserInTop5 = currentUsername && top5.some(user => user.username === currentUsername)
         
-        // Build display list: top 3 + current user if not in top 3
-        let displayList = [...top3]
+        // Build display list: top 5 + current user if not in top 5
+        let displayList = [...top5]
         
-        if (currentUserRank && !currentUserInTop3 && currentUserRank > 3) {
-          // Find current user in full list and add them as 4th entry
+        if (currentUserRank && !currentUserInTop5 && currentUserRank > 5) {
+          // Find current user in full list and add them as 6th entry
           const currentUserData = allLeaderboardData.find(user => user.username === currentUsername)
           if (currentUserData) {
             displayList.push(currentUserData)
@@ -134,14 +134,14 @@ export default {
 
         // Add displayRank to each entry
         const leaderboardData = displayList.map((user, index) => {
-          // If this is the 4th entry and it's the current user, show their actual rank
-          if (index === 3 && user.username === currentUsername && currentUserRank) {
+          // If this is the 6th entry and it's the current user, show their actual rank
+          if (index === 5 && user.username === currentUsername && currentUserRank) {
             return {
               ...user,
               displayRank: currentUserRank
             }
           }
-          // Otherwise show position in display list (1, 2, 3)
+          // Otherwise show position in display list (1, 2, 3, 4, 5)
           return {
             ...user,
             displayRank: index + 1
