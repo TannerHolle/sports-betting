@@ -73,10 +73,22 @@ const createAccount = async (username, password) => {
     }
   } catch (error) {
     console.error('Error creating account:', error)
+    console.error('Error response:', error.response?.data)
+    
+    // Return the actual error message from the backend if available
+    if (error.response?.data?.error) {
+      throw new Error(error.response.data.error)
+    }
+    
     if (error.response?.status === 409) {
       throw new Error('Username already exists')
     }
-    throw new Error('Failed to create account')
+    
+    if (error.response?.status === 400) {
+      throw new Error(error.response.data?.error || 'Invalid request. Please check your username and password.')
+    }
+    
+    throw new Error(error.message || 'Failed to create account')
   }
 }
 
