@@ -285,9 +285,12 @@ export default {
 
 .revenue-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .stat-card {
@@ -459,14 +462,31 @@ export default {
   font-size: 0.875rem;
 }
 
+@media (max-width: 1024px) {
+  .revenue-stats {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    max-width: 100%;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .sportsbook-revenue {
     padding: 1.5rem;
   }
 
   .revenue-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+    max-width: 100%;
   }
 
   .stat-card {
