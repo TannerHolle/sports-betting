@@ -178,7 +178,14 @@ export default {
       if (gameCompleted.value) return 'Final'
       if (status.value?.type?.state === 'in') {
         const time = status.value?.displayClock || '0:00'
-        const quarter = `${status.value?.period || 1}${getOrdinalSuffix(status.value?.period || 1)}`
+        const period = status.value?.period || 1
+        
+        // Check for halftime (0:00 or 0.0 in 2nd quarter)
+        if ((time === '0:00' || time === '0.0') && period === 2) {
+          return 'Halftime'
+        }
+        
+        const quarter = `${period}${getOrdinalSuffix(period)}`
         return `${time} - ${quarter} Quarter`
       }
       // Convert scheduled game time to user's local timezone

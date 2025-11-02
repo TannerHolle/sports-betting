@@ -218,7 +218,15 @@ export default {
     const statusText = computed(() => {
       if (gameCompleted.value) return 'Final'
       if (gameInProgress.value) {
-        return `${status.value.displayClock} - ${status.value.period}${getOrdinalSuffix(status.value.period)}`
+        const time = status.value.displayClock || '0:00'
+        const period = status.value.period || 1
+        
+        // Check for halftime (0:00 or 0.0 in 2nd quarter)
+        if ((time === '0:00' || time === '0.0') && period === 2) {
+          return 'Halftime'
+        }
+        
+        return `${time} - ${period}${getOrdinalSuffix(period)}`
       }
       // Convert scheduled game time to user's local timezone
       const shortDetail = status.value?.type?.shortDetail
