@@ -96,6 +96,9 @@
         />
       </div>
     </div>
+    
+    <!-- Sportsbook Revenue -->
+    <SportsbookRevenue v-if="isAdmin" />
 
     <!-- Bet Resolver -->
     <BetResolver v-if="isAdmin" />
@@ -112,6 +115,7 @@ import { useUserStore } from '../stores/userStore.js'
 import BetHistory from './BetHistory.vue'
 import BetResolver from './BetResolver.vue'
 import AdminPanel from './AdminPanel.vue'
+import SportsbookRevenue from './SportsbookRevenue.vue'
 import Leaderboard from './Leaderboard.vue'
 import NCAAFootballCard from './NCAAFootballCard.vue'
 import NFLGameCard from './NFLGameCard.vue'
@@ -124,6 +128,7 @@ export default {
     BetHistory,
     BetResolver,
     AdminPanel,
+    SportsbookRevenue,
     Leaderboard,
     NCAAFootballCard,
     NFLGameCard,
@@ -152,7 +157,7 @@ export default {
 
     // Check if current user is admin (tannerholle)
     const isAdmin = computed(() => {
-      return userStore.currentUser.value?.username === 'tannerholle'
+      return userStore.currentUser.value?.username === 'tannerholle' || userStore.currentUser.value?.username === 'tanner'
     })
 
     // Sports configuration
