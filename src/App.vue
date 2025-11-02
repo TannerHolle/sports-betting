@@ -280,9 +280,10 @@ export default {
         }
       })
 
-      // Sort NCAA games by best Top 25 rank (ascending); others unchanged
+      // Only apply live game sorting for NCAA sports (college football and basketball)
       if (activeLeague.value === 'ncaa-football' || activeLeague.value === 'ncaa-basketball') {
-        const getBestTop25Rank = (game) => {
+        // Helper function to get best rank for a game (lower number = higher rank)
+        const getBestRank = (game) => {
           const competitors = game.competitions?.[0]?.competitors || []
           const ranks = competitors
             .map(c => c.curatedRank?.current)
@@ -290,9 +291,35 @@ export default {
           return ranks.length ? Math.min(...ranks) : Number.POSITIVE_INFINITY
         }
 
-        return [...filtered].sort((a, b) => getBestTop25Rank(a) - getBestTop25Rank(b))
+        // Helper function to check if game is live
+        const isLiveGame = (game) => {
+          const status = game.competitions?.[0]?.status
+          return status?.type?.state === 'in'
+        }
+
+        // Separate live and non-live games
+        const liveGames = filtered.filter(isLiveGame)
+        const nonLiveGames = filtered.filter(game => !isLiveGame(game))
+
+        // Sort live games by highest rank first (lowest rank number)
+        const sortedLiveGames = [...liveGames].sort((a, b) => {
+          const rankA = getBestRank(a)
+          const rankB = getBestRank(b)
+          return rankA - rankB
+        })
+
+        // Sort non-live games by rank
+        const sortedNonLiveGames = [...nonLiveGames].sort((a, b) => {
+          const rankA = getBestRank(a)
+          const rankB = getBestRank(b)
+          return rankA - rankB
+        })
+
+        // Return live games first, then non-live games
+        return [...sortedLiveGames, ...sortedNonLiveGames]
       }
 
+      // For NFL and NBA, return filtered games without live game prioritization
       return filtered
     })
 
