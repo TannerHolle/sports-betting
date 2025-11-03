@@ -14,7 +14,6 @@
 
     <div v-else class="revenue-stats">
       <div class="stat-card primary">
-        <div class="stat-icon">💰</div>
         <div class="stat-content">
           <div class="stat-value" :class="{ positive: houseProfit > 0, negative: houseProfit < 0 }">
             ${{ houseProfit.toLocaleString() }}
@@ -24,7 +23,6 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">📥</div>
         <div class="stat-content">
           <div class="stat-value">${{ totalCollected.toLocaleString() }}</div>
           <div class="stat-label">Total Collected</div>
@@ -32,7 +30,6 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">📤</div>
         <div class="stat-content">
           <div class="stat-value">${{ totalPaidOut.toLocaleString() }}</div>
           <div class="stat-label">Total Paid Out</div>
@@ -40,7 +37,6 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">👥</div>
         <div class="stat-content">
           <div class="stat-value">{{ totalUsers }}</div>
           <div class="stat-label">Total Users</div>
@@ -48,7 +44,6 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🎯</div>
         <div class="stat-content">
           <div class="stat-value">{{ totalBetsCount }}</div>
           <div class="stat-label">Total Bets</div>
@@ -56,7 +51,6 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">💵</div>
         <div class="stat-content">
           <div class="stat-value">${{ averageBetSize.toLocaleString() }}</div>
           <div class="stat-label">Avg Bet Size</div>
@@ -64,7 +58,6 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🎲</div>
         <div class="stat-content">
           <div class="stat-value">${{ totalWagered.toLocaleString() }}</div>
           <div class="stat-label">Total Wagered</div>
@@ -72,7 +65,6 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">⏳</div>
         <div class="stat-content">
           <div class="stat-value">${{ pendingBetsAmount.toLocaleString() }}</div>
           <div class="stat-label">Pending Bets</div>
