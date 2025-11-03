@@ -5,7 +5,7 @@
         Leagues
       </h1>
       <p class="page-description">
-        Create or join leagues to compete with friends
+        Show your friends you know ball way better than them
       </p>
     </div>
 

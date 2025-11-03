@@ -226,6 +226,12 @@ body {
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
+/* Scoreboard page */
+.scoreboard-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+}
+
 /* Main content */
 .main {
   padding: 40px 0;

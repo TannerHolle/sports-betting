@@ -364,9 +364,7 @@ export default {
       toggleSignupPasswordVisibility,
       handleLogin,
       handleSignup,
-      goToBetting,
-      pendingInviteCode,
-      joinLeagueFromInvite
+      goToBetting
     }
   }
 }

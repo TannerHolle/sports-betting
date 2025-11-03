@@ -4,31 +4,7 @@
     <Navigation :current-page="currentPage" @change-page="setCurrentPage" />
     
     <!-- Scoreboard Page (Public - No Auth Required) -->
-    <div v-if="currentPage === 'scoreboard'">
-      <header class="header">
-      <div class="container">
-        <h1 class="title">
-          <span class="title-icon">📊</span>
-          Live Scoreboard
-        </h1>
-        <div class="header-info">
-          <span class="season-info">{{ seasonInfo }}</span>
-          <div class="auto-refresh-indicator" v-if="refreshInterval">
-            <span class="auto-refresh-dot"></span>
-            Auto-refresh active
-          </div>
-          <div class="header-buttons">
-            <button @click="refreshData" class="refresh-btn" :disabled="manualLoading">
-              <span v-if="manualLoading" class="spinner"></span>
-              {{ manualLoading ? 'Loading...' : 'Refresh' }}
-            </button>
-            <button @click="toggleAutoRefresh" class="auto-refresh-btn">
-              {{ refreshInterval ? 'Stop Auto' : 'Start Auto' }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
+    <div v-if="currentPage === 'scoreboard'" class="scoreboard-page">
 
     <!-- League Tabs -->
     <div class="league-tabs">
@@ -84,7 +60,7 @@
           <button @click="fetchData" class="retry-btn">Try Again</button>
         </div>
 
-        <div v-else-if="manualLoading && !games.length" class="loading-container">
+        <div v-else-if="loading && !games.length" class="loading-container">
           <div class="spinner-large"></div>
           <p>Loading games...</p>
         </div>
@@ -162,9 +138,7 @@ export default {
     const currentPage = ref(initialPage) // Default to scoreboard (public)
     const games = ref([])
     const loading = ref(false)
-    const manualLoading = ref(false)
     const error = ref(null)
-    const seasonData = ref(null)
     const refreshInterval = ref(null)
     const selectedFilter = ref(localStorage.getItem('selectedFilter') || 'top25')
     const selectedDate = ref('')
@@ -244,20 +218,6 @@ export default {
       }
     ])
 
-    const seasonInfo = computed(() => {
-      if (!seasonData.value) return ''
-      const { season, week } = seasonData.value
-      
-      if (activeLeague.value === 'ncaa-basketball') {
-        // Basketball shows season without week
-        return `${season.year} Season`
-      } else if (week) {
-        // Football shows season with week
-        return `${season.year} Season - Week ${week.number}`
-      } else {
-        return `${season.year} Season`
-      }
-    })
 
     const currentSport = computed(() => {
       return sports.value.find(sport => sport.id === activeLeague.value)
@@ -337,10 +297,7 @@ export default {
       return filtered
     })
 
-    const fetchData = async (isManual = false) => {
-      if (isManual) {
-        manualLoading.value = true
-      }
+    const fetchData = async () => {
       loading.value = true
       error.value = null
       
@@ -359,31 +316,6 @@ export default {
         }
         
         const response = await axios.get(apiUrl)
-        
-        
-        // Handle different data structures for different sports
-        try {
-          if (activeLeague.value === 'ncaa-basketball') {
-            // Basketball doesn't have week data
-            seasonData.value = {
-              season: response.data.season || { year: new Date().getFullYear() },
-              week: null
-            }
-          } else {
-            // Football has week data
-            seasonData.value = {
-              season: response.data.season || { year: new Date().getFullYear() },
-              week: response.data.week || null
-            }
-          }
-        } catch (seasonError) {
-          console.error('Error setting season data:', seasonError)
-          seasonData.value = {
-            season: { year: new Date().getFullYear() },
-            week: null
-          }
-        }
-        
         games.value = response.data.events || []
         
       } catch (err) {
@@ -392,20 +324,7 @@ export default {
         console.error('Error details:', err.response?.data || err.message)
       } finally {
         loading.value = false
-        if (isManual) {
-          manualLoading.value = false
-        }
-        
-        // Force clear loading states after a short delay to ensure they're reset
-        setTimeout(() => {
-          loading.value = false
-          manualLoading.value = false
-        }, 100)
       }
-    }
-
-    const refreshData = () => {
-      fetchData(true)
     }
 
     // Watch for filter changes and save to localStorage
@@ -414,9 +333,9 @@ export default {
     })
 
     // Watch for date changes and fetch new data
-    watch(selectedDate, (newDate) => {
+    watch(selectedDate, () => {
       // Fetch new data when date changes
-      fetchData(true)
+      fetchData()
     })
 
     const setActiveLeague = (league) => {
@@ -430,11 +349,10 @@ export default {
         selectedFilter.value = 'all' // NFL defaults to All Games
       }
       
-      // Force reset loading states
+      // Reset loading state
       loading.value = false
-      manualLoading.value = false
       
-      fetchData(true) // Fetch data for the new league
+      fetchData() // Fetch data for the new league
     }
 
     // Filtering functions
@@ -605,14 +523,6 @@ export default {
       }
     }
 
-    const toggleAutoRefresh = () => {
-      if (refreshInterval.value) {
-        stopAutoRefresh()
-      } else {
-        startAutoRefresh()
-      }
-    }
-
     const setCurrentPage = (page) => {
       currentPage.value = page
       localStorage.setItem('currentPage', page)
@@ -638,10 +548,7 @@ export default {
       currentPage,
       games,
       loading,
-      manualLoading,
       error,
-      seasonInfo,
-      refreshInterval,
       selectedFilter,
       selectedDate,
       filteredGames,
@@ -652,11 +559,7 @@ export default {
       currentGameCardComponent,
       isAuthenticated,
       fetchData,
-      refreshData,
       setActiveLeague,
-      startAutoRefresh,
-      stopAutoRefresh,
-      toggleAutoRefresh,
       setCurrentPage
     }
   }
