@@ -332,10 +332,8 @@ export default {
       const invite = urlParams.get('invite')
       if (invite) {
         pendingInviteCode.value = invite.toUpperCase()
-        // Show hint that they'll join a league
-        if (activeTab.value === 'signup') {
-          successMessage.value = `You'll automatically join a league when you create your account!`
-        }
+        // Automatically switch to signup tab if invite code is present
+        activeTab.value = 'signup'
       }
     }
 
@@ -366,7 +364,9 @@ export default {
       toggleSignupPasswordVisibility,
       handleLogin,
       handleSignup,
-      goToBetting
+      goToBetting,
+      pendingInviteCode,
+      joinLeagueFromInvite
     }
   }
 }
