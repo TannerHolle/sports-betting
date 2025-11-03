@@ -26,12 +26,41 @@
         </button>
 
         <button 
+          v-if="currentPage === 'leagues'"
+          @click="$emit('change-page', 'scoreboard')"
+          class="nav-link secondary"
+        >
+          <span class="nav-icon">📊</span>
+          Scoreboard
+        </button>
+
+        <button 
           v-if="currentPage === 'auth'"
           @click="$emit('change-page', 'scoreboard')"
           class="nav-link secondary"
         >
           <span class="nav-icon">📊</span>
           Scoreboard
+        </button>
+
+        <!-- Leagues Link (only when authenticated and not already on leagues page) -->
+        <button 
+          v-if="isAuthenticated && currentPage !== 'leagues' && currentPage !== 'auth'"
+          @click="$emit('change-page', 'leagues')"
+          class="nav-link secondary"
+        >
+          <span class="nav-icon">🏆</span>
+          Leagues
+        </button>
+
+        <!-- Betting Link (only when authenticated and on leagues page) -->
+        <button 
+          v-if="isAuthenticated && currentPage === 'leagues'"
+          @click="$emit('change-page', 'betting')"
+          class="nav-link primary"
+        >
+          <span class="nav-icon">🎯</span>
+          Fantasy Betting
         </button>
 
         <!-- User Authentication -->
@@ -138,7 +167,7 @@ export default {
 }
 
 .brand-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -173,7 +202,7 @@ export default {
 }
 
 .nav-link.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
   color: white;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
@@ -185,7 +214,7 @@ export default {
 }
 
 .nav-link.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
   color: white;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);

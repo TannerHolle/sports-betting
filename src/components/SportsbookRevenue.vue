@@ -310,8 +310,8 @@ export default {
 }
 
 .stat-card.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: #667eea;
+background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+border-color: #4169e1;
   color: white;
 }
 

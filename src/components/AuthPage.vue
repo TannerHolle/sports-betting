@@ -161,6 +161,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
+import axios from 'axios'
+import { API_BASE_URL } from '../config/api.js'
 
 export default {
   name: 'AuthPage',
@@ -174,6 +176,7 @@ export default {
     const loading = ref(false)
     const error = ref('')
     const successMessage = ref('')
+    const pendingInviteCode = ref(null)
     
     const loginForm = ref({
       username: '',
@@ -237,6 +240,10 @@ export default {
       try {
         const user = await userStore.login(loginForm.value.username, loginForm.value.password)
         if (user) {
+          // Join league if invite code is in URL
+          if (pendingInviteCode.value) {
+            await joinLeagueFromInvite(pendingInviteCode.value)
+          }
           // Auto-redirect to betting page after successful login
           setTimeout(() => {
             goToBetting()
@@ -270,6 +277,10 @@ export default {
         )
         
         if (user) {
+          // Join league if invite code is in URL
+          if (pendingInviteCode.value) {
+            await joinLeagueFromInvite(pendingInviteCode.value)
+          }
           // Auto-redirect to betting page after successful signup
           setTimeout(() => {
             goToBetting()
@@ -278,6 +289,28 @@ export default {
       } catch (err) {
         error.value = err.message || 'Account creation failed. Please try again.'
         loading.value = false
+      }
+    }
+
+    const joinLeagueFromInvite = async (inviteCode) => {
+      if (!inviteCode || !userStore.currentUser.value?.username) return
+      
+      try {
+        const response = await axios.post(`${API_BASE_URL}/leagues/join-by-code`, {
+          inviteCode: inviteCode.toUpperCase(),
+          username: userStore.currentUser.value.username
+        })
+        
+        // Clear the invite code from URL
+        const url = new URL(window.location.href)
+        url.searchParams.delete('invite')
+        window.history.replaceState({}, '', url)
+        pendingInviteCode.value = null
+        
+        console.log(`Successfully joined league: ${response.data.name}`)
+      } catch (error) {
+        console.error('Error joining league from invite:', error)
+        // Don't show error to user, just log it
       }
     }
 
@@ -293,9 +326,23 @@ export default {
       }
     }
 
+    // Check for invite code in URL
+    const checkInviteCode = () => {
+      const urlParams = new URLSearchParams(window.location.search)
+      const invite = urlParams.get('invite')
+      if (invite) {
+        pendingInviteCode.value = invite.toUpperCase()
+        // Show hint that they'll join a league
+        if (activeTab.value === 'signup') {
+          successMessage.value = `You'll automatically join a league when you create your account!`
+        }
+      }
+    }
+
     // Add event listener on mount
     onMounted(() => {
       window.addEventListener('change-page', handlePageChange)
+      checkInviteCode()
     })
 
     // Remove event listener on unmount
@@ -328,7 +375,7 @@ export default {
 <style scoped>
 .auth-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
   display: flex;
   align-items: center;
   justify-content: center;

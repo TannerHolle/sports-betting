@@ -1,10 +1,28 @@
 <template>
   <div class="leaderboard" v-if="isAuthenticated">
     <div class="leaderboard-header">
-      <h3>🏆 Worldwide Leaderboard</h3>
+      <h3>🏆 {{ (selectedLeagueName || 'Worldwide') }} Leaderboard</h3>
       <p class="leaderboard-description">
         Top performers by total winnings
       </p>
+      <div class="league-selector" v-if="availableLeagues && availableLeagues.length > 0">
+        <label for="league-select">View League:</label>
+        <select 
+          id="league-select" 
+          v-model="selectedLeagueId"
+          @change="onLeagueChange"
+          class="league-dropdown"
+        >
+          <option value="">Worldwide</option>
+          <option 
+            v-for="league in availableLeagues" 
+            :key="league._id" 
+            :value="league._id"
+          >
+            {{ league.name }}
+          </option>
+        </select>
+      </div>
     </div>
 
     <div class="leaderboard-content" v-if="!loading && leaderboard.length > 0">
@@ -50,30 +68,100 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
 
 export default {
   name: 'Leaderboard',
-  setup() {
+  props: {
+    userLeagues: {
+      type: Array,
+      default: () => []
+    }
+  },
+  setup(props) {
     const userStore = useUserStore()
     const leaderboard = ref([])
     const loading = ref(false)
+    const selectedLeagueId = ref('')
+    const userLeagues = ref([])
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
+    
+    // Use prop leagues if provided, otherwise use local state
+    const availableLeagues = computed(() => {
+      return props.userLeagues && props.userLeagues.length > 0 ? props.userLeagues : userLeagues.value
+    })
+
+    // Watch for changes in available leagues and set default selection
+    // Only set default on initial load (when selectedLeagueId is empty)
+    watch(availableLeagues, (newLeagues) => {
+      // Only auto-select if:
+      // 1. User hasn't made a selection yet (selectedLeagueId is empty)
+      // 2. User has exactly one league
+      if (selectedLeagueId.value === '' && newLeagues && newLeagues.length === 1) {
+        setDefaultLeagueSelection(newLeagues)
+      }
+    }, { immediate: false }) // Don't run immediately, let onMounted handle initial setup
+    
+    const selectedLeagueName = computed(() => {
+      if (!selectedLeagueId.value || !availableLeagues.value) return null
+      const league = availableLeagues.value.find(l => l._id === selectedLeagueId.value)
+      return league ? league.name : null
+    })
 
     const getMedal = (index) => {
       const medals = ['🥇', '🥈', '🥉']
       return medals[index] || ''
     }
 
+    const fetchUserLeagues = async () => {
+      if (props.userLeagues && props.userLeagues.length > 0) {
+        // If leagues are provided via props, use them and set default
+        setDefaultLeagueSelection(props.userLeagues)
+        return
+      }
+      
+      if (!currentUser.value?.username) return
+      
+      try {
+        const response = await axios.get(`${API_BASE_URL}/user/${currentUser.value.username}/leagues`)
+        userLeagues.value = response.data || []
+        setDefaultLeagueSelection(userLeagues.value)
+      } catch (error) {
+        console.error('Error fetching user leagues:', error)
+        userLeagues.value = []
+      }
+    }
+
+    const setDefaultLeagueSelection = (leagues) => {
+      // Only set default if no selection has been made yet
+      // If user has exactly one league, default to that league
+      // If user has multiple leagues or no leagues, default to worldwide (empty)
+      if (selectedLeagueId.value === '') {
+        if (leagues && leagues.length === 1) {
+          selectedLeagueId.value = leagues[0]._id
+          // Fetch leaderboard for the selected league
+          fetchLeaderboard()
+        }
+        // Otherwise, selectedLeagueId remains empty (worldwide), which is already the default
+      }
+    }
+
+    const onLeagueChange = () => {
+      fetchLeaderboard()
+    }
+
     const fetchLeaderboard = async () => {
       loading.value = true
       try {
-        const response = await axios.get(`${API_BASE_URL}/users`)
+        const url = selectedLeagueId.value 
+          ? `${API_BASE_URL}/users?leagueId=${selectedLeagueId.value}`
+          : `${API_BASE_URL}/users`
+        const response = await axios.get(url)
         const users = response.data
 
         // Calculate leaderboard data for all users
@@ -156,8 +244,12 @@ export default {
       }
     }
 
-    onMounted(() => {
-      fetchLeaderboard()
+    onMounted(async () => {
+      await fetchUserLeagues()
+      // Only fetch leaderboard if we haven't already (setDefaultLeagueSelection will fetch if needed)
+      if (!selectedLeagueId.value) {
+        fetchLeaderboard()
+      }
     })
 
     return {
@@ -165,7 +257,11 @@ export default {
       currentUser,
       leaderboard,
       loading,
-      getMedal
+      getMedal,
+      selectedLeagueId,
+      selectedLeagueName,
+      onLeagueChange,
+      availableLeagues
     }
   }
 }
@@ -198,6 +294,42 @@ export default {
   margin: 0;
   color: #6b7280;
   font-size: 1rem;
+}
+
+.league-selector {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.league-selector label {
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.league-dropdown {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 200px;
+}
+
+.league-dropdown:hover {
+  border-color: #3b82f6;
+}
+
+.league-dropdown:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .leaderboard-content {

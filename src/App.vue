@@ -113,6 +113,12 @@
       <BettingPage v-else />
     </div>
     
+    <!-- Leagues Page (Protected - Auth Required) -->
+    <div v-if="currentPage === 'leagues'">
+      <AuthPage v-if="!isAuthenticated" @change-page="setCurrentPage" />
+      <LeaguesPage v-else />
+    </div>
+    
     <!-- Auth Page -->
     <AuthPage v-if="currentPage === 'auth'" @change-page="setCurrentPage" />
   </div>
@@ -128,6 +134,7 @@ import CollegeBasketballCard from './components/CollegeBasketballCard.vue'
 import NBAGameCard from './components/NBAGameCard.vue'
 import Navigation from './components/Navigation.vue'
 import BettingPage from './components/BettingPage.vue'
+import LeaguesPage from './components/LeaguesPage.vue'
 import AuthPage from './components/AuthPage.vue'
 
 export default {
@@ -139,13 +146,20 @@ export default {
     NBAGameCard,
     Navigation,
     BettingPage,
+    LeaguesPage,
     AuthPage
   },
   setup() {
     const userStore = useUserStore()
     // Initialize user session on app start
     userStore.initializeStore()
-    const currentPage = ref(localStorage.getItem('currentPage') || 'scoreboard') // Default to scoreboard (public)
+    
+    // Check for invite code in URL - if present and user not authenticated, go to auth page
+    const urlParams = new URLSearchParams(window.location.search)
+    const inviteCode = urlParams.get('invite')
+    const initialPage = inviteCode && !userStore.isAuthenticated.value ? 'auth' : (localStorage.getItem('currentPage') || 'scoreboard')
+    
+    const currentPage = ref(initialPage) // Default to scoreboard (public)
     const games = ref([])
     const loading = ref(false)
     const manualLoading = ref(false)

@@ -45,7 +45,7 @@
     <BetHistory />
 
     <!-- Leaderboard -->
-    <Leaderboard />
+    <Leaderboard :user-leagues="userLeaguesForLeaderboard" />
 
     <!-- League Selection -->
     <div class="league-selection">
@@ -112,6 +112,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import axios from 'axios'
 import { useUserStore } from '../stores/userStore.js'
+import { API_BASE_URL } from '../config/api.js'
 import BetHistory from './BetHistory.vue'
 import BetResolver from './BetResolver.vue'
 import AdminPanel from './AdminPanel.vue'
@@ -142,6 +143,7 @@ export default {
     const error = ref(null)
     const activeLeague = ref('ncaa-football') // Default to NCAA Football
     const refreshInterval = ref(null)
+    const userLeaguesForLeaderboard = ref([])
 
     // User data from store
     const userBalance = computed(() => userStore.userBalance.value)
@@ -290,7 +292,20 @@ export default {
       }
     }
 
-    onMounted(() => {
+    const fetchUserLeagues = async () => {
+      if (!userStore.currentUser.value?.username) return
+      
+      try {
+        const response = await axios.get(`${API_BASE_URL}/user/${userStore.currentUser.value.username}/leagues`)
+        userLeaguesForLeaderboard.value = response.data || []
+      } catch (error) {
+        console.error('Error fetching user leagues:', error)
+        userLeaguesForLeaderboard.value = []
+      }
+    }
+
+    onMounted(async () => {
+      await fetchUserLeagues()
       startLiveRefresh()
     })
 
@@ -312,7 +327,8 @@ export default {
       outstandingBetAmount,
       isAdmin,
       fetchData,
-      setActiveLeague
+      setActiveLeague,
+      userLeaguesForLeaderboard
     }
   }
 }
@@ -321,7 +337,7 @@ export default {
 <style scoped>
 .betting-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
   padding: 2rem 0;
 }
 
@@ -442,7 +458,7 @@ export default {
 .league-tab.active {
   background: rgba(255, 255, 255, 0.95);
   color: #1a1a1a;
-  border-color: #667eea;
+  border-color: #4169e1;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
