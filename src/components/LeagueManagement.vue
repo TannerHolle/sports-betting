@@ -430,9 +430,15 @@ export default {
 }
 
 .leagues-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .leagues-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .league-item {
