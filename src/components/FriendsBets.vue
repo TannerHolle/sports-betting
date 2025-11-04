@@ -8,8 +8,8 @@
         class="league-selector"
         :disabled="isDropdownDisabled"
       >
-        <option value="">All Leagues</option>
-        <option v-if="isAdmin" value="all-bets">All Bets from All Users (admin only)</option>
+        <option v-if="isAdmin" value="all-bets">All Bets from All Users</option>
+        <option value="">All My Leagues</option>
         <option 
           v-for="league in userLeagues" 
           :key="league._id"
