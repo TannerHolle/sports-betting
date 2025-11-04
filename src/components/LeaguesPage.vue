@@ -87,6 +87,8 @@ export default {
 
 .tabs-container {
   margin: 0 auto;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .tabs-header {
@@ -157,6 +159,12 @@ export default {
 
   .tabs-container {
     padding: 0 0.5rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .tab-content {
+    overflow-x: hidden;
   }
 
   .tabs-header {

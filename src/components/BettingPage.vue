@@ -280,8 +280,8 @@ export default {
       // Initial fetch with loading
       fetchData(true)
       
-      // Set up interval to refresh every 30 seconds (without loading indicator)
-      refreshInterval.value = setInterval(() => fetchData(false), 30000)
+      // Set up interval to refresh every 10 seconds (without loading indicator)
+      refreshInterval.value = setInterval(() => fetchData(false), 10000)
     }
 
     // Stop live refresh

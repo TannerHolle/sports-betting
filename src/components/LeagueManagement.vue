@@ -462,6 +462,10 @@ export default {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   transition: all 0.2s ease;
+  box-sizing: border-box;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .league-item:hover {
@@ -604,6 +608,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .league-id {
@@ -617,6 +622,8 @@ export default {
   color: #1a1a1a;
   overflow-x: auto;
   word-break: break-all;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .league-id.invite-code {
@@ -686,6 +693,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .share-link-input {
@@ -698,6 +706,9 @@ export default {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   color: #1a1a1a;
   overflow-x: auto;
+  min-width: 0;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .share-link-hint {
@@ -788,7 +799,17 @@ export default {
 
 @media (max-width: 768px) {
   .league-management {
-    padding: 1.5rem;
+    padding: 1rem;
+  }
+  
+  .league-management-content {
+    gap: 1.5rem;
+  }
+  
+  .create-league-section,
+  .join-league-section,
+  .my-leagues-section {
+    padding: 1rem;
   }
   
   .league-form {
@@ -796,31 +817,73 @@ export default {
   }
   
   .league-header {
-    flex-direction: row;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.75rem;
   }
   
   .league-info {
-    flex: 0 0 auto;
-    min-width: 0;
-    max-width: 35%;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .league-name {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   
   .league-members {
-    text-align: right;
-    min-width: 150px;
-    max-width: 60%;
-    flex: 1 1 auto;
+    width: 100%;
+    text-align: left;
+    min-width: 0;
+    max-width: 100%;
+    padding-left: 0;
   }
   
   .members-list {
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
   
   .join-btn {
     width: 100%;
     justify-content: center;
+  }
+  
+  .league-id-container,
+  .share-link-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .league-id {
+    width: 100%;
+    min-width: 0;
+    font-size: 1rem;
+    word-break: break-all;
+    overflow-wrap: break-word;
+  }
+  
+  .league-id.invite-code {
+    font-size: 1.1rem;
+  }
+  
+  .share-link-input {
+    width: 100%;
+    min-width: 0;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    font-size: 0.8rem;
+  }
+  
+  .copy-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .share-link-hint {
+    font-size: 0.7rem;
+    line-height: 1.4;
   }
   
   .browse-leagues {

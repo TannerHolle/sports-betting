@@ -313,7 +313,7 @@ export default {
     // Start periodic refresh for live scores
     const startLiveScoreRefresh = () => {
       fetchLiveScores()
-      refreshInterval.value = setInterval(fetchLiveScores, 30000)
+      refreshInterval.value = setInterval(fetchLiveScores, 10000)
     }
 
     // Stop live score refresh

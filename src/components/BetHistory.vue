@@ -433,8 +433,8 @@ export default {
       // Initial fetch
       fetchLiveScores()
       
-      // Set up interval to refresh every 30 seconds
-      refreshInterval.value = setInterval(fetchLiveScores, 30000)
+      // Set up interval to refresh every 10 seconds
+      refreshInterval.value = setInterval(fetchLiveScores, 10000)
     }
 
     // Stop live score refresh
