@@ -50,21 +50,36 @@
       </div>
 
       <!-- My Leagues Section -->
-      <div class="my-leagues-section" v-if="userLeagues.length > 0">
+      <div class="my-leagues-section" v-if="leaguesWithTestMembers.length > 0">
         <h4>My Leagues</h4>
         <div class="leagues-list">
           <div
-            v-for="league in userLeagues"
+            v-for="league in leaguesWithTestMembers"
             :key="league._id"
             class="league-item my-league"
           >
-            <div class="league-info">
-              <div class="league-name">{{ league.name }}</div>
-              <div class="league-meta">
-                <span>{{ league.members?.length || 0 }} members</span>
-                <span v-if="league.creator?._id === currentUser?._id" class="creator-badge">Creator</span>
+            <div class="league-header">
+              <div class="league-info">
+                <div class="league-name">{{ league.name }}</div>
+                <div class="league-meta">
+                  <span v-if="league.creator?._id === currentUser?._id" class="creator-badge">Creator</span>
+                </div>
               </div>
-              <div class="league-id-section">
+              <div class="league-members" v-if="league.members && league.members.length > 0">
+                <div class="members-label">{{ league.members?.length || 0 }} members:</div>
+                <div class="members-list">
+                  <span 
+                    v-for="(member, index) in league.members" 
+                    :key="member._id || member.username || index"
+                    class="member-item"
+                  >
+                    <span class="member-username">{{ member.username || member }}</span>
+                    <span v-if="index < league.members.length - 1" class="member-comma">,</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="league-id-section">
                 <label class="league-id-label">Invite Code (Easy Share):</label>
                 <div class="league-id-container">
                   <code class="league-id invite-code">{{ league.inviteCode || 'N/A' }}</code>
@@ -103,7 +118,6 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -132,6 +146,28 @@ export default {
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
 
+    // TEMPORARY: Add test members for UI testing
+    // Set to true to add 20 test members to each league
+    const ENABLE_TEST_MEMBERS = true
+
+    // Generate test members
+    const generateTestMembers = (count) => {
+      return Array.from({ length: count }, (_, i) => ({
+        _id: `test_member_${i + 1}`,
+        username: `testuser${i + 1}`
+      }))
+    }
+
+    // Computed property that adds test members to leagues
+    const leaguesWithTestMembers = computed(() => {
+      if (!ENABLE_TEST_MEMBERS) return userLeagues.value
+      
+      // Replace all members with exactly 20 test members for testing
+      return userLeagues.value.map(league => ({
+        ...league,
+        members: generateTestMembers(20)
+      }))
+    })
 
     const fetchUserLeagues = async () => {
       if (!currentUser.value?.username) return
@@ -298,6 +334,7 @@ export default {
       currentUser,
       newLeagueName,
       userLeagues,
+      leaguesWithTestMembers,
       creating,
       createError,
       createSuccess,
@@ -443,8 +480,7 @@ export default {
 
 .league-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   padding: 1rem;
   background: white;
   border: 1px solid #e5e7eb;
@@ -461,8 +497,18 @@ export default {
   border-color: #3b82f6;
 }
 
+.league-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
 .league-info {
-  flex: 1;
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: 35%;
 }
 
 .league-name {
@@ -470,13 +516,23 @@ export default {
   font-weight: 600;
   color: #1a1a1a;
   margin-bottom: 0.25rem;
+  white-space: nowrap;
 }
 
 .league-meta {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
   font-size: 0.875rem;
   color: #6b7280;
+}
+
+@media (min-width: 1280px) {
+  .league-meta {
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+  }
 }
 
 .creator-badge {
@@ -486,6 +542,74 @@ export default {
   border-radius: 4px;
   font-weight: 600;
   font-size: 0.75rem;
+  display: inline-block;
+  width: 70px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.league-members {
+  flex-shrink: 0;
+  text-align: right;
+  min-width: 200px;
+  max-width: 450px;
+  flex: 0 1 auto;
+  padding-left: 0.5rem;
+}
+
+.members-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.members-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  color: #1a1a1a;
+  justify-content: flex-end;
+  align-items: flex-start;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 0.25rem;
+  padding-right: 0.5rem;
+}
+
+.members-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.members-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.members-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.members-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.member-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.member-username {
+  font-weight: 500;
+  color: #3b82f6;
+  white-space: nowrap;
+}
+
+.member-comma {
+  color: #6b7280;
+  margin-left: 0.25rem;
 }
 
 .league-id-section {
@@ -697,10 +821,28 @@ export default {
     flex-direction: column;
   }
   
-  .league-item {
-    flex-direction: column;
+  .league-header {
+    flex-direction: row;
     align-items: flex-start;
     gap: 1rem;
+  }
+  
+  .league-info {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: 35%;
+  }
+  
+  .league-members {
+    text-align: right;
+    min-width: 150px;
+    max-width: 60%;
+    flex: 1 1 auto;
+  }
+  
+  .members-list {
+    justify-content: flex-end;
+    max-height: 120px;
   }
   
   .join-btn {
