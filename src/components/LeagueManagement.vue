@@ -50,11 +50,11 @@
       </div>
 
       <!-- My Leagues Section -->
-      <div class="my-leagues-section" v-if="leaguesWithTestMembers.length > 0">
+      <div class="my-leagues-section" v-if="userLeagues.length > 0">
         <h4>My Leagues</h4>
         <div class="leagues-list">
           <div
-            v-for="league in leaguesWithTestMembers"
+            v-for="league in userLeagues"
             :key="league._id"
             class="league-item my-league"
           >
@@ -145,29 +145,6 @@ export default {
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
-
-    // TEMPORARY: Add test members for UI testing
-    // Set to true to add 20 test members to each league
-    const ENABLE_TEST_MEMBERS = true
-
-    // Generate test members
-    const generateTestMembers = (count) => {
-      return Array.from({ length: count }, (_, i) => ({
-        _id: `test_member_${i + 1}`,
-        username: `testuser${i + 1}`
-      }))
-    }
-
-    // Computed property that adds test members to leagues
-    const leaguesWithTestMembers = computed(() => {
-      if (!ENABLE_TEST_MEMBERS) return userLeagues.value
-      
-      // Replace all members with exactly 20 test members for testing
-      return userLeagues.value.map(league => ({
-        ...league,
-        members: generateTestMembers(20)
-      }))
-    })
 
     const fetchUserLeagues = async () => {
       if (!currentUser.value?.username) return
@@ -334,7 +311,6 @@ export default {
       currentUser,
       newLeagueName,
       userLeagues,
-      leaguesWithTestMembers,
       creating,
       createError,
       createSuccess,
@@ -572,8 +548,6 @@ export default {
   color: #1a1a1a;
   justify-content: flex-end;
   align-items: flex-start;
-  max-height: 120px;
-  overflow-y: auto;
   padding: 0.25rem;
   padding-right: 0.5rem;
 }
@@ -613,7 +587,7 @@ export default {
 }
 
 .league-id-section {
-  margin-top: 0.75rem;
+  margin-top: auto;
   padding-top: 0.75rem;
   border-top: 1px solid #e5e7eb;
 }
@@ -842,7 +816,6 @@ export default {
   
   .members-list {
     justify-content: flex-end;
-    max-height: 120px;
   }
   
   .join-btn {
