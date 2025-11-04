@@ -1,13 +1,15 @@
 <template>
   <div class="friends-bets" v-if="isAuthenticated">
-    <div class="league-selector-section" v-if="userLeagues.length > 0">
+    <div class="league-selector-section" v-if="userLeagues.length > 0 || isAdmin">
       <label class="league-selector-label">Select League:</label>
       <select 
         v-model="selectedLeagueId" 
         @change="fetchFriendsBets"
         class="league-selector"
+        :disabled="isDropdownDisabled"
       >
         <option value="">All Leagues</option>
+        <option v-if="isAdmin" value="all-bets">All Bets from All Users (admin only)</option>
         <option 
           v-for="league in userLeagues" 
           :key="league._id"
@@ -18,7 +20,7 @@
       </select>
     </div>
 
-    <div v-if="userLeagues.length === 0" class="no-leagues">
+    <div v-if="userLeagues.length === 0 && !isAdmin" class="no-leagues">
       <p>You're not in any leagues yet. Join or create a league to see your friends' bets!</p>
     </div>
 
@@ -137,6 +139,30 @@ export default {
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
+    
+    // Check if current user is admin
+    const isAdmin = computed(() => {
+      return currentUser.value?.username === 'tannerholle' || currentUser.value?.username === 'tanner'
+    })
+
+    // Check if dropdown should be disabled (non-admin with only 1 league)
+    const isDropdownDisabled = computed(() => {
+      return !isAdmin.value && userLeagues.value.length === 1
+    })
+
+    // Set default selected league based on user type and league count
+    const setDefaultLeague = () => {
+      if (isAdmin.value) {
+        // Admin defaults to "all-bets"
+        selectedLeagueId.value = 'all-bets'
+      } else if (userLeagues.value.length === 1) {
+        // Non-admin with 1 league defaults to that league
+        selectedLeagueId.value = userLeagues.value[0]._id
+      } else {
+        // Non-admin with multiple leagues defaults to "All Leagues" (empty)
+        selectedLeagueId.value = ''
+      }
+    }
 
     // Fetch user's leagues
     const fetchUserLeagues = async () => {
@@ -145,9 +171,12 @@ export default {
       try {
         const response = await axios.get(`${API_BASE_URL}/user/${currentUser.value.username}/leagues`)
         userLeagues.value = response.data || []
+        // Set default after fetching leagues
+        setDefaultLeague()
       } catch (error) {
         console.error('Error fetching user leagues:', error)
         userLeagues.value = []
+        setDefaultLeague()
       }
     }
 
@@ -159,13 +188,38 @@ export default {
       error.value = ''
       
       try {
-        let url = `${API_BASE_URL}/users`
-        if (selectedLeagueId.value) {
-          url += `?leagueId=${selectedLeagueId.value}`
-        }
+        let users = {}
         
-        const response = await axios.get(url)
-        const users = response.data
+        // If admin selected "all-bets", fetch all users (no league filter)
+        if (selectedLeagueId.value === 'all-bets') {
+          const response = await axios.get(`${API_BASE_URL}/users`)
+          users = response.data
+        }
+        // If "All Leagues" is selected (empty), fetch users from all leagues user is in
+        else if (!selectedLeagueId.value) {
+          // Fetch users from each league the user is in and combine them
+          const allUsersMap = new Map()
+          for (const league of userLeagues.value) {
+            try {
+              const response = await axios.get(`${API_BASE_URL}/users?leagueId=${league._id}`)
+              const leagueUsers = response.data
+              // Merge users (avoid duplicates by username)
+              Object.values(leagueUsers).forEach(user => {
+                if (!allUsersMap.has(user.username)) {
+                  allUsersMap.set(user.username, user)
+                }
+              })
+            } catch (error) {
+              console.error(`Error fetching users for league ${league._id}:`, error)
+            }
+          }
+          users = Object.fromEntries(allUsersMap)
+        }
+        // Otherwise, fetch users from the specific selected league
+        else {
+          const response = await axios.get(`${API_BASE_URL}/users?leagueId=${selectedLeagueId.value}`)
+          users = response.data
+        }
         
         // Get pending bets and bets that won/lost within last 7 days from friends (excluding current user)
         const betsWithUsers = []
@@ -410,7 +464,8 @@ export default {
 
     onMounted(async () => {
       await fetchUserLeagues()
-      if (userLeagues.value.length > 0) {
+      // Fetch bets if user has leagues OR is an admin (admins can see all bets)
+      if (userLeagues.value.length > 0 || isAdmin.value) {
         await fetchFriendsBets()
         startLiveScoreRefresh()
       }
@@ -422,6 +477,8 @@ export default {
 
     return {
       isAuthenticated,
+      isAdmin,
+      isDropdownDisabled,
       userLeagues,
       selectedLeagueId,
       friendsBets,
