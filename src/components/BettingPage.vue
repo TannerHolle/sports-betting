@@ -113,6 +113,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import axios from 'axios'
 import { useUserStore } from '../stores/userStore.js'
 import { API_BASE_URL } from '../config/api.js'
+import { isGameToday } from '../utils/timezoneUtils.js'
 import BetHistory from './BetHistory.vue'
 import BetResolver from './BetResolver.vue'
 import AdminPanel from './AdminPanel.vue'
@@ -212,10 +213,8 @@ export default {
         // Only show games that are scheduled (not started yet) - NO in-progress games
         const isScheduled = status?.type?.state === 'pre'
         
-        // Check if game is today in local timezone
-        const gameDate = new Date(game.date)
-        const today = new Date()
-        const isToday = gameDate.toDateString() === today.toDateString()
+        // Check if game is today in local timezone (handles UTC timezone conversion properly)
+        const isToday = isGameToday(game.date)
         
         // For NBA, show only scheduled games that are today
         if (activeLeague.value === 'nba') {

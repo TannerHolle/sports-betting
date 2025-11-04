@@ -129,17 +129,38 @@ export function getUserTimezone() {
 
 /**
  * Check if a game is today in the user's local timezone
- * @param {string} gameDate - Game date string
- * @returns {boolean} - True if game is today
+ * Properly handles UTC dates from the API by normalizing both dates to local timezone
+ * @param {string} gameDate - Game date string (ISO format, e.g., "2025-10-26T18:00Z")
+ * @returns {boolean} - True if game is today in user's local timezone
  */
 export function isGameToday(gameDate) {
   if (!gameDate) return false
   
   try {
-    const today = new Date()
+    // Parse the game date (which may be in UTC)
     const game = new Date(gameDate)
     
-    return game.toDateString() === today.toDateString()
+    if (isNaN(game.getTime())) {
+      return false
+    }
+    
+    // Get current date in local timezone
+    const now = new Date()
+    
+    // Normalize both dates to local timezone by comparing year, month, and day
+    // This ensures that a game at 8 PM EST on Oct 26 is considered "today"
+    // even if checked at 1 AM EST on Oct 26 (where the UTC date might be Oct 27)
+    const gameYear = game.getFullYear()
+    const gameMonth = game.getMonth()
+    const gameDay = game.getDate()
+    
+    const todayYear = now.getFullYear()
+    const todayMonth = now.getMonth()
+    const todayDay = now.getDate()
+    
+    return gameYear === todayYear && 
+           gameMonth === todayMonth && 
+           gameDay === todayDay
   } catch (error) {
     console.warn('Error checking if game is today:', error)
     return false
