@@ -541,6 +541,12 @@ export default {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.league-selector:disabled {
+  background: #f3f4f6;
+  cursor: default;
+  opacity: 0.6;
+}
+
 .no-leagues {
   text-align: center;
   padding: 3rem 1rem;
