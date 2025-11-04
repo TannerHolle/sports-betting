@@ -105,8 +105,20 @@
               <h4>{{ bet.gameData.gameName }}</h4>
               <span class="bet-date">{{ formatDate(bet.createdAt) }}</span>
             </div>
-            <div class="bet-status" :class="bet.status">
-              {{ bet.status === 'won' ? 'Won' : 'Lost' }}
+            <div class="bet-header-right">
+              <div class="bet-header-right-content">
+                <div v-if="getFinalScoreData(bet)" class="final-score-inline">
+                  <span class="final-score-text">
+                    {{ getFinalScoreData(bet).homeTeam }} {{ getFinalScoreData(bet).homeScore }} - {{ getFinalScoreData(bet).awayScore }} {{ getFinalScoreData(bet).awayTeam }}
+                    <span v-if="bet.betType === 'total'" class="total-badge">
+                      ({{ getTotalPoints(getFinalScoreData(bet)) }})
+                    </span>
+                  </span>
+                </div>
+                <div class="bet-status" :class="bet.status">
+                  {{ bet.status === 'won' ? 'Won' : 'Lost' }}
+                </div>
+              </div>
             </div>
           </div>
           
@@ -133,7 +145,7 @@
             </div>
           </div>
           
-          <!-- Live Game Data for completed bets -->
+          <!-- Live Game Data for active bets -->
           <div v-if="isGameLive(bet)" class="live-game-data">
             <div class="live-score">
               <span class="team-score">{{ getLiveData(bet).homeTeam }} {{ getLiveData(bet).homeScore }}</span>
@@ -277,6 +289,29 @@ export default {
     // Get live data for a bet
     const getLiveData = (bet) => {
       return liveScores.value.get(bet.gameId)
+    }
+
+    // Get final score data for completed bets
+    const getFinalScoreData = (bet) => {
+      // Only show final score for completed bets (won/lost)
+      if (bet.status !== 'won' && bet.status !== 'lost') return null
+      
+      const liveData = liveScores.value.get(bet.gameId)
+      if (!liveData) return null
+      
+      // Don't show final score if game is still live (shouldn't happen for completed bets, but safety check)
+      if (liveData.isLive && !liveData.isCompleted) return null
+      
+      // Return score data for completed bets
+      return liveData
+    }
+
+    // Calculate total points from score data
+    const getTotalPoints = (scoreData) => {
+      if (!scoreData) return null
+      const homeScore = parseInt(scoreData.homeScore) || 0
+      const awayScore = parseInt(scoreData.awayScore) || 0
+      return homeScore + awayScore
     }
 
     // Check if bet can be cancelled (pending and game hasn't started)
@@ -476,6 +511,8 @@ export default {
       formatBetSelection,
       isGameLive,
       getLiveData,
+      getFinalScoreData,
+      getTotalPoints,
       canCancelBet,
       handleCancelBet,
       cancellingBetId,
@@ -603,6 +640,11 @@ export default {
 }
 
 .bet-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.bet-header-right-content {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -744,6 +786,23 @@ export default {
     gap: 0.5rem;
     align-items: flex-start;
   }
+}
+
+/* Final Score Inline Styles */
+.final-score-inline {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.final-score-text {
+  display: inline-block;
+}
+
+.total-badge {
+  color: #475569;
+  font-weight: 500;
+  margin-left: 0.25rem;
 }
 
 /* Live Game Data Styles */
