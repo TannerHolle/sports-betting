@@ -183,6 +183,27 @@ const resolveBet = async (betId, result) => {
   return false
 }
 
+// Cancel a pending bet
+const cancelBet = async (betId) => {
+  if (!currentUser.value) return { success: false, error: 'User not authenticated' }
+  
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/user/${currentUser.value.username}/bet/${betId}`)
+    
+    if (response.data.success) {
+      // Re-fetch full user to ensure bets/history are up to date
+      await loadUserFromAPI(currentUser.value.username)
+      return { success: true }
+    }
+  } catch (error) {
+    console.error('Error cancelling bet:', error)
+    if (error.response?.data?.error) {
+      return { success: false, error: error.response.data.error }
+    }
+    return { success: false, error: 'Failed to cancel bet' }
+  }
+}
+
 // Computed properties
 const userBalance = computed(() => currentUser.value?.balance || 0)
 const userStats = computed(() => {
@@ -258,6 +279,7 @@ export const useUserStore = () => {
     updateBalance,
     placeBet,
     resolveBet,
+    cancelBet,
     loadUserFromAPI,
     initializeStore
   }

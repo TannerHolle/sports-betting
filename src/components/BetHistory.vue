@@ -36,7 +36,18 @@
               <h4>{{ bet.gameData.gameName }}</h4>
               <span class="bet-date">Bet placed at {{ formatDate(bet.createdAt) }}</span>
             </div>
-            <div class="bet-status pending">Pending</div>
+            <div class="bet-header-right">
+              <div class="bet-status pending">Pending</div>
+              <!-- Cancel Button (only show if game hasn't started) -->
+              <button 
+                v-if="canCancelBet(bet)"
+                @click="handleCancelBet(bet._id)" 
+                :disabled="cancellingBetId === bet._id"
+                class="cancel-bet-btn-header"
+              >
+                {{ cancellingBetId === bet._id ? 'Cancelling...' : 'Cancel' }}
+              </button>
+            </div>
           </div>
           
           <div class="bet-details">
@@ -72,6 +83,7 @@
               <span class="game-time">{{ getLiveData(bet).status }}</span>
             </div>
           </div>
+          
         </div>
       </div>
     </div>
@@ -136,6 +148,26 @@
         </div>
       </div>
     </div>
+
+    <!-- Cancel Bet Confirmation Modal -->
+    <div v-if="showCancelModal" class="modal-overlay" @click.self="closeCancelModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Cancel Bet?</h3>
+          <button @click="closeCancelModal" class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to cancel this bet?</p>
+          <p class="modal-info"><strong>${{ cancelBetAmount?.toLocaleString() }}</strong> will be refunded to your balance.</p>
+        </div>
+        <div class="modal-footer">
+          <button @click="closeCancelModal" class="modal-btn modal-btn-cancel">Keep Bet</button>
+          <button @click="confirmCancelBet" :disabled="cancellingBetId" class="modal-btn modal-btn-confirm">
+            {{ cancellingBetId ? 'Cancelling...' : 'Cancel Bet' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -151,6 +183,11 @@ export default {
     const activeTab = ref('active')
     const liveScores = ref(new Map())
     const refreshInterval = ref(null)
+    const cancellingBetId = ref(null)
+    const gameStartStatus = ref(new Map()) // Cache game start status
+    const showCancelModal = ref(false)
+    const pendingCancelBetId = ref(null)
+    const cancelBetAmount = ref(null)
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
@@ -242,6 +279,74 @@ export default {
       return liveScores.value.get(bet.gameId)
     }
 
+    // Check if bet can be cancelled (pending and game hasn't started)
+    const canCancelBet = (bet) => {
+      if (bet.status !== 'pending') return false
+      
+      // Check if game has started using live scores
+      const liveData = liveScores.value.get(bet.gameId)
+      if (liveData) {
+        // If we have live data, check if game has started
+        return !liveData.isLive && !liveData.isCompleted
+      }
+      
+      // If we don't have live data yet, we'll check async
+      // For now, return true and we'll validate on the backend
+      return true
+    }
+
+    // Handle cancel bet - show modal
+    const handleCancelBet = (betId) => {
+      if (cancellingBetId.value) return // Prevent double clicks
+      
+      const bet = activeBets.value.find(b => b._id === betId)
+      if (!bet) return
+      
+      pendingCancelBetId.value = betId
+      cancelBetAmount.value = bet.amount
+      showCancelModal.value = true
+    }
+
+    // Close cancel modal
+    const closeCancelModal = () => {
+      if (cancellingBetId.value) return // Don't close if cancelling
+      showCancelModal.value = false
+      pendingCancelBetId.value = null
+      cancelBetAmount.value = null
+    }
+
+    // Confirm cancel bet
+    const confirmCancelBet = async () => {
+      if (!pendingCancelBetId.value) return
+      
+      const betId = pendingCancelBetId.value
+      cancellingBetId.value = betId
+      
+      try {
+        const result = await userStore.cancelBet(betId)
+        
+        if (result.success) {
+          // Success - user data will be refreshed automatically
+          // Clear game start status cache for this game
+          const bet = activeBets.value.find(b => b._id === betId)
+          if (bet) {
+            gameStartStatus.value.delete(bet.gameId)
+          }
+          // Close modal
+          showCancelModal.value = false
+          pendingCancelBetId.value = null
+          cancelBetAmount.value = null
+        } else {
+          alert(result.error || 'Failed to cancel bet')
+        }
+      } catch (error) {
+        console.error('Error cancelling bet:', error)
+        alert('Failed to cancel bet. Please try again.')
+      } finally {
+        cancellingBetId.value = null
+      }
+    }
+
     // Get sport from bet data (now stored with each bet)
     const getSportFromBet = (bet) => {
       // Use stored sport if available, fallback to team name detection for old bets
@@ -306,6 +411,10 @@ export default {
               // Merge scores into the main map
               scores.forEach((data, gameId) => {
                 allScores.set(gameId, data)
+                // Update game start status cache
+                if (data) {
+                  gameStartStatus.value.set(gameId, data.isLive || data.isCompleted)
+                }
               })
             } catch (error) {
               console.error(`Error fetching live scores for ${sport}:`, error)
@@ -366,7 +475,14 @@ export default {
       formatBetType,
       formatBetSelection,
       isGameLive,
-      getLiveData
+      getLiveData,
+      canCancelBet,
+      handleCancelBet,
+      cancellingBetId,
+      showCancelModal,
+      closeCancelModal,
+      confirmCancelBet,
+      cancelBetAmount
     }
   }
 }
@@ -478,6 +594,12 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1rem;
+}
+
+.bet-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .bet-game h4 {
@@ -670,5 +792,199 @@ export default {
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+/* Cancel Button in Header */
+.cancel-bet-btn-header {
+  padding: 0.25rem 0.75rem;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.cancel-bet-btn-header:hover:not(:disabled) {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.cancel-bet-btn-header:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 450px;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #1a1a1a;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: #f3f4f6;
+  color: #1a1a1a;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-body p {
+  margin: 0 0 0.75rem 0;
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.modal-body p:last-of-type {
+  margin-bottom: 0;
+}
+
+.modal-info {
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #f59e0b;
+  margin-top: 1rem;
+}
+
+.modal-info strong {
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  justify-content: flex-end;
+}
+
+.modal-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.modal-btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.modal-btn-cancel:hover {
+  background: #e5e7eb;
+}
+
+.modal-btn-confirm {
+  background: #dc2626;
+  color: white;
+}
+
+.modal-btn-confirm:hover:not(:disabled) {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.modal-btn-confirm:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 1rem;
+  }
+  
+  .modal-footer {
+    flex-direction: column-reverse;
+  }
+  
+  .modal-btn {
+    width: 100%;
+  }
 }
 </style>
