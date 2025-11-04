@@ -73,6 +73,39 @@
       <form v-if="activeTab === 'signup'" @submit.prevent="handleSignup" class="auth-form">
         <h3>Create Your Account</h3>
         <div class="form-group">
+          <label for="signup-name">Name:</label>
+          <input 
+            id="signup-name"
+            v-model="signupForm.name" 
+            type="text" 
+            required 
+            placeholder="Enter your full name"
+            class="form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email:</label>
+          <input 
+            id="signup-email"
+            v-model="signupForm.email" 
+            type="email" 
+            required 
+            placeholder="Enter your email"
+            class="form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label for="signup-phone">Phone Number:</label>
+          <input 
+            id="signup-phone"
+            v-model="signupForm.phoneNumber" 
+            type="tel" 
+            required 
+            placeholder="Enter your phone number"
+            class="form-input"
+          />
+        </div>
+        <div class="form-group">
             <label for="signup-username">Username:</label>
             <input 
             id="signup-username"
@@ -184,6 +217,9 @@ export default {
     })
     
     const signupForm = ref({
+      name: '',
+      email: '',
+      phoneNumber: '',
       username: '',
       password: ''
     })
@@ -273,7 +309,10 @@ export default {
       try {
         const user = await userStore.createAccount(
           signupForm.value.username,
-          signupForm.value.password
+          signupForm.value.password,
+          signupForm.value.name,
+          signupForm.value.email,
+          signupForm.value.phoneNumber
         )
         
         if (user) {

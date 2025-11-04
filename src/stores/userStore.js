@@ -57,11 +57,14 @@ const loadUserFromAPI = async (username) => {
 
 
 // Create new user account
-const createAccount = async (username, password) => {
+const createAccount = async (username, password, name, email, phoneNumber) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/user`, {
       username: username.toLowerCase(),
-      password
+      password,
+      name,
+      email,
+      phoneNumber
     })
     
     if (response.data) {
