@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useUserStore } from './stores/userStore.js'
 import Navigation from './components/Navigation.vue'
 import ScoreboardPage from './components/ScoreboardPage.vue'
@@ -65,6 +65,13 @@ export default {
     const handlePageChangeEvent = (event) => {
       setCurrentPage(event.detail)
     }
+
+    // Watch for page changes and scroll to top
+    watch(currentPage, () => {
+      nextTick(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      })
+    })
 
     onMounted(() => {
       window.addEventListener('change-page', handlePageChangeEvent)

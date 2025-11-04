@@ -34,7 +34,7 @@
       </div>
 
       <div v-else-if="friendsBets.length === 0" class="no-bets">
-        <p>No active bets from your friends yet.</p>
+        <p>No pending or recent bets from your friends yet.</p>
       </div>
 
       <div v-else class="bets-list">
@@ -42,16 +42,23 @@
           v-for="betWithUser in friendsBets" 
           :key="`${betWithUser.user.username}-${betWithUser.bet._id}`"
           class="bet-card"
+          :class="betWithUser.bet.status"
         >
           <div class="bet-header">
             <div class="bet-user-info">
               <div class="user-avatar">{{ getInitials(betWithUser.user.username) }}</div>
               <div class="user-details">
                 <div class="username">{{ betWithUser.user.username }}</div>
-                <div class="bet-date">{{ formatDate(betWithUser.bet.createdAt) }}</div>
+                <div class="bet-date">
+                  <span v-if="betWithUser.bet.status === 'pending'">{{ formatDate(betWithUser.bet.createdAt) }}</span>
+                  <span v-else-if="betWithUser.bet.resolvedAt">{{ formatDate(betWithUser.bet.resolvedAt) }}</span>
+                  <span v-else>{{ formatDate(betWithUser.bet.createdAt) }}</span>
+                </div>
               </div>
             </div>
-            <div class="bet-status pending">Pending</div>
+            <div class="bet-status" :class="getStatusClass(betWithUser.bet.status)">
+              {{ formatStatus(betWithUser.bet.status) }}
+            </div>
           </div>
 
           <div class="bet-game">
@@ -148,12 +155,38 @@ export default {
         const response = await axios.get(url)
         const users = response.data
         
-        // Get all pending bets from friends (excluding current user)
+        // Get pending bets and bets that won/lost within last 7 days from friends (excluding current user)
         const betsWithUsers = []
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+        
         Object.values(users).forEach(user => {
           if (user.username !== currentUser.value.username && user.bets) {
-            const pendingBets = user.bets.filter(bet => bet.status === 'pending')
-            pendingBets.forEach(bet => {
+            const relevantBets = user.bets.filter(bet => {
+              // Include pending bets
+              if (bet.status === 'pending') {
+                return true
+              }
+              
+              // Include won/lost bets from last 7 days
+              if (bet.status === 'won' || bet.status === 'lost') {
+                // Check if bet has a resolvedAt date
+                if (bet.resolvedAt) {
+                  const resolvedDate = new Date(bet.resolvedAt)
+                  return resolvedDate >= sevenDaysAgo
+                }
+                // If no resolvedAt, check createdAt (fallback)
+                if (bet.createdAt) {
+                  const createdDate = new Date(bet.createdAt)
+                  return createdDate >= sevenDaysAgo
+                }
+                return false
+              }
+              
+              return false
+            })
+            
+            relevantBets.forEach(bet => {
               betsWithUsers.push({
                 bet: bet,
                 user: user
@@ -162,10 +195,16 @@ export default {
           }
         })
         
-        // Sort by most recent first
-        betsWithUsers.sort((a, b) => 
-          new Date(b.bet.createdAt) - new Date(a.bet.createdAt)
-        )
+        // Sort by most recent first (use resolvedAt for won/lost, createdAt for pending)
+        betsWithUsers.sort((a, b) => {
+          const dateA = (a.bet.resolvedAt && (a.bet.status === 'won' || a.bet.status === 'lost')) 
+            ? new Date(a.bet.resolvedAt) 
+            : new Date(a.bet.createdAt)
+          const dateB = (b.bet.resolvedAt && (b.bet.status === 'won' || b.bet.status === 'lost')) 
+            ? new Date(b.bet.resolvedAt) 
+            : new Date(b.bet.createdAt)
+          return dateB - dateA
+        })
         
         friendsBets.value = betsWithUsers
         
@@ -225,6 +264,16 @@ export default {
       }
       
       return bet.selection
+    }
+
+    const formatStatus = (status) => {
+      if (!status) return 'Pending'
+      return status.charAt(0).toUpperCase() + status.slice(1)
+    }
+
+    const getStatusClass = (status) => {
+      if (!status) return 'pending'
+      return status.toLowerCase()
     }
 
     const getInitials = (username) => {
@@ -347,6 +396,8 @@ export default {
       formatDate,
       formatBetType,
       formatBetSelection,
+      formatStatus,
+      getStatusClass,
       getInitials,
       isGameLive,
       getLiveData
@@ -480,6 +531,16 @@ export default {
   border-left: 4px solid #3b82f6;
 }
 
+.bet-card.won {
+  border-left: 4px solid #059669;
+  background: #ecfdf5;
+}
+
+.bet-card.lost {
+  border-left: 4px solid #dc2626;
+  background: #fef2f2;
+}
+
 .bet-card:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -540,6 +601,16 @@ export default {
 .bet-status.pending {
   background: #fef3c7;
   color: #92400e;
+}
+
+.bet-status.won {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.bet-status.lost {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .bet-game h4 {

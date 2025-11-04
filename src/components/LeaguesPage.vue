@@ -47,7 +47,7 @@ export default {
     FriendsBets
   },
   setup() {
-    const activeTab = ref('management')
+    const activeTab = ref('friends')
 
     return {
       activeTab
