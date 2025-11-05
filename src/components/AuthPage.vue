@@ -99,10 +99,12 @@
           <input 
             id="signup-phone"
             v-model="signupForm.phoneNumber" 
+            @input="formatPhoneNumber"
             type="tel" 
             required 
             placeholder="Enter your phone number"
             class="form-input"
+            maxlength="14"
           />
         </div>
         <div class="form-group">
@@ -267,6 +269,31 @@ export default {
     const toggleSignupPasswordVisibility = () => {
       showSignupPassword.value = !showSignupPassword.value
     }
+    
+    // Format phone number as user types
+    const formatPhoneNumber = (event) => {
+      // Remove all non-numeric characters
+      let input = event.target.value.replace(/\D/g, '')
+      
+      // Limit to 10 digits
+      if (input.length > 10) {
+        input = input.slice(0, 10)
+      }
+      
+      // Format as (XXX) XXX-XXXX
+      let formatted = ''
+      if (input.length > 0) {
+        formatted = '(' + input.slice(0, 3)
+      }
+      if (input.length > 3) {
+        formatted += ') ' + input.slice(3, 6)
+      }
+      if (input.length > 6) {
+        formatted += '-' + input.slice(6, 10)
+      }
+      
+      signupForm.value.phoneNumber = formatted
+    }
 
     const handleLogin = async () => {
       loading.value = true
@@ -307,12 +334,15 @@ export default {
       }
       
       try {
+        // Strip formatting from phone number before sending (only send digits)
+        const phoneDigits = signupForm.value.phoneNumber.replace(/\D/g, '')
+        
         const user = await userStore.createAccount(
           signupForm.value.username,
           signupForm.value.password,
           signupForm.value.name,
           signupForm.value.email,
-          signupForm.value.phoneNumber
+          phoneDigits
         )
         
         if (user) {
@@ -401,6 +431,7 @@ export default {
       validatePasswordStrength,
       toggleLoginPasswordVisibility,
       toggleSignupPasswordVisibility,
+      formatPhoneNumber,
       handleLogin,
       handleSignup,
       goToBetting
