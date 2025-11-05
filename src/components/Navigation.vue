@@ -48,14 +48,28 @@
 
         <!-- User Info -->
         <div v-else class="user-section">
-          <div class="user-info">
-            <div class="user-details">
-              <span class="username">{{ currentUser.username }}: ${{ totalCash.toLocaleString() }}</span>
+          <div class="user-menu-container" @click.stop="toggleUserMenu">
+            <div class="user-info">
+              <div class="user-avatar">
+                <span class="avatar-text">{{ currentUser.username.charAt(0).toUpperCase() }}</span>
+              </div>
+              <div class="user-details">
+                <span class="username">{{ currentUser.username }}</span>
+                <span class="balance">${{ totalCash.toLocaleString() }}</span>
+              </div>
+              <svg class="dropdown-arrow" :class="{ open: isUserMenuOpen }" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div v-if="isUserMenuOpen" class="user-dropdown">
+              <button @click="handleLogout" class="dropdown-item logout-item">
+                <svg class="logout-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 14H3C2.46957 14 1.96086 13.7893 1.58579 13.4142C1.21071 13.0391 1 12.5304 1 12V4C1 3.46957 1.21071 2.96086 1.58579 2.58579C1.96086 2.21071 2.46957 2 3 2H6M11 11L15 7M15 7L11 3M15 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Logout</span>
+              </button>
             </div>
           </div>
-          <button @click="handleLogout" class="logout-btn">
-            Logout
-          </button>
         </div>
       </div>
 
@@ -141,7 +155,7 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 
 export default {
@@ -156,6 +170,7 @@ export default {
   setup(props, { emit }) {
     const userStore = useUserStore()
     const isMobileMenuOpen = ref(false)
+    const isUserMenuOpen = ref(false)
     
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
@@ -179,15 +194,41 @@ export default {
       isMobileMenuOpen.value = false
     }
 
+    const toggleUserMenu = () => {
+      isUserMenuOpen.value = !isUserMenuOpen.value
+    }
+
+    const closeUserMenu = () => {
+      isUserMenuOpen.value = false
+    }
+
     const handleNavClick = (page) => {
       emit('change-page', page)
       closeMobileMenu()
+      closeUserMenu()
     }
 
     const handleLogout = () => {
       userStore.logout()
       closeMobileMenu()
+      closeUserMenu()
     }
+
+    // Close user menu when clicking outside
+    const handleClickOutside = (event) => {
+      const userMenu = event.target.closest('.user-menu-container')
+      if (!userMenu && isUserMenuOpen.value) {
+        closeUserMenu()
+      }
+    }
+
+    onMounted(() => {
+      window.addEventListener('click', handleClickOutside)
+    })
+
+    onUnmounted(() => {
+      window.removeEventListener('click', handleClickOutside)
+    })
 
     return {
       isAuthenticated,
@@ -195,8 +236,11 @@ export default {
       userBalance,
       totalCash,
       isMobileMenuOpen,
+      isUserMenuOpen,
       toggleMobileMenu,
+      toggleUserMenu,
       closeMobileMenu,
+      closeUserMenu,
       handleNavClick,
       handleLogout
     }
@@ -214,7 +258,7 @@ export default {
 }
 
 .nav-container {
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -331,6 +375,11 @@ export default {
   display: flex;
   align-items: center;
   gap: 1rem;
+  position: relative;
+}
+
+.user-menu-container {
+  position: relative;
 }
 
 .user-info {
@@ -342,46 +391,162 @@ export default {
   box-sizing: border-box;
   display: flex;
   align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-info:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-text {
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
 }
 
 .user-details {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
+  align-items: flex-start;
+  gap: 0.125rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .username {
   font-weight: 600;
   color: #1a1a1a;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .balance {
   font-weight: 700;
   color: #059669;
-  font-size: 1rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
 }
 
-.logout-btn {
+.dropdown-arrow {
+  color: #6b7280;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  min-width: 160px;
+  padding: 0.25rem 0;
+  z-index: 1000;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: #dc2626;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
+  padding: 0.625rem 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-size: 0.9rem;
-  height: 48px;
-  box-sizing: border-box;
+  transition: background-color 0.2s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #1a1a1a;
 }
 
-.logout-btn:hover {
-  background: #b91c1c;
+.dropdown-item:hover {
+  background: #f8fafc;
+}
+
+.user-info-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  cursor: default;
+}
+
+.user-info-item:hover {
+  background: transparent;
+}
+
+.dropdown-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dropdown-value {
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 0.875rem;
+}
+
+.balance-value {
+  color: #059669;
+  font-weight: 700;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 0.5rem 0;
+}
+
+.logout-item {
+  color: #dc2626;
+  font-weight: 600;
+  gap: 0.5rem;
+}
+
+.logout-item:hover {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.logout-icon {
+  flex-shrink: 0;
 }
 
 .nav-icon {
