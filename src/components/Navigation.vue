@@ -197,8 +197,9 @@ export default {
       
       const outstandingBets = currentUser.value.bets.filter(bet => bet.status === 'pending')
       const outstandingAmount = outstandingBets.reduce((sum, bet) => sum + (bet.amount || 0), 0)
-      
-      return userBalance.value + outstandingAmount
+
+      // Make the balance what they have available
+      return userBalance.value
     })
 
     const toggleMobileMenu = () => {
