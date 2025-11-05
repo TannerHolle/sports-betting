@@ -1,23 +1,37 @@
 <template>
   <div class="friends-bets" v-if="isAuthenticated">
     <div class="league-selector-section" v-if="userLeagues.length > 0 || isAdmin">
-      <label class="league-selector-label">Select League:</label>
-      <select 
-        v-model="selectedLeagueId" 
-        @change="fetchFriendsBets"
-        class="league-selector"
-        :disabled="isDropdownDisabled"
-      >
-        <option v-if="isAdmin" value="all-bets">All Bets from All Users</option>
-        <option value="">All My Leagues</option>
-        <option 
-          v-for="league in userLeagues" 
-          :key="league._id"
-          :value="league._id"
+      <div class="league-selector-left">
+        <label class="league-selector-label">Select League:</label>
+        <select 
+          v-model="selectedLeagueId" 
+          @change="fetchFriendsBets"
+          class="league-selector"
+          :disabled="isDropdownDisabled"
         >
-          {{ league.name }}
-        </option>
-      </select>
+          <option v-if="isAdmin" value="all-bets">All Bets from All Users</option>
+          <option value="">All My Leagues</option>
+          <option 
+            v-for="league in userLeagues" 
+            :key="league._id"
+            :value="league._id"
+          >
+            {{ league.name }}
+          </option>
+        </select>
+      </div>
+      <div class="status-filter-right">
+        <!-- <label class="status-filter-label">Filter:</label> -->
+        <select 
+          v-model="selectedStatusFilter"
+          class="status-filter-select"
+        >
+          <option value="">All</option>
+          <option value="won">Won</option>
+          <option value="lost">Lost</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
     </div>
 
     <div v-if="userLeagues.length === 0 && !isAdmin" class="no-leagues">
@@ -35,13 +49,13 @@
         <button @click="fetchFriendsBets" class="retry-btn">Try Again</button>
       </div>
 
-      <div v-else-if="friendsBets.length === 0" class="no-bets">
+      <div v-else-if="filteredFriendsBets.length === 0" class="no-bets">
         <p>No pending or recent bets from your friends yet.</p>
       </div>
 
       <div v-else class="bets-list">
         <div 
-          v-for="betWithUser in friendsBets" 
+          v-for="betWithUser in filteredFriendsBets" 
           :key="`${betWithUser.user.username}-${betWithUser.bet._id}`"
           class="bet-card"
           :class="betWithUser.bet.status"
@@ -132,6 +146,7 @@ export default {
     const userLeagues = ref([])
     const selectedLeagueId = ref('')
     const friendsBets = ref([])
+    const selectedStatusFilter = ref('')
     const loading = ref(false)
     const error = ref('')
     const liveScores = ref(new Map())
@@ -148,6 +163,16 @@ export default {
     // Check if dropdown should be disabled (non-admin with only 1 league)
     const isDropdownDisabled = computed(() => {
       return !isAdmin.value && userLeagues.value.length === 1
+    })
+
+    // Filter bets by status
+    const filteredFriendsBets = computed(() => {
+      if (!selectedStatusFilter.value) {
+        return friendsBets.value
+      }
+      return friendsBets.value.filter(betWithUser => 
+        betWithUser.bet.status === selectedStatusFilter.value
+      )
     })
 
     // Set default selected league based on user type and league count
@@ -481,7 +506,9 @@ export default {
       isDropdownDisabled,
       userLeagues,
       selectedLeagueId,
+      selectedStatusFilter,
       friendsBets,
+      filteredFriendsBets,
       loading,
       error,
       fetchFriendsBets,
@@ -513,6 +540,16 @@ export default {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
   border-bottom: 2px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.league-selector-left {
+  flex: 1;
+  min-width: 200px;
 }
 
 .league-selector-label {
@@ -533,6 +570,39 @@ export default {
   background: white;
   cursor: pointer;
   transition: border-color 0.2s ease;
+}
+
+.status-filter-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.status-filter-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.status-filter-select {
+  width: 100%;
+  max-width: 200px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.status-filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .league-selector:focus {
@@ -887,6 +957,19 @@ export default {
   }
   
   .league-selector {
+    max-width: 100%;
+  }
+  
+  .league-selector-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .status-filter-right {
+    align-items: stretch;
+  }
+  
+  .status-filter-select {
     max-width: 100%;
   }
 }
