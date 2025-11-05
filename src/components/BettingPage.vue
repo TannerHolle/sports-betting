@@ -47,28 +47,30 @@
     <!-- Leaderboard -->
     <Leaderboard :user-leagues="userLeaguesForLeaderboard" />
 
-    <!-- League Selection -->
-    <div class="league-selection">
-      <div class="league-tabs">
-        <button 
-          v-for="sport in sports" 
-          :key="sport.id"
-          @click="setActiveLeague(sport.id)" 
-          :class="{ active: activeLeague === sport.id }"
-          class="league-tab"
-        >
-          <span class="tab-icon">{{ sport.icon }}</span>
-          {{ sport.name }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Games with Betting -->
-    <div class="games-section">
+    <!-- Games Header -->
+    <div class="games-header">
       <h2>Games Today Available for Betting</h2>
       <p class="section-description">
         Scheduled games with betting lines that are happening today are shown below. Click on any game to expand and place your bets.
       </p>
+    </div>
+
+    <!-- League Selection -->
+    <div class="league-selection">
+      <button 
+        v-for="sport in sports" 
+        :key="sport.id"
+        @click="setActiveLeague(sport.id)" 
+        :class="{ active: activeLeague === sport.id }"
+        class="league-chip"
+      >
+        <span class="chip-icon">{{ sport.icon }}</span>
+        <span class="chip-text">{{ sport.name }}</span>
+      </button>
+    </div>
+
+    <!-- Games with Betting -->
+    <div class="games-section">
       
       <div v-if="error" class="error-message">
         <h3>⚠️ Error Loading Games</h3>
@@ -417,61 +419,91 @@ export default {
 }
 
 .league-selection {
-  width: fit-content;
-  margin: 0 auto 2rem auto;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.league-tabs {
   display: flex;
-  gap: 1rem;
   justify-content: center;
-  flex-wrap: wrap;
-}
-
-.league-tab {
-  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  color: #374151;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.league-tab:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-2px);
-}
-
-.league-tab.active {
-  background: rgba(255, 255, 255, 0.95);
-  color: #1a1a1a;
-  border-color: #4169e1;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.tab-icon {
-  font-size: 1.5rem;
-}
-
-.games-section {
-  max-width: 1200px;
-  margin: 0 auto;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 0 auto 3rem auto;
+  max-width: 900px;
   padding: 0 2rem;
 }
 
-.games-section h2 {
+.league-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.league-chip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.league-chip:hover::before {
+  left: 100%;
+}
+
+.league-chip:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.league-chip.active {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1e3a8a;
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3), 0 0 20px rgba(65, 105, 225, 0.3);
+  transform: translateY(-2px);
+}
+
+.league-chip.active:hover {
+  background: white;
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.4), 0 0 24px rgba(65, 105, 225, 0.4);
+}
+
+.chip-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.league-chip.active .chip-icon {
+  filter: drop-shadow(0 2px 4px rgba(65, 105, 225, 0.3));
+}
+
+.chip-text {
+  white-space: nowrap;
+}
+
+.games-header {
+  max-width: 1200px;
+  margin: 0 auto 2rem auto;
+  padding: 0 2rem;
+}
+
+.games-header h2 {
   color: white;
   font-size: 2rem;
   font-weight: 700;
@@ -482,9 +514,15 @@ export default {
 .section-description {
   color: white;
   text-align: center;
-  margin: 0 0 3rem 0;
+  margin: 0;
   opacity: 0.9;
   font-size: 1.1rem;
+}
+
+.games-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
 }
 
 .games-grid {
@@ -631,20 +669,18 @@ export default {
   }
   
   .league-selection {
-    padding: 0.75rem 1rem;
-    margin: 0 auto 1.5rem auto;
+    padding: 0 1rem;
+    margin: 0 auto 2rem auto;
+    gap: 0.75rem;
   }
   
-  .league-tabs {
+  .league-chip {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
     gap: 0.5rem;
   }
   
-  .league-tab {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
-  }
-  
-  .tab-icon {
+  .chip-icon {
     font-size: 1.2rem;
   }
 }
