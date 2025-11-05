@@ -12,7 +12,7 @@
       
       <div class="modal-body">
         <p class="modal-description">
-          Think you've got a great idea? Prove it. I want to hear your suggestions. Worst case scenario? I politely ignore you. Best case? You help make this app quite a bit better.
+          Think you've got a great idea? Prove it. I want to hear your suggestions. Worst case scenario? I politely ignore you. Best case? You help make this app better.
         </p>
         
         <div class="form-group">
