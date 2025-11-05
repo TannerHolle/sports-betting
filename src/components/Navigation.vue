@@ -62,6 +62,13 @@
               </svg>
             </div>
             <div v-if="isUserMenuOpen" class="user-dropdown">
+              <button @click="handleSuggestions" class="dropdown-item suggestions-item">
+                <svg class="suggestions-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 1L10.09 5.26L15 6.27L11 9.14L11.82 14.02L8 11.77L4.18 14.02L5 9.14L1 6.27L5.91 5.26L8 1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+                <span>Suggestions</span>
+              </button>
+              <div class="dropdown-divider"></div>
               <button @click="handleLogout" class="dropdown-item logout-item">
                 <svg class="logout-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M6 14H3C2.46957 14 1.96086 13.7893 1.58579 13.4142C1.21071 13.0391 1 12.5304 1 12V4C1 3.46957 1.21071 2.96086 1.58579 2.58579C1.96086 2.21071 2.46957 2 3 2H6M11 11L15 7M15 7L11 3M15 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -73,6 +80,9 @@
         </div>
       </div>
 
+      <!-- Suggestions Modal -->
+      <SuggestionsModal :isOpen="isSuggestionsModalOpen" @close="closeSuggestionsModal" />
+      
       <!-- Mobile: Hamburger Button and User Info -->
       <div class="mobile-nav-header">
         <!-- User Info (Mobile) -->
@@ -157,9 +167,13 @@
 <script>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
+import SuggestionsModal from './SuggestionsModal.vue'
 
 export default {
   name: 'Navigation',
+  components: {
+    SuggestionsModal
+  },
   props: {
     currentPage: {
       type: String,
@@ -171,6 +185,7 @@ export default {
     const userStore = useUserStore()
     const isMobileMenuOpen = ref(false)
     const isUserMenuOpen = ref(false)
+    const isSuggestionsModalOpen = ref(false)
     
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
@@ -208,6 +223,15 @@ export default {
       closeUserMenu()
     }
 
+    const handleSuggestions = () => {
+      isSuggestionsModalOpen.value = true
+      closeUserMenu()
+    }
+
+    const closeSuggestionsModal = () => {
+      isSuggestionsModalOpen.value = false
+    }
+
     const handleLogout = () => {
       userStore.logout()
       closeMobileMenu()
@@ -237,11 +261,14 @@ export default {
       totalCash,
       isMobileMenuOpen,
       isUserMenuOpen,
+      isSuggestionsModalOpen,
       toggleMobileMenu,
       toggleUserMenu,
       closeMobileMenu,
       closeUserMenu,
       handleNavClick,
+      handleSuggestions,
+      closeSuggestionsModal,
       handleLogout
     }
   }
@@ -547,6 +574,27 @@ export default {
 
 .logout-icon {
   flex-shrink: 0;
+}
+
+.suggestions-item {
+  color: #4169e1;
+  font-weight: 600;
+  gap: 0.5rem;
+}
+
+.suggestions-item:hover {
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.suggestions-icon {
+  flex-shrink: 0;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 0.25rem 0;
 }
 
 .nav-icon {

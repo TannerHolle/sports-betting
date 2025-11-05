@@ -79,8 +79,8 @@
       <div class="live-game-state" v-if="gameInProgress">
         <div class="game-clock">
           <div class="clock-display">
-            <span class="time">{{ status.displayClock || '0:00' }}</span>
-            <span class="quarter">{{ status.period }}{{ getOrdinalSuffix(status.period) }} Half</span>
+            <span class="time">{{ displayTime }}</span>
+            <span class="quarter" v-if="displayPeriod">{{ displayPeriod }}</span>
           </div>
         </div>
       </div>
@@ -213,7 +213,15 @@ export default {
     const statusText = computed(() => {
       if (gameCompleted.value) return 'Final'
       if (gameInProgress.value) {
-        return `${status.value.displayClock} - ${status.value.period}${getOrdinalSuffix(status.value.period)}`
+        const time = status.value.displayClock || '0:00'
+        const period = status.value.period || 1
+        
+        // Check for halftime (0:00 in 1st half for college basketball - 2 halves total)
+        if ((time === '0:00' || time === '0.0') && period === 1) {
+          return 'Halftime'
+        }
+        
+        return `${time} - ${period}${getOrdinalSuffix(period)}`
       }
       // Convert scheduled game time to user's local timezone
       const shortDetail = status.value?.type?.shortDetail
@@ -238,6 +246,33 @@ export default {
         default: return 'th'
       }
     }
+
+    // Computed properties for live game display
+    const displayTime = computed(() => {
+      if (!gameInProgress.value) return ''
+      const time = status.value.displayClock || '0:00'
+      const period = status.value.period || 1
+      
+      // Show "Halftime" when time is 0:00 in 1st half (college basketball has 2 halves)
+      if ((time === '0:00' || time === '0.0') && period === 1) {
+        return 'Halftime'
+      }
+      
+      return time
+    })
+
+    const displayPeriod = computed(() => {
+      if (!gameInProgress.value) return ''
+      const time = status.value.displayClock || '0:00'
+      const period = status.value.period || 1
+      
+      // Don't show period label during halftime
+      if ((time === '0:00' || time === '0.0') && period === 1) {
+        return ''
+      }
+      
+      return `${period}${getOrdinalSuffix(period)} Half`
+    })
 
     const toggleCollapsed = () => {
       isCollapsed.value = !isCollapsed.value
@@ -329,6 +364,8 @@ export default {
       status,
       statusClass,
       statusText,
+      displayTime,
+      displayPeriod,
       getRecord,
       getOrdinalSuffix,
       toggleCollapsed,
