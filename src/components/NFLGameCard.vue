@@ -31,7 +31,7 @@
         <span class="score-medium" :class="{ 'winning-score': isWinning(competitor) }">{{ competitor.score || '0' }}</span>
       </div>
       <!-- Show if betting options are available -->
-      <div v-if="betting && gameScheduled" class="odds-indicator">
+      <div v-if="betting && gameScheduled" class="odds-indicator" @click="toggleCollapsed">
         ✓ Odds Available - Click to expand
       </div>
     </div>
@@ -406,6 +406,7 @@ export default {
   font-size: 12px;
   color: #059669;
   font-weight: 500;
+  cursor: pointer;
 }
 
 </style>
