@@ -40,7 +40,7 @@
         <div class="user-info">
           <div class="username">{{ user.username }}</div>
           <div class="user-stats">
-            <span class="stat">${{ user.totalCash.toLocaleString() }} total cash</span>
+            <!--<span class="stat">${{ user.totalCash.toLocaleString() }} total cash</span>-->
             <span class="stat">${{ user.totalWon.toLocaleString() }} won</span>
             <span class="stat">${{ user.totalLost.toLocaleString() }} lost</span>
             <span class="stat">{{ user.winRate }}% win rate</span>
