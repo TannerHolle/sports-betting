@@ -21,7 +21,7 @@
         </select>
       </div>
       <div class="status-filter-right">
-        <!-- <label class="status-filter-label">Filter:</label> -->
+        <label class="status-filter-label">Filter:</label>
         <select 
           v-model="selectedStatusFilter"
           class="status-filter-select"
@@ -30,6 +30,9 @@
           <option value="won">Won</option>
           <option value="lost">Lost</option>
           <option value="pending">Pending</option>
+          <option value="huge-bets">Huge Bets</option>
+          <option value="big-underdogs">Big Underdogs</option>
+          <option value="live-bets">Live Bets</option>
         </select>
       </div>
     </div>
@@ -165,14 +168,83 @@ export default {
       return !isAdmin.value && userLeagues.value.length === 1
     })
 
-    // Filter bets by status
+    // Helper function to parse odds and check if it's a big underdog
+    const isBigUnderdog = (odds) => {
+      if (!odds) return false
+      
+      // Handle "EVEN" odds
+      if (odds === 'EVEN' || odds === 'even') {
+        return false // Even odds are not underdogs
+      }
+      
+      let oddsValue
+      
+      // Handle number format (e.g., 150 means +150)
+      if (typeof odds === 'number') {
+        oddsValue = odds
+        // Big underdog = positive odds of +200 or higher
+        return oddsValue >= 200
+      }
+      
+      // Handle string format - can be "+150", "-200", "150", or "-200"
+      if (typeof odds === 'string') {
+        // Check if it starts with "-" (favorite, not underdog)
+        if (odds.startsWith('-')) {
+          return false
+        }
+        
+        // Parse the number (remove "+" if present, or just parse the number)
+        oddsValue = parseInt(odds.replace(/[+-]/, ''))
+        if (isNaN(oddsValue)) return false
+        
+        // Big underdog = positive odds of +200 or higher
+        return oddsValue >= 200
+      }
+      
+      return false
+    }
+
+    // Helper function to check if bet is a huge bet
+    const isHugeBet = (amount) => {
+      // Huge bet = $100 or more
+      return amount > 100
+    }
+
+    // Filter bets by status or special filters
     const filteredFriendsBets = computed(() => {
       if (!selectedStatusFilter.value) {
         return friendsBets.value
       }
-      return friendsBets.value.filter(betWithUser => 
-        betWithUser.bet.status === selectedStatusFilter.value
-      )
+      
+      // Handle status filters (won, lost, pending)
+      if (['won', 'lost', 'pending'].includes(selectedStatusFilter.value)) {
+        return friendsBets.value.filter(betWithUser => 
+          betWithUser.bet.status === selectedStatusFilter.value
+        )
+      }
+      
+      // Handle "huge bets" filter
+      if (selectedStatusFilter.value === 'huge-bets') {
+        return friendsBets.value.filter(betWithUser => 
+          isHugeBet(betWithUser.bet.amount)
+        )
+      }
+      
+      // Handle "big underdogs" filter
+      if (selectedStatusFilter.value === 'big-underdogs') {
+        return friendsBets.value.filter(betWithUser => 
+          isBigUnderdog(betWithUser.bet.odds)
+        )
+      }
+      
+      // Handle "live bets" filter - bets on games currently in progress
+      if (selectedStatusFilter.value === 'live-bets') {
+        return friendsBets.value.filter(betWithUser => 
+          isGameLive(betWithUser.bet)
+        )
+      }
+      
+      return friendsBets.value
     })
 
     // Set default selected league based on user type and league count
@@ -575,8 +647,7 @@ export default {
 .status-filter-right {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
+  align-items: flex-start;
 }
 
 .status-filter-label {
