@@ -112,6 +112,7 @@ export default {
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard',
         component: 'NCAAFootballCard',
         filters: [
+          { value: 'all', label: 'All Games' },
           { value: 'top25', label: 'Top 25 Only' },
           { value: 'sec', label: 'SEC' },
           { value: 'big10', label: 'Big Ten' },
@@ -146,6 +147,7 @@ export default {
         apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard',
         component: 'CollegeBasketballCard',
         filters: [
+          { value: 'all', label: 'All Games' },
           { value: 'top25', label: 'Top 25 Only' },
           { value: 'acc', label: 'ACC' },
           { value: 'big10', label: 'Big Ten' },
@@ -313,6 +315,8 @@ export default {
     // Filtering functions
     const filterNCAAFootballGames = (competitors, groups, filter) => {
       switch (filter) {
+        case 'all':
+          return true
         case 'top25':
           return competitors.some(comp => 
             comp.curatedRank && comp.curatedRank.current <= 25
@@ -389,6 +393,8 @@ export default {
 
     const filterNCAABasketballGames = (competitors, groups, filter) => {
       switch (filter) {
+        case 'all':
+          return true
         case 'top25':
           return competitors.some(comp => 
             comp.curatedRank && comp.curatedRank.current <= 25
@@ -479,6 +485,12 @@ export default {
     }
 
     onMounted(() => {
+      // Ensure college sports default to 'top25' filter on initial load if no preference is saved
+      if (activeLeague.value === 'ncaa-football' || activeLeague.value === 'ncaa-basketball') {
+        if (!localStorage.getItem('selectedFilter')) {
+          selectedFilter.value = 'top25'
+        }
+      }
       fetchData()
       startAutoRefresh()
     })
