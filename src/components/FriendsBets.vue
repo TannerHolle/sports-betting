@@ -457,9 +457,33 @@ export default {
 
     // Get final score data for completed bets
     const getFinalScoreData = (bet) => {
+        console.log('bet in getFinalScoreData', bet)
       // Only show final score for completed bets (won/lost)
       if (bet.status !== 'won' && bet.status !== 'lost') return null
       
+      // First, check if bet has actualResult (from backend)
+      if (bet.actualResult) {
+        // Normalize actualResult to match expected format
+        const homeScore = typeof bet.actualResult.homeScore === 'object' 
+          ? parseInt(bet.actualResult.homeScore.$numberInt || bet.actualResult.homeScore) 
+          : parseInt(bet.actualResult.homeScore) || 0
+        
+        const awayScore = typeof bet.actualResult.awayScore === 'object'
+          ? parseInt(bet.actualResult.awayScore.$numberInt || bet.actualResult.awayScore)
+          : parseInt(bet.actualResult.awayScore) || 0
+        
+        return {
+          homeTeam: bet.actualResult.homeTeam,
+          awayTeam: bet.actualResult.awayTeam,
+          homeScore: homeScore,
+          awayScore: awayScore,
+          isCompleted: true,
+          isLive: false,
+          status: bet.actualResult.gameStatus || 'Final'
+        }
+      }
+      
+      // Fallback to live scores if available
       const liveData = liveScores.value.get(bet.gameId)
       if (!liveData) return null
       
