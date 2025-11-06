@@ -457,7 +457,6 @@ export default {
 
     // Get final score data for completed bets
     const getFinalScoreData = (bet) => {
-        console.log('bet in getFinalScoreData', bet)
       // Only show final score for completed bets (won/lost)
       if (bet.status !== 'won' && bet.status !== 'lost') return null
       
