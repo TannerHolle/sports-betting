@@ -50,15 +50,18 @@
     <!-- Games Header -->
     <div class="games-header">
       <h2>Games Today Available for Betting</h2>
-      <p class="section-description">
-        Scheduled games with betting lines that are happening today are shown below. Click on any game to expand and place your bets.
+      <p class="section-description" v-if="!loading && gamesWithBetting.length === 0">
+        No games left to bet on today.
+      </p>
+      <p class="section-description" v-else>
+        Scheduled games with betting lines that are happening today are shown below. If you'd like to bet on a specific game, click on live sports and go to the league and date of the game you want to bet on.
       </p>
     </div>
 
     <!-- League Selection -->
     <div class="league-selection">
       <button 
-        v-for="sport in sports" 
+        v-for="sport in availableSports" 
         :key="sport.id"
         @click="setActiveLeague(sport.id)" 
         :class="{ active: activeLeague === sport.id }"
@@ -146,7 +149,9 @@ export default {
     const error = ref(null)
     const activeLeague = ref('ncaa-football') // Default to NCAA Football
     const refreshInterval = ref(null)
+    const allSportsRefreshInterval = ref(null)
     const userLeaguesForLeaderboard = ref([])
+    const gamesBySport = ref({}) // Store games for each sport
 
     // User data from store
     const userBalance = computed(() => userStore.userBalance.value)
@@ -205,28 +210,30 @@ export default {
       return currentSport.value?.component || 'NCAAFootballCard'
     })
 
-    // Filter games that have betting information and are available for betting,
-    // then sort NCAA games by best Top 25 rank (ascending)
-    const gamesWithBetting = computed(() => {
-      const filtered = games.value.filter(game => {
-        const competition = game.competitions?.[0]
-        const status = competition?.status
-        
-        // Only show games that are scheduled (not started yet) - NO in-progress games
-        const isScheduled = status?.type?.state === 'pre'
-        
-        // Check if game is today in local timezone (handles UTC timezone conversion properly)
-        const isToday = isGameToday(game.date)
-        
-        // For NBA, show only scheduled games that are today
-        if (activeLeague.value === 'nba') {
-          return isScheduled && isToday
-        }
-        
-        // For other sports, show only scheduled games with real odds data that are today
-        return isScheduled && isToday && competition?.odds && competition.odds.length > 0
-      })
+    // Helper function to check if a game matches betting criteria for a specific sport
+    const matchesBettingCriteria = (game, sportId, dateCheckFn) => {
+      const competition = game.competitions?.[0]
+      const status = competition?.status
+      const isScheduled = status?.type?.state === 'pre'
+      const dateMatches = dateCheckFn(game.date)
+      
+      if (sportId === 'nba') {
+        return isScheduled && dateMatches
+      }
+      
+      return isScheduled && dateMatches && competition?.odds && competition.odds.length > 0
+    }
 
+    // Helper function to check if games have betting available for a specific sport
+    // Only checks for today's games
+    const hasGamesWithBetting = (sportId, gamesList) => {
+      if (!gamesList || gamesList.length === 0) return false
+      
+      return gamesList.some(game => matchesBettingCriteria(game, sportId, isGameToday))
+    }
+
+    // Helper function to sort games by rank (for NCAA games)
+    const sortGamesByRank = (gamesList) => {
       // Sort by rank for NCAA Football/Basketball
       if (activeLeague.value === 'ncaa-football' || activeLeague.value === 'ncaa-basketball') {
         const getBestTop25Rank = (game) => {
@@ -237,10 +244,29 @@ export default {
           return ranks.length ? Math.min(...ranks) : Number.POSITIVE_INFINITY
         }
 
-        return [...filtered].sort((a, b) => getBestTop25Rank(a) - getBestTop25Rank(b))
+        return [...gamesList].sort((a, b) => getBestTop25Rank(a) - getBestTop25Rank(b))
       }
 
-      return filtered
+      return gamesList
+    }
+
+    // Filter games that have betting information and are available for betting,
+    // then sort NCAA games by best Top 25 rank (ascending)
+    // Only shows today's games
+    const gamesWithBetting = computed(() => {
+      const filtered = games.value.filter(game => {
+        return matchesBettingCriteria(game, activeLeague.value, isGameToday)
+      })
+
+      return sortGamesByRank(filtered)
+    })
+
+    // Filter sports to only show those with games available for betting today
+    const availableSports = computed(() => {
+      return sports.value.filter(sport => {
+        const sportGames = gamesBySport.value[sport.id] || []
+        return hasGamesWithBetting(sport.id, sportGames)
+      })
     })
 
     const fetchData = async (showLoading = true) => {
@@ -257,7 +283,11 @@ export default {
         }
         
         const response = await axios.get(baseApiUrl)
-        games.value = response.data.events || []
+        const fetchedGames = response.data.events || []
+        games.value = fetchedGames
+        
+        // Store games for this sport
+        gamesBySport.value[activeLeague.value] = fetchedGames
         
       } catch (err) {
         error.value = err.message || 'Failed to fetch data'
@@ -267,6 +297,22 @@ export default {
           loading.value = false
         }
       }
+    }
+
+    // Check all sports to see which have games available
+    const checkAllSports = async () => {
+      const checkPromises = sports.value.map(async (sport) => {
+        try {
+          const response = await axios.get(sport.apiUrl)
+          const fetchedGames = response.data.events || []
+          gamesBySport.value[sport.id] = fetchedGames
+        } catch (err) {
+          console.error(`Error fetching data for ${sport.name}:`, err)
+          gamesBySport.value[sport.id] = []
+        }
+      })
+      
+      await Promise.all(checkPromises)
     }
 
     const setActiveLeague = (league) => {
@@ -293,6 +339,22 @@ export default {
       }
     }
 
+    // Start periodic refresh for all sports (to update available sports list)
+    const startAllSportsRefresh = () => {
+      // Check all sports every 60 seconds to update availability
+      allSportsRefreshInterval.value = setInterval(() => {
+        checkAllSports()
+      }, 60000)
+    }
+
+    // Stop all sports refresh
+    const stopAllSportsRefresh = () => {
+      if (allSportsRefreshInterval.value) {
+        clearInterval(allSportsRefreshInterval.value)
+        allSportsRefreshInterval.value = null
+      }
+    }
+
     const fetchUserLeagues = async () => {
       if (!userStore.currentUser.value?.username) return
       
@@ -307,11 +369,24 @@ export default {
 
     onMounted(async () => {
       await fetchUserLeagues()
+      // Check all sports first to see which have games available
+      await checkAllSports()
+      
+      // If current active league doesn't have games, switch to first available
+      if (availableSports.value.length > 0) {
+        const hasActiveLeagueGames = availableSports.value.some(sport => sport.id === activeLeague.value)
+        if (!hasActiveLeagueGames) {
+          activeLeague.value = availableSports.value[0].id
+        }
+      }
+      
       startLiveRefresh()
+      startAllSportsRefresh()
     })
 
     onUnmounted(() => {
       stopLiveRefresh()
+      stopAllSportsRefresh()
     })
 
     return {
@@ -320,6 +395,7 @@ export default {
       error,
       activeLeague,
       sports,
+      availableSports,
       currentSport,
       currentGameCardComponent,
       gamesWithBetting,

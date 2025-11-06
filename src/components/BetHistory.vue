@@ -23,7 +23,7 @@
     <!-- Active Bets -->
     <div v-if="activeTab === 'active'" class="bets-section">
       <div v-if="activeBets.length === 0" class="no-bets">
-        <p>No active bets. Place your first bet on a game above!</p>
+        <p>No active bets. <br></br>Place a bet and track it here!</p>
       </div>
       <div v-else class="bets-list">
         <div 
