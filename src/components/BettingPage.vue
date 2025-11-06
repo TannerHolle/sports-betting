@@ -49,12 +49,12 @@
 
     <!-- Games Header -->
     <div class="games-header">
-      <h2>Games Today Available for Betting</h2>
+      <h2>{{ noGamesToday ? 'Games Tomorrow Available for Betting' : 'Games Today Available for Betting' }}</h2>
       <p class="section-description" v-if="!loading && gamesWithBetting.length === 0">
-        No games left to bet on today.
+        No games left to bet on {{ noGamesToday ? 'tomorrow' : 'today' }}.
       </p>
       <p class="section-description" v-else>
-        Scheduled games with betting lines that are happening today are shown below. If you'd like to bet on a specific game, click on live sports and go to the league and date of the game you want to bet on.
+        Scheduled games with betting lines that are happening {{ noGamesToday ? 'tomorrow' : 'today' }} are shown below. If you'd like to bet on a specific game, click on live sports and go to the league and date of the game you want to bet on.
       </p>
     </div>
 
@@ -152,6 +152,7 @@ export default {
     const allSportsRefreshInterval = ref(null)
     const userLeaguesForLeaderboard = ref([])
     const gamesBySport = ref({}) // Store games for each sport
+    const noGamesToday = ref(false) // Track if there are no games to bet on today
 
     // User data from store
     const userBalance = computed(() => userStore.userBalance.value)
@@ -210,26 +211,35 @@ export default {
       return currentSport.value?.component || 'NCAAFootballCard'
     })
 
-    // Helper function to check if a game matches betting criteria for a specific sport
-    const matchesBettingCriteria = (game, sportId, dateCheckFn) => {
-      const competition = game.competitions?.[0]
-      const status = competition?.status
-      const isScheduled = status?.type?.state === 'pre'
-      const dateMatches = dateCheckFn(game.date)
-      
-      if (sportId === 'nba') {
-        return isScheduled && dateMatches
-      }
-      
-      return isScheduled && dateMatches && competition?.odds && competition.odds.length > 0
+    // Helper to format tomorrow's date for API (YYYYMMDD)
+    const getTomorrowDateString = () => {
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      return `${tomorrow.getFullYear()}${String(tomorrow.getMonth() + 1).padStart(2, '0')}${String(tomorrow.getDate()).padStart(2, '0')}`
     }
 
-    // Helper function to check if games have betting available for a specific sport
-    // Only checks for today's games
+    // Helper to check if a game matches betting criteria
+    const matchesBettingCriteria = (game, sportId, isTomorrow = false) => {
+      const competition = game.competitions?.[0]
+      const isScheduled = competition?.status?.type?.state === 'pre'
+      if (!isScheduled) return false
+
+      // For tomorrow's games (fetched via date param), trust API and be lenient with odds
+      if (isTomorrow) return true
+
+      // For today's games, check date and require odds (except NBA)
+      const dateMatches = isGameToday(game.date)
+      if (sportId === 'nba') return dateMatches
+      return dateMatches && competition?.odds?.length > 0
+    }
+
+    // Check if games list has betting available (today or tomorrow)
     const hasGamesWithBetting = (sportId, gamesList) => {
-      if (!gamesList || gamesList.length === 0) return false
-      
-      return gamesList.some(game => matchesBettingCriteria(game, sportId, isGameToday))
+      if (!gamesList?.length) return false
+      return gamesList.some(game => 
+        matchesBettingCriteria(game, sportId, false) || 
+        matchesBettingCriteria(game, sportId, true)
+      )
     }
 
     // Helper function to sort games by rank (for NCAA games)
@@ -250,18 +260,15 @@ export default {
       return gamesList
     }
 
-    // Filter games that have betting information and are available for betting,
-    // then sort NCAA games by best Top 25 rank (ascending)
-    // Only shows today's games
+    // Filter games with betting available, sorted by rank for NCAA games
     const gamesWithBetting = computed(() => {
-      const filtered = games.value.filter(game => {
-        return matchesBettingCriteria(game, activeLeague.value, isGameToday)
-      })
-
+      const filtered = games.value.filter(game => 
+        matchesBettingCriteria(game, activeLeague.value, noGamesToday.value)
+      )
       return sortGamesByRank(filtered)
     })
 
-    // Filter sports to only show those with games available for betting today
+    // Filter sports to show those with games available for betting (today or tomorrow)
     const availableSports = computed(() => {
       return sports.value.filter(sport => {
         const sportGames = gamesBySport.value[sport.id] || []
@@ -270,32 +277,45 @@ export default {
     })
 
     const fetchData = async (showLoading = true) => {
-      if (showLoading) {
-        loading.value = true
-      }
+      if (showLoading) loading.value = true
       error.value = null
       
       try {
         const baseApiUrl = currentSport.value?.apiUrl
+        if (!baseApiUrl) throw new Error('No API URL configured for current sport')
         
-        if (!baseApiUrl) {
-          throw new Error('No API URL configured for current sport')
-        }
-        
+        // Fetch today's games
         const response = await axios.get(baseApiUrl)
         const fetchedGames = response.data.events || []
-        games.value = fetchedGames
         
-        // Store games for this sport
-        gamesBySport.value[activeLeague.value] = fetchedGames
+        // Check if we have games with betting for today (strict date check)
+        const hasGamesToday = fetchedGames.some(game => 
+          matchesBettingCriteria(game, activeLeague.value, false)
+        )
         
+        if (hasGamesToday) {
+          games.value = fetchedGames
+          noGamesToday.value = false
+        } else {
+          // No games today, fetch tomorrow's games
+          try {
+            const tomorrowUrl = `${baseApiUrl}?dates=${getTomorrowDateString()}`
+            const tomorrowResponse = await axios.get(tomorrowUrl)
+            games.value = tomorrowResponse.data.events || []
+            noGamesToday.value = true
+          } catch (tomorrowErr) {
+            console.error('Error fetching tomorrow\'s games:', tomorrowErr)
+            games.value = fetchedGames
+            noGamesToday.value = true
+          }
+        }
+        
+        gamesBySport.value[activeLeague.value] = games.value
       } catch (err) {
         error.value = err.message || 'Failed to fetch data'
         console.error('Error fetching data:', err)
       } finally {
-        if (showLoading) {
-          loading.value = false
-        }
+        if (showLoading) loading.value = false
       }
     }
 
@@ -305,7 +325,25 @@ export default {
         try {
           const response = await axios.get(sport.apiUrl)
           const fetchedGames = response.data.events || []
-          gamesBySport.value[sport.id] = fetchedGames
+          
+          // Check if we have games with betting today
+          const hasGamesToday = fetchedGames.some(game => 
+            matchesBettingCriteria(game, sport.id, false)
+          )
+          
+          if (hasGamesToday) {
+            gamesBySport.value[sport.id] = fetchedGames
+          } else {
+            // Fetch tomorrow's games and combine with today's
+            try {
+              const tomorrowUrl = `${sport.apiUrl}?dates=${getTomorrowDateString()}`
+              const tomorrowResponse = await axios.get(tomorrowUrl)
+              const tomorrowGames = tomorrowResponse.data.events || []
+              gamesBySport.value[sport.id] = [...fetchedGames, ...tomorrowGames]
+            } catch {
+              gamesBySport.value[sport.id] = fetchedGames
+            }
+          }
         } catch (err) {
           console.error(`Error fetching data for ${sport.name}:`, err)
           gamesBySport.value[sport.id] = []
@@ -405,7 +443,8 @@ export default {
       isAdmin,
       fetchData,
       setActiveLeague,
-      userLeaguesForLeaderboard
+      userLeaguesForLeaderboard,
+      noGamesToday
     }
   }
 }
