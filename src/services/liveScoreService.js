@@ -64,7 +64,9 @@ class LiveScoreService {
         awayScore: awayTeam.score || '0',
         status: this.formatStatus(status),
         isLive: status?.type?.state === 'in',
-        isCompleted: status?.type?.completed || false
+        isCompleted: status?.type?.completed || false,
+        gameStartTime: game.date || competition.date,
+        gameStartTimeFormatted: status?.type?.shortDetail || null
       }
 
       // Cache the result

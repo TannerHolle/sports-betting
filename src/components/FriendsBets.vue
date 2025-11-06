@@ -69,9 +69,9 @@
               <div class="user-details">
                 <div class="username">{{ betWithUser.user.username }}</div>
                 <div class="bet-date">
-                  <span v-if="betWithUser.bet.status === 'pending'">{{ formatDate(betWithUser.bet.createdAt) }}</span>
-                  <span v-else-if="betWithUser.bet.resolvedAt">{{ formatDate(betWithUser.bet.resolvedAt) }}</span>
-                  <span v-else>{{ formatDate(betWithUser.bet.createdAt) }}</span>
+                  <span v-if="betWithUser.bet.status === 'pending'">Bet placed at {{ formatDate(betWithUser.bet.createdAt) }}</span>
+                  <span v-else-if="betWithUser.bet.resolvedAt">Bet placed at {{ formatDate(betWithUser.bet.createdAt) }}</span>
+                  <span v-else>Bet placed at {{ formatDate(betWithUser.bet.createdAt) }}</span>
                 </div>
               </div>
             </div>
@@ -82,6 +82,9 @@
                     {{ getFinalScoreData(betWithUser.bet).homeTeam }} {{ getFinalScoreData(betWithUser.bet).homeScore }} - {{ getFinalScoreData(betWithUser.bet).awayScore }} {{ getFinalScoreData(betWithUser.bet).awayTeam }}
                     <span v-if="betWithUser.bet.betType === 'total'" class="total-badge">
                       ({{ getTotalPoints(getFinalScoreData(betWithUser.bet)) }})
+                    </span>
+                    <span v-if="betWithUser.bet.betType === 'spread' && getSpreadDifference(betWithUser.bet) !== null" class="spread-badge">
+                      ({{ getSpreadDifference(betWithUser.bet) }})
                     </span>
                   </span>
                 </div>
@@ -94,6 +97,9 @@
 
           <div class="bet-game">
             <h4>{{ betWithUser.bet.gameData.gameName }}</h4>
+            <div v-if="getGameStartTime(betWithUser.bet)" class="game-start-time">
+              Game starts at {{ getGameStartTime(betWithUser.bet) }}
+            </div>
           </div>
           
           <div class="bet-details">
@@ -141,6 +147,7 @@ import { useUserStore } from '../stores/userStore.js'
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
 import liveScoreService from '../services/liveScoreService.js'
+import { formatRelativeTime } from '../utils/timezoneUtils.js'
 
 export default {
   name: 'FriendsBets',
@@ -455,6 +462,52 @@ export default {
       return liveScores.value.get(bet.gameId)
     }
 
+    // Get game start time (only if game hasn't started yet)
+    const getGameStartTime = (bet) => {
+      // Only show for pending bets
+      if (bet.status !== 'pending') return null
+      
+      // Check if game has started using live scores
+      const liveData = liveScores.value.get(bet.gameId)
+      if (liveData) {
+        // If game has started or completed, don't show start time
+        if (liveData.isLive || liveData.isCompleted) return null
+        
+        // If we have formatted start time, use it
+        if (liveData.gameStartTimeFormatted) {
+          return formatGameStartTime(liveData.gameStartTimeFormatted)
+        }
+        
+        // Otherwise, format from ISO date
+        if (liveData.gameStartTime) {
+          const date = new Date(liveData.gameStartTime)
+          if (!isNaN(date.getTime())) {
+            return date.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          }
+        }
+      }
+      
+      // If no live data yet, we can't show start time
+      return null
+    }
+
+    // Format game start time from API string
+    const formatGameStartTime = (timeString) => {
+      if (!timeString) return null
+      
+      // Use the existing timezone utility to format relative time
+      if (timeString.includes('PM') || timeString.includes('AM')) {
+        return formatRelativeTime(timeString)
+      }
+      
+      return timeString
+    }
+
     // Get final score data for completed bets
     const getFinalScoreData = (bet) => {
       // Only show final score for completed bets (won/lost)
@@ -499,6 +552,21 @@ export default {
       const homeScore = parseInt(scoreData.homeScore) || 0
       const awayScore = parseInt(scoreData.awayScore) || 0
       return homeScore + awayScore
+    }
+
+    // Calculate score difference for point spread bets (simple difference between scores)
+    const getSpreadDifference = (bet) => {
+      // Only show for completed bets (won/lost)
+      if (bet.status !== 'won' && bet.status !== 'lost') return null
+      
+      const scoreData = getFinalScoreData(bet)
+      if (!scoreData) return null
+      
+      const homeScore = parseInt(scoreData.homeScore) || 0
+      const awayScore = parseInt(scoreData.awayScore) || 0
+      
+      // Return the simple difference (absolute value of home score - away score)
+      return Math.abs(homeScore - awayScore)
     }
 
     // Get sport from bet data
@@ -615,8 +683,10 @@ export default {
       getInitials,
       isGameLive,
       getLiveData,
+      getGameStartTime,
       getFinalScoreData,
-      getTotalPoints
+      getTotalPoints,
+      getSpreadDifference
     }
   }
 }
@@ -863,6 +933,15 @@ export default {
 .bet-date {
   font-size: 0.875rem;
   color: #6b7280;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.game-start-time {
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: block;
+  margin: 0 0 1rem 0;
 }
 
 .bet-status {
@@ -889,7 +968,7 @@ export default {
 }
 
 .bet-game h4 {
-  margin: 0 0 1rem 0;
+  margin: 0;
   color: #1a1a1a;
   font-size: 1.1rem;
   font-weight: 600;
@@ -975,6 +1054,12 @@ export default {
 }
 
 .total-badge {
+  color: #475569;
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+
+.spread-badge {
   color: #475569;
   font-weight: 500;
   margin-left: 0.25rem;

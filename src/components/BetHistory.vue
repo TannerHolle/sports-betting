@@ -35,6 +35,7 @@
             <div class="bet-game">
               <h4>{{ bet.gameData.gameName }}</h4>
               <span class="bet-date">Bet placed at {{ formatDate(bet.createdAt) }}</span>
+              <span v-if="getGameStartTime(bet)" class="game-start-time">Game starts at {{ getGameStartTime(bet) }}</span>
             </div>
             <div class="bet-header-right">
               <div class="bet-status pending">Pending</div>
@@ -113,6 +114,9 @@
                     <span v-if="bet.betType === 'total'" class="total-badge">
                       ({{ getTotalPoints(getFinalScoreData(bet)) }})
                     </span>
+                    <span v-if="bet.betType === 'spread' && getSpreadDifference(bet) !== null" class="spread-badge">
+                      ({{ getSpreadDifference(bet) }})
+                    </span>
                   </span>
                 </div>
                 <div class="bet-status" :class="bet.status">
@@ -187,6 +191,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import liveScoreService from '../services/liveScoreService.js'
+import { formatRelativeTime } from '../utils/timezoneUtils.js'
 
 export default {
   name: 'BetHistory',
@@ -291,6 +296,52 @@ export default {
       return liveScores.value.get(bet.gameId)
     }
 
+    // Get game start time (only if game hasn't started yet)
+    const getGameStartTime = (bet) => {
+      // Only show for pending bets
+      if (bet.status !== 'pending') return null
+      
+      // Check if game has started using live scores
+      const liveData = liveScores.value.get(bet.gameId)
+      if (liveData) {
+        // If game has started or completed, don't show start time
+        if (liveData.isLive || liveData.isCompleted) return null
+        
+        // If we have formatted start time, use it
+        if (liveData.gameStartTimeFormatted) {
+          return formatGameStartTime(liveData.gameStartTimeFormatted)
+        }
+        
+        // Otherwise, format from ISO date
+        if (liveData.gameStartTime) {
+          const date = new Date(liveData.gameStartTime)
+          if (!isNaN(date.getTime())) {
+            return date.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          }
+        }
+      }
+      
+      // If no live data yet, we can't show start time
+      return null
+    }
+
+    // Format game start time from API string
+    const formatGameStartTime = (timeString) => {
+      if (!timeString) return null
+      
+      // Use the existing timezone utility to format relative time
+      if (timeString.includes('PM') || timeString.includes('AM')) {
+        return formatRelativeTime(timeString)
+      }
+      
+      return timeString
+    }
+
     // Get final score data for completed bets
     const getFinalScoreData = (bet) => {
       // Only show final score for completed bets (won/lost)
@@ -312,6 +363,21 @@ export default {
       const homeScore = parseInt(scoreData.homeScore) || 0
       const awayScore = parseInt(scoreData.awayScore) || 0
       return homeScore + awayScore
+    }
+
+    // Calculate score difference for point spread bets (simple difference between scores)
+    const getSpreadDifference = (bet) => {
+      // Only show for completed bets (won/lost)
+      if (bet.status !== 'won' && bet.status !== 'lost') return null
+      
+      const scoreData = getFinalScoreData(bet)
+      if (!scoreData) return null
+      
+      const homeScore = parseInt(scoreData.homeScore) || 0
+      const awayScore = parseInt(scoreData.awayScore) || 0
+      
+      // Return the simple difference (home score - away score)
+      return Math.abs(homeScore - awayScore)
     }
 
     // Check if bet can be cancelled (pending and game hasn't started)
@@ -511,8 +577,10 @@ export default {
       formatBetSelection,
       isGameLive,
       getLiveData,
+      getGameStartTime,
       getFinalScoreData,
       getTotalPoints,
+      getSpreadDifference,
       canCancelBet,
       handleCancelBet,
       cancellingBetId,
@@ -660,6 +728,14 @@ export default {
 .bet-date {
   font-size: 0.875rem;
   color: #6b7280;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.game-start-time {
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: block;
 }
 
 .bet-status {
@@ -800,6 +876,12 @@ export default {
 }
 
 .total-badge {
+  color: #475569;
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+
+.spread-badge {
   color: #475569;
   font-weight: 500;
   margin-left: 0.25rem;
