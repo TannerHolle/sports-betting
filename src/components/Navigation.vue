@@ -151,6 +151,18 @@
           <span class="nav-text">Sign In</span>
         </button>
 
+        <!-- Suggestions - only when authenticated -->
+        <button 
+          v-if="isAuthenticated"
+          @click="handleSuggestionsMobile"
+          class="mobile-nav-link suggestions-btn-mobile"
+        >
+          <svg class="suggestions-icon-mobile" width="18" height="18" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1L10.09 5.26L15 6.27L11 9.14L11.82 14.02L8 11.77L4.18 14.02L5 9.14L1 6.27L5.91 5.26L8 1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="nav-text">Suggestions</span>
+        </button>
+
         <!-- Logout - only when authenticated -->
         <button 
           v-if="isAuthenticated"
@@ -229,6 +241,11 @@ export default {
       closeUserMenu()
     }
 
+    const handleSuggestionsMobile = () => {
+      isSuggestionsModalOpen.value = true
+      closeMobileMenu()
+    }
+
     const closeSuggestionsModal = () => {
       isSuggestionsModalOpen.value = false
     }
@@ -269,6 +286,7 @@ export default {
       closeUserMenu,
       handleNavClick,
       handleSuggestions,
+      handleSuggestionsMobile,
       closeSuggestionsModal,
       handleLogout
     }
@@ -720,6 +738,21 @@ export default {
 
 .logout-btn-mobile:hover {
   background: #b91c1c;
+}
+
+.suggestions-btn-mobile {
+  background: #eff6ff;
+  color: #4169e1;
+  border-color: #bfdbfe;
+}
+
+.suggestions-btn-mobile:hover {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.suggestions-icon-mobile {
+  flex-shrink: 0;
 }
 
 .user-section-mobile {
