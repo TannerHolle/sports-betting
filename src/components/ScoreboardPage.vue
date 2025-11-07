@@ -199,15 +199,23 @@ export default {
     })
 
     const emptyStateMessage = computed(() => {
+      // Helper function to format date without timezone issues
+      const formatDate = (dateString) => {
+        if (!dateString) return ''
+        // Parse YYYY-MM-DD format directly to avoid timezone issues
+        const [year, month, day] = dateString.split('-').map(Number)
+        const date = new Date(year, month - 1, day)
+        return date.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })
+      }
+
       if (games.value.length === 0) {
         if (selectedDate.value) {
-          const date = new Date(selectedDate.value)
-          const formattedDate = date.toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })
+          const formattedDate = formatDate(selectedDate.value)
           return `There are no games scheduled for ${formattedDate}.`
         }
         return 'There are no games scheduled for the selected date.'
@@ -217,13 +225,7 @@ export default {
       const filterLabel = currentSportFilters.value.find(f => f.value === selectedFilter.value)?.label || 'your filter'
       
       if (selectedDate.value) {
-        const date = new Date(selectedDate.value)
-        const formattedDate = date.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        })
+        const formattedDate = formatDate(selectedDate.value)
         return `No games match the "${filterLabel}" filter for ${formattedDate}. Try selecting a different filter or date.`
       }
       
