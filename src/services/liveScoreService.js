@@ -6,6 +6,14 @@ class LiveScoreService {
     this.cacheTimeout = 30000 // 30 seconds
   }
 
+  // Format date for ESPN API (YYYYMMDD)
+  formatDateForAPI(date) {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}${month}${day}`
+  }
+
   // Get live score data for a specific game
   async getLiveScore(gameId, sport = 'nba') {
     try {
@@ -17,21 +25,24 @@ class LiveScoreService {
 
       // Determine API URL based on sport
       let apiUrl
+      const currentDate = new Date()
+      const formattedDate = this.formatDateForAPI(currentDate)
+      
       switch (sport.toLowerCase()) {
         case 'nba':
-          apiUrl = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard'
+          apiUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${formattedDate}`
           break
         case 'nfl':
           apiUrl = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
           break
         case 'ncaa-basketball':
-          apiUrl = 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard'
+          apiUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${formattedDate}`
           break
         case 'ncaa-football':
           apiUrl = 'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard'
           break
         default:
-          apiUrl = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard'
+          apiUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${formattedDate}`
       }
 
       const response = await axios.get(apiUrl)

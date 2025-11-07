@@ -254,6 +254,14 @@ export default {
       return filtered
     })
 
+    // Format date for ESPN API (YYYYMMDD)
+    const formatDateForAPI = (date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${year}${month}${day}`
+    }
+
     const fetchData = async () => {
       loading.value = true
       error.value = null
@@ -265,10 +273,16 @@ export default {
           throw new Error('No API URL configured for current sport')
         }
         
-        // Add date parameter only if a date is selected
+        // Add date parameter
         let apiUrl = baseApiUrl
         if (selectedDate.value) {
+          // If a date is explicitly selected, use it
           const formattedDate = selectedDate.value.replace(/-/g, '')
+          apiUrl = `${baseApiUrl}?dates=${formattedDate}`
+        } else if (activeLeague.value === 'nba' || activeLeague.value === 'ncaa-basketball') {
+          // For NBA and college basketball, always include current date to avoid getting yesterday's games in early morning
+          const currentDate = new Date()
+          const formattedDate = formatDateForAPI(currentDate)
           apiUrl = `${baseApiUrl}?dates=${formattedDate}`
         }
         
