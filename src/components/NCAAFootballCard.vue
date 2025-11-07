@@ -176,98 +176,8 @@ export default {
       return awayTeam ? awayTeam.team.shortDisplayName : ''
     })
     
-    // Convert ESPN API odds format to betting format
-    const convertESPNOddsToBettingFormat = (espnOdds) => {
-      if (!espnOdds || !espnOdds.length || !espnOdds[0]) return null
-      
-      const odds = espnOdds[0] // Use first odds provider
-      const betting = {}
-      
-      // Moneyline
-      if (odds.moneyline) {
-        betting.moneyline = {
-          home: {
-            close: {
-              odds: odds.moneyline.home?.close?.odds || odds.moneyline.home?.open?.odds
-            }
-          },
-          away: {
-            close: {
-              odds: odds.moneyline.away?.close?.odds || odds.moneyline.away?.open?.odds
-            }
-          }
-        }
-      }
-      
-      // Point Spread
-      if (odds.pointSpread) {
-        betting.pointSpread = {
-          home: {
-            close: {
-              line: odds.pointSpread.home?.close?.line || odds.pointSpread.home?.open?.line,
-              odds: odds.pointSpread.home?.close?.odds || odds.pointSpread.home?.open?.odds
-            }
-          },
-          away: {
-            close: {
-              line: odds.pointSpread.away?.close?.line || odds.pointSpread.away?.open?.line,
-              odds: odds.pointSpread.away?.close?.odds || odds.pointSpread.away?.open?.odds
-            }
-          }
-        }
-      }
-      
-      // Total (Over/Under)
-      if (odds.total) {
-        betting.total = {
-          over: {
-            close: {
-              line: odds.total.over?.close?.line || odds.total.over?.open?.line,
-              odds: odds.total.over?.close?.odds || odds.total.over?.open?.odds
-            }
-          },
-          under: {
-            close: {
-              line: odds.total.under?.close?.line || odds.total.under?.open?.line,
-              odds: odds.total.under?.close?.odds || odds.total.under?.open?.odds
-            }
-          }
-        }
-      }
-      
-      return Object.keys(betting).length > 0 ? betting : null
-    }
-    
-    // Convert odds data to betting format
-    // ESPN API provides odds directly in the game object
-    const betting = computed(() => {
-      // Check for ESPN odds in the game object (can be at game.odds or competitions[0].odds)
-      const espnOdds = props.game.odds || competition.value?.odds
-      if (espnOdds && espnOdds.length > 0) {
-        return convertESPNOddsToBettingFormat(espnOdds)
-      }
-      
-      // Fallback to odds service if ESPN odds not available
-      if (!gameOdds.value) {
-        return null
-      }
-      
-      return oddsService.convertOddsToBettingFormat(
-        gameOdds.value,
-        homeTeamName.value,
-        awayTeamName.value
-      )
-    })
-    
-    // Fetch odds from service if ESPN odds not available
+    // Fetch odds from odds service
     const fetchGameOdds = async () => {
-      // If ESPN odds are already available, no need to fetch
-      const espnOdds = props.game.odds || competition.value?.odds
-      if (espnOdds && espnOdds.length > 0) {
-        return
-      }
-      
-      // Fallback to odds service
       try {
         const allOdds = await oddsService.getAllOdds()
         const gameOddsData = oddsService.findGameOdds(allOdds, 'ncaa-football', homeTeamName.value, awayTeamName.value)
@@ -279,6 +189,19 @@ export default {
         console.error('Error fetching game odds:', error)
       }
     }
+    
+    // Convert odds data to betting format
+    const betting = computed(() => {
+      if (!gameOdds.value) {
+        return null
+      }
+      
+      return oddsService.convertOddsToBettingFormat(
+        gameOdds.value,
+        homeTeamName.value,
+        awayTeamName.value
+      )
+    })
     
     onMounted(() => {
       fetchGameOdds()

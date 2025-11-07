@@ -136,9 +136,10 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import BettingInterface from './BettingInterface.vue'
 import { convertToLocalTime, formatRelativeTime } from '../utils/timezoneUtils.js'
+import oddsService from '../services/oddsService.js'
 
 export default {
   name: 'NFLGameCard',
@@ -157,13 +158,54 @@ export default {
   },
   setup(props) {
     const isCollapsed = ref(true)
+    const gameOdds = ref(null)
     const competition = computed(() => props.game.competitions?.[0])
     const competitors = computed(() => competition.value?.competitors || [])
     const venue = computed(() => competition.value?.venue?.fullName || 'TBD')
     const broadcast = computed(() => competition.value?.broadcast || competition.value?.broadcasts?.[0]?.names?.[0])
     const status = computed(() => competition.value?.status)
     const situation = computed(() => competition.value?.situation)
-    const betting = computed(() => competition.value?.odds?.[0])
+    
+    const homeTeamName = computed(() => {
+      const homeTeam = competitors.value.find(c => c.homeAway === 'home')
+      return homeTeam ? homeTeam.team.shortDisplayName : ''
+    })
+    
+    const awayTeamName = computed(() => {
+      const awayTeam = competitors.value.find(c => c.homeAway === 'away')
+      return awayTeam ? awayTeam.team.shortDisplayName : ''
+    })
+    
+    // Fetch odds from odds service
+    const fetchGameOdds = async () => {
+      try {
+        const allOdds = await oddsService.getAllOdds()
+        const gameOddsData = oddsService.findGameOdds(allOdds, 'nfl', homeTeamName.value, awayTeamName.value)
+        
+        if (gameOddsData) {
+          gameOdds.value = gameOddsData
+        }
+      } catch (error) {
+        console.error('Error fetching game odds:', error)
+      }
+    }
+    
+    // Convert odds data to betting format
+    const betting = computed(() => {
+      if (!gameOdds.value) {
+        return null
+      }
+      
+      return oddsService.convertOddsToBettingFormat(
+        gameOdds.value,
+        homeTeamName.value,
+        awayTeamName.value
+      )
+    })
+    
+    onMounted(() => {
+      fetchGameOdds()
+    })
     
     const gameCompleted = computed(() => status.value?.type?.completed)
     const gameScheduled = computed(() => status.value?.type?.state === 'pre')
