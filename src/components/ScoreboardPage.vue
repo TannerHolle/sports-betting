@@ -117,7 +117,8 @@ export default {
           { value: 'sec', label: 'SEC' },
           { value: 'big10', label: 'Big Ten' },
           { value: 'acc', label: 'ACC' },
-          { value: 'big12', label: 'Big 12' }
+          { value: 'big12', label: 'Big 12' },
+          { value: 'mountainwest', label: 'Mountain West' }
         ]
       },
       {
@@ -343,6 +344,8 @@ export default {
           return groups?.id === '1' || groups?.shortName === 'ACC'
         case 'big12':
           return groups?.id === '4' || groups?.shortName === 'Big 12'
+        case 'mountainwest':
+          return groups?.id === '17' || groups?.shortName === 'Mountain West'
         default:
           return true
       }
