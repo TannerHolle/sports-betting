@@ -18,6 +18,9 @@
       <LeaguesPage v-else />
     </div>
     
+    <!-- AI Chat Page (Public - No Auth Required) -->
+    <AIChatPage v-if="currentPage === 'ai-chat'" />
+    
     <!-- Auth Page -->
     <AuthPage v-if="currentPage === 'auth'" @change-page="setCurrentPage" />
   </div>
@@ -31,6 +34,7 @@ import ScoreboardPage from './components/ScoreboardPage.vue'
 import BettingPage from './components/BettingPage.vue'
 import LeaguesPage from './components/LeaguesPage.vue'
 import AuthPage from './components/AuthPage.vue'
+import AIChatPage from './components/AIChatPage.vue'
 
 export default {
   name: 'App',
@@ -39,7 +43,8 @@ export default {
     ScoreboardPage,
     BettingPage,
     LeaguesPage,
-    AuthPage
+    AuthPage,
+    AIChatPage
   },
   setup() {
     const userStore = useUserStore()

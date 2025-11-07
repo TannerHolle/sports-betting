@@ -17,6 +17,14 @@
             <span class="nav-text">Live Scores</span>
           </button>
 
+          <!-- AI Chat - always visible -->
+          <button 
+            @click="$emit('change-page', 'ai-chat')"
+            :class="['nav-link', { active: currentPage === 'ai-chat' }]"
+          >
+            <span class="nav-text">Betting Assistant</span>
+          </button>
+
           <!-- Fantasy Betting - only when authenticated -->
           <button 
             v-if="isAuthenticated"
@@ -122,6 +130,14 @@
           :class="['mobile-nav-link', { active: currentPage === 'scoreboard' }]"
         >
           <span class="nav-text">Live Scores</span>
+        </button>
+
+        <!-- AI Chat -->
+        <button 
+          @click="handleNavClick('ai-chat')"
+          :class="['mobile-nav-link', { active: currentPage === 'ai-chat' }]"
+        >
+          <span class="nav-text">Betting Assistant</span>
         </button>
 
         <!-- Fantasy Betting - only when authenticated -->
