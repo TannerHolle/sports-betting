@@ -26,66 +26,16 @@
         <p>No active bets. <br></br>Place a bet and track it here!</p>
       </div>
       <div v-else class="bets-list">
-        <div 
+        <BetCard
           v-for="bet in activeBets" 
           :key="bet._id"
-          class="bet-card active"
-        >
-          <div class="bet-header">
-            <div class="bet-game">
-              <h4>{{ bet.gameData.gameName }}</h4>
-              <span class="bet-date">Bet placed at {{ formatDate(bet.createdAt) }}</span>
-              <span v-if="getGameStartTime(bet)" class="game-start-time">Game starts at {{ getGameStartTime(bet) }}</span>
-            </div>
-            <div class="bet-header-right">
-              <div class="bet-status pending">Pending</div>
-              <!-- Cancel Button (only show if game hasn't started) -->
-              <button 
-                v-if="canCancelBet(bet)"
-                @click="handleCancelBet(bet._id)" 
-                :disabled="cancellingBetId === bet._id"
-                class="cancel-bet-btn-header"
-              >
-                {{ cancellingBetId === bet._id ? 'Cancelling...' : 'Cancel' }}
-              </button>
-            </div>
-          </div>
-          
-          <div class="bet-details">
-            <div class="bet-type-info">
-              <span class="bet-type">{{ formatBetType(bet.betType) }}</span>
-              <span class="bet-selection">{{ formatBetSelection(bet) }}</span>
-            </div>
-            <div class="bet-amounts">
-              <div class="bet-amount">
-                <span class="label">Wagered:</span>
-                <span class="value">${{ bet.amount.toLocaleString() }}</span>
-              </div>
-              <div class="bet-amount">
-                <span class="label">Potential Win:</span>
-                <span class="value potential">${{ bet.potentialWin.toLocaleString() }}</span>
-              </div>
-            </div>
-            <div class="bet-odds">
-              <span class="label">Odds:</span>
-              <span class="value">{{ bet.odds }}</span>
-            </div>
-          </div>
-          
-          <!-- Live Game Data -->
-          <div v-if="isGameLive(bet)" class="live-game-data">
-            <div class="live-score">
-              <span class="team-score">{{ getLiveData(bet).homeTeam }} {{ getLiveData(bet).homeScore }}</span>
-              <span class="score-separator">-</span>
-              <span class="team-score">{{ getLiveData(bet).awayScore }} {{ getLiveData(bet).awayTeam }}</span>
-            </div>
-            <div class="live-status">
-              <span class="live-indicator">● LIVE</span>
-              <span class="game-time">{{ getLiveData(bet).status }}</span>
-            </div>
-          </div>
-          
-        </div>
+          :bet="bet"
+          :live-scores="liveScores"
+          :show-cancel-button="true"
+          :cancelling-bet-id="cancellingBetId"
+          :can-cancel-bet="canCancelBet"
+          @cancel-bet="handleCancelBet"
+        />
       </div>
     </div>
 
@@ -95,73 +45,13 @@
         <p>No completed bets yet.</p>
       </div>
       <div v-else class="bets-list">
-        <div 
+        <BetCard
           v-for="bet in completedBets" 
           :key="bet._id"
-          class="bet-card"
-          :class="bet.status"
-        >
-          <div class="bet-header">
-            <div class="bet-game">
-              <h4>{{ bet.gameData.gameName }}</h4>
-              <span class="bet-date">{{ formatDate(bet.createdAt) }}</span>
-            </div>
-            <div class="bet-header-right">
-              <div class="bet-header-right-content">
-                <div v-if="getFinalScoreData(bet)" class="final-score-inline">
-                  <span class="final-score-text">
-                    {{ getFinalScoreData(bet).homeTeam }} {{ getFinalScoreData(bet).homeScore }} - {{ getFinalScoreData(bet).awayScore }} {{ getFinalScoreData(bet).awayTeam }}
-                    <span v-if="bet.betType === 'total'" class="total-badge">
-                      ({{ getTotalPoints(getFinalScoreData(bet)) }})
-                    </span>
-                    <span v-if="bet.betType === 'spread' && getSpreadDifference(bet) !== null" class="spread-badge">
-                      ({{ getSpreadDifference(bet) }})
-                    </span>
-                  </span>
-                </div>
-                <div class="bet-status" :class="bet.status">
-                  {{ bet.status === 'won' ? 'Won' : 'Lost' }}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="bet-details">
-            <div class="bet-type-info">
-              <span class="bet-type">{{ formatBetType(bet.betType) }}</span>
-              <span class="bet-selection">{{ formatBetSelection(bet) }}</span>
-            </div>
-            <div class="bet-amounts">
-              <div class="bet-amount">
-                <span class="label">Wagered:</span>
-                <span class="value">${{ bet.amount.toLocaleString() }}</span>
-              </div>
-              <div class="bet-amount">
-                <span class="label">{{ bet.status === 'won' ? 'Won:' : 'Lost:' }}</span>
-                <span class="value" :class="{ 'won': bet.status === 'won', 'lost': bet.status === 'lost' }">
-                  {{ bet.status === 'won' ? '+' : '-' }}${{ bet.status === 'won' ? bet.potentialWin.toLocaleString() : bet.amount.toLocaleString() }}
-                </span>
-              </div>
-            </div>
-            <div class="bet-odds">
-              <span class="label">Odds:</span>
-              <span class="value">{{ bet.odds }}</span>
-            </div>
-          </div>
-          
-          <!-- Live Game Data for active bets -->
-          <div v-if="isGameLive(bet)" class="live-game-data">
-            <div class="live-score">
-              <span class="team-score">{{ getLiveData(bet).homeTeam }} {{ getLiveData(bet).homeScore }}</span>
-              <span class="score-separator">-</span>
-              <span class="team-score">{{ getLiveData(bet).awayScore }} {{ getLiveData(bet).awayTeam }}</span>
-            </div>
-            <div class="live-status">
-              <span class="live-indicator">● LIVE</span>
-              <span class="game-time">{{ getLiveData(bet).status }}</span>
-            </div>
-          </div>
-        </div>
+          :bet="bet"
+          :live-scores="liveScores"
+          :show-cancel-button="false"
+        />
       </div>
     </div>
 
@@ -191,10 +81,13 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import liveScoreService from '../services/liveScoreService.js'
-import { formatRelativeTime } from '../utils/timezoneUtils.js'
+import BetCard from './BetCard.vue'
 
 export default {
   name: 'BetHistory',
+  components: {
+    BetCard
+  },
   setup() {
     const userStore = useUserStore()
     const activeTab = ref('active')
@@ -227,158 +120,6 @@ export default {
       return currentUser.value.bets
     })
 
-    const formatDate = (dateString) => {
-      if (!dateString) {
-        return 'Unknown date'
-      }
-      
-      const date = new Date(dateString)
-      
-      // Check if date is valid
-      if (isNaN(date.getTime())) {
-        return 'Invalid date'
-      }
-      
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    }
-
-    const formatBetType = (betType) => {
-      switch (betType) {
-        case 'spread': return 'Point Spread'
-        case 'moneyline': return 'Moneyline'
-        case 'total': return 'Total Points'
-        default: return betType
-      }
-    }
-
-    const formatBetSelection = (bet) => {
-      // For over/under bets, include the line amount
-      if (bet.betType === 'total' && bet.line) {
-        // Handle both string and number line values
-        let lineNumber
-        if (typeof bet.line === 'string') {
-          // Extract the number from the line (e.g., "o48.5" -> "48.5")
-          lineNumber = bet.line.replace(/[ou]/i, '')
-        } else if (typeof bet.line === 'number') {
-          // Use the number directly
-          lineNumber = bet.line.toString()
-        } else {
-          // Fallback to just the selection
-          return bet.selection
-        }
-        return `${bet.selection} (${lineNumber})`
-      }
-      
-      // For spread bets, include the line amount
-      if (bet.betType === 'spread' && bet.line) {
-        const lineNumber = Math.abs(parseFloat(bet.line))
-        const sign = parseFloat(bet.line) > 0 ? '+' : ''
-        return `${bet.selection} (${sign}${lineNumber})`
-      }
-      
-      // For moneyline and other bets, just return the selection
-      return bet.selection
-    }
-
-    // Check if a game is live
-    const isGameLive = (bet) => {
-      const liveData = liveScores.value.get(bet.gameId)
-      return liveData && liveData.isLive && !liveData.isCompleted
-    }
-
-    // Get live data for a bet
-    const getLiveData = (bet) => {
-      return liveScores.value.get(bet.gameId)
-    }
-
-    // Get game start time (only if game hasn't started yet)
-    const getGameStartTime = (bet) => {
-      // Only show for pending bets
-      if (bet.status !== 'pending') return null
-      
-      // Check if game has started using live scores
-      const liveData = liveScores.value.get(bet.gameId)
-      if (liveData) {
-        // If game has started or completed, don't show start time
-        if (liveData.isLive || liveData.isCompleted) return null
-        
-        // If we have formatted start time, use it
-        if (liveData.gameStartTimeFormatted) {
-          return formatGameStartTime(liveData.gameStartTimeFormatted)
-        }
-        
-        // Otherwise, format from ISO date
-        if (liveData.gameStartTime) {
-          const date = new Date(liveData.gameStartTime)
-          if (!isNaN(date.getTime())) {
-            return date.toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })
-          }
-        }
-      }
-      
-      // If no live data yet, we can't show start time
-      return null
-    }
-
-    // Format game start time from API string
-    const formatGameStartTime = (timeString) => {
-      if (!timeString) return null
-      
-      // Use the existing timezone utility to format relative time
-      if (timeString.includes('PM') || timeString.includes('AM')) {
-        return formatRelativeTime(timeString)
-      }
-      
-      return timeString
-    }
-
-    // Get final score data for completed bets
-    const getFinalScoreData = (bet) => {
-      // Only show final score for completed bets (won/lost)
-      if (bet.status !== 'won' && bet.status !== 'lost') return null
-      
-      const liveData = liveScores.value.get(bet.gameId)
-      if (!liveData) return null
-      
-      // Don't show final score if game is still live (shouldn't happen for completed bets, but safety check)
-      if (liveData.isLive && !liveData.isCompleted) return null
-      
-      // Return score data for completed bets
-      return liveData
-    }
-
-    // Calculate total points from score data
-    const getTotalPoints = (scoreData) => {
-      if (!scoreData) return null
-      const homeScore = parseInt(scoreData.homeScore) || 0
-      const awayScore = parseInt(scoreData.awayScore) || 0
-      return homeScore + awayScore
-    }
-
-    // Calculate score difference for point spread bets (simple difference between scores)
-    const getSpreadDifference = (bet) => {
-      // Only show for completed bets (won/lost)
-      if (bet.status !== 'won' && bet.status !== 'lost') return null
-      
-      const scoreData = getFinalScoreData(bet)
-      if (!scoreData) return null
-      
-      const homeScore = parseInt(scoreData.homeScore) || 0
-      const awayScore = parseInt(scoreData.awayScore) || 0
-      
-      // Return the simple difference (home score - away score)
-      return Math.abs(homeScore - awayScore)
-    }
 
     // Check if bet can be cancelled (pending and game hasn't started)
     const canCancelBet = (bet) => {
@@ -572,15 +313,7 @@ export default {
       isAuthenticated,
       activeBets,
       completedBets,
-      formatDate,
-      formatBetType,
-      formatBetSelection,
-      isGameLive,
-      getLiveData,
-      getGameStartTime,
-      getFinalScoreData,
-      getTotalPoints,
-      getSpreadDifference,
+      liveScores,
       canCancelBet,
       handleCancelBet,
       cancellingBetId,
