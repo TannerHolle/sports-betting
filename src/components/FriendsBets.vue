@@ -2,11 +2,11 @@
   <div class="friends-bets" v-if="isAuthenticated">
     <div class="league-selector-section" v-if="userLeagues.length > 0 || isAdmin">
       <div class="search-filter-left">
-        <label class="search-filter-label">Search Username:</label>
+        <label class="search-filter-label">Search Friends Bets:</label>
         <input 
           v-model="searchUsername"
           type="text"
-          placeholder="Enter username..."
+          placeholder="Enter username or name..."
           class="search-input"
         />
       </div>
@@ -165,12 +165,14 @@ export default {
     const filteredFriendsBets = computed(() => {
       let filtered = friendsBets.value
       
-      // Filter by username search
+      // Filter by username or name search
       if (searchUsername.value.trim()) {
         const searchTerm = searchUsername.value.trim().toLowerCase()
-        filtered = filtered.filter(betWithUser => 
-          betWithUser.user.username.toLowerCase().includes(searchTerm)
-        )
+        filtered = filtered.filter(betWithUser => {
+          const usernameMatch = betWithUser.user.username?.toLowerCase().includes(searchTerm)
+          const nameMatch = betWithUser.user.name?.toLowerCase().includes(searchTerm)
+          return usernameMatch || nameMatch
+        })
       }
       
       // Filter by status or special filters
