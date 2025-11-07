@@ -49,12 +49,14 @@
 
     <!-- Games Header -->
     <div class="games-header">
-      <h2>Games Today Available for Betting</h2>
+      <h2>
+        Games {{ showingDate === 'tomorrow' ? 'Tomorrow' : 'Today' }} Available for Betting
+      </h2>
       <p class="section-description" v-if="!loading && gamesWithBetting.length === 0">
-        No games left to bet on today.
+        No games with betting lines available at this time.
       </p>
       <p class="section-description" v-else>
-        Scheduled games with betting lines that are happening today are shown below. If you'd like to bet on a specific game, click on live sports and go to the league and date of the game you want to bet on.
+        Games with betting lines scheduled for {{ showingDate === 'tomorrow' ? 'tomorrow' : 'today' }} are shown below. To browse and bet on games from other dates or leagues, visit the Live Scores page.
       </p>
     </div>
 
@@ -118,7 +120,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import axios from 'axios'
 import { useUserStore } from '../stores/userStore.js'
 import { API_BASE_URL } from '../config/api.js'
-import { isGameToday } from '../utils/timezoneUtils.js'
+import oddsService from '../services/oddsService.js'
 import BetHistory from './BetHistory.vue'
 import BetResolver from './BetResolver.vue'
 import AdminPanel from './AdminPanel.vue'
@@ -152,6 +154,8 @@ export default {
     const allSportsRefreshInterval = ref(null)
     const userLeaguesForLeaderboard = ref([])
     const gamesBySport = ref({}) // Store games for each sport
+    const showingDate = ref('today') // Track if showing 'today' or 'tomorrow'
+    const allOdds = ref({}) // Cache all odds data
 
     // User data from store
     const userBalance = computed(() => userStore.userBalance.value)
@@ -210,26 +214,65 @@ export default {
       return currentSport.value?.component || 'NCAAFootballCard'
     })
 
-    // Helper function to check if a game matches betting criteria for a specific sport
-    const matchesBettingCriteria = (game, sportId, dateCheckFn) => {
-      const competition = game.competitions?.[0]
-      const status = competition?.status
-      const isScheduled = status?.type?.state === 'pre'
-      const dateMatches = dateCheckFn(game.date)
-      
-      if (sportId === 'nba') {
-        return isScheduled && dateMatches
-      }
-      
-      return isScheduled && dateMatches && competition?.odds && competition.odds.length > 0
+    // Format date for ESPN API (YYYYMMDD)
+    const formatDateForAPI = (date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${year}${month}${day}`
     }
 
+    // Check if a game has odds available in the odds database
+    const gameHasOdds = (game, sportId) => {
+      if (!game || !game.competitions?.[0]) return false
+      
+      const competition = game.competitions[0]
+      const competitors = competition.competitors || []
+      const homeTeam = competitors.find(c => c.homeAway === 'home')
+      const awayTeam = competitors.find(c => c.homeAway === 'away')
+      
+      if (!homeTeam || !awayTeam) return false
+      
+      const homeTeamName = homeTeam.team?.shortDisplayName || homeTeam.team?.displayName || ''
+      const awayTeamName = awayTeam.team?.shortDisplayName || awayTeam.team?.displayName || ''
+      
+      if (!homeTeamName || !awayTeamName) {
+        return false
+      }
+      
+      // Check if odds exist for this game
+      if (!allOdds.value || !allOdds.value[sportId]) {
+        return false
+      }
+      
+      // Try matching with shortDisplayName first (same as game cards do)
+      let gameOdds = oddsService.findGameOdds(allOdds.value, sportId, homeTeamName, awayTeamName)
+      
+      if (!gameOdds) {
+        // Try with displayName if shortDisplayName didn't match
+        const homeDisplayName = homeTeam.team?.displayName || ''
+        const awayDisplayName = awayTeam.team?.displayName || ''
+        if (homeDisplayName && awayDisplayName && (homeDisplayName !== homeTeamName || awayDisplayName !== awayTeamName)) {
+          gameOdds = oddsService.findGameOdds(allOdds.value, sportId, homeDisplayName, awayDisplayName)
+        }
+      }
+      
+      return gameOdds !== null
+    }
+
+
     // Helper function to check if games have betting available for a specific sport
-    // Only checks for today's games
+    // Just checks if there are any scheduled games with odds (no date filtering)
     const hasGamesWithBetting = (sportId, gamesList) => {
       if (!gamesList || gamesList.length === 0) return false
       
-      return gamesList.some(game => matchesBettingCriteria(game, sportId, isGameToday))
+      return gamesList.some(game => {
+        const competition = game.competitions?.[0]
+        const status = competition?.status
+        const isScheduled = status?.type?.state === 'pre'
+        if (!isScheduled) return false
+        return gameHasOdds(game, sportId)
+      })
     }
 
     // Helper function to sort games by rank (for NCAA games)
@@ -252,16 +295,20 @@ export default {
 
     // Filter games that have betting information and are available for betting,
     // then sort NCAA games by best Top 25 rank (ascending)
-    // Only shows today's games
+    // Shows all scheduled games with odds (no date re-filtering since we already fetched for the correct date)
     const gamesWithBetting = computed(() => {
       const filtered = games.value.filter(game => {
-        return matchesBettingCriteria(game, activeLeague.value, isGameToday)
+        const competition = game.competitions?.[0]
+        const status = competition?.status
+        const isScheduled = status?.type?.state === 'pre'
+        if (!isScheduled) return false
+        return gameHasOdds(game, activeLeague.value)
       })
 
       return sortGamesByRank(filtered)
     })
 
-    // Filter sports to only show those with games available for betting today
+    // Filter sports to only show those with games available for betting
     const availableSports = computed(() => {
       return sports.value.filter(sport => {
         const sportGames = gamesBySport.value[sport.id] || []
@@ -269,6 +316,34 @@ export default {
       })
     })
 
+    // Fetch games for a specific date
+    const fetchGamesForDate = async (date, sportId) => {
+      const sport = sports.value.find(s => s.id === sportId)
+      if (!sport) return []
+      
+      const formattedDate = formatDateForAPI(date)
+      const apiUrl = `${sport.apiUrl}?dates=${formattedDate}`
+      
+      try {
+        const response = await axios.get(apiUrl)
+        return response.data.events || []
+      } catch (err) {
+        console.error(`Error fetching games for ${sportId} on ${formattedDate}:`, err)
+        return []
+      }
+    }
+
+    // Fetch all odds data
+    const fetchAllOdds = async () => {
+      try {
+        allOdds.value = await oddsService.getAllOdds()
+      } catch (err) {
+        console.error('Error fetching odds:', err)
+        allOdds.value = {}
+      }
+    }
+
+    // Main fetch function: tries today first, then tomorrow if no games with odds
     const fetchData = async (showLoading = true) => {
       if (showLoading) {
         loading.value = true
@@ -276,18 +351,56 @@ export default {
       error.value = null
       
       try {
-        const baseApiUrl = currentSport.value?.apiUrl
+        // First, ensure we have odds data (refresh it to get latest)
+        await fetchAllOdds()
         
-        if (!baseApiUrl) {
-          throw new Error('No API URL configured for current sport')
+        const sportId = activeLeague.value
+        const today = new Date()
+        const tomorrow = new Date(today)
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        
+        // Try today's games first - just show all scheduled games from the fetch (like ScoreboardPage does)
+        let todayGames = await fetchGamesForDate(today, sportId)
+        
+        // Filter to only scheduled games with odds (don't re-filter by date since we already fetched for that date)
+        let todayGamesWithOdds = todayGames.filter(game => {
+          const competition = game.competitions?.[0]
+          const status = competition?.status
+          const isScheduled = status?.type?.state === 'pre'
+          if (!isScheduled) return false
+          return gameHasOdds(game, sportId)
+        })
+        
+        if (todayGamesWithOdds.length > 0) {
+          // We have games with odds for today
+          showingDate.value = 'today'
+          games.value = todayGames
+          gamesBySport.value[sportId] = todayGames
+        } else {
+          // No games with odds today, try tomorrow
+          let tomorrowGames = await fetchGamesForDate(tomorrow, sportId)
+          
+          // Filter to only scheduled games with odds (don't re-filter by date since we already fetched for that date)
+          let tomorrowGamesWithOdds = tomorrowGames.filter(game => {
+            const competition = game.competitions?.[0]
+            const status = competition?.status
+            const isScheduled = status?.type?.state === 'pre'
+            if (!isScheduled) return false
+            return gameHasOdds(game, sportId)
+          })
+          
+          if (tomorrowGamesWithOdds.length > 0) {
+            // We have games with odds for tomorrow
+            showingDate.value = 'tomorrow'
+            games.value = tomorrowGames
+            gamesBySport.value[sportId] = tomorrowGames
+          } else {
+            // No games with odds for today or tomorrow
+            showingDate.value = 'today'
+            games.value = []
+            gamesBySport.value[sportId] = []
+          }
         }
-        
-        const response = await axios.get(baseApiUrl)
-        const fetchedGames = response.data.events || []
-        games.value = fetchedGames
-        
-        // Store games for this sport
-        gamesBySport.value[activeLeague.value] = fetchedGames
         
       } catch (err) {
         error.value = err.message || 'Failed to fetch data'
@@ -299,13 +412,46 @@ export default {
       }
     }
 
-    // Check all sports to see which have games available
+    // Check all sports to see which have games available (today or tomorrow)
     const checkAllSports = async () => {
+      // Ensure we have odds data
+      if (Object.keys(allOdds.value).length === 0) {
+        await fetchAllOdds()
+      }
+      
+      const today = new Date()
+      const tomorrow = new Date(today)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      
       const checkPromises = sports.value.map(async (sport) => {
         try {
-          const response = await axios.get(sport.apiUrl)
-          const fetchedGames = response.data.events || []
-          gamesBySport.value[sport.id] = fetchedGames
+          // Try today first
+          let todayGames = await fetchGamesForDate(today, sport.id)
+          let todayGamesWithOdds = todayGames.filter(game => {
+            const competition = game.competitions?.[0]
+            const status = competition?.status
+            const isScheduled = status?.type?.state === 'pre'
+            if (!isScheduled) return false
+            return gameHasOdds(game, sport.id)
+          })
+          
+          // If no games with odds today, try tomorrow
+          if (todayGamesWithOdds.length === 0) {
+            const tomorrowGames = await fetchGamesForDate(tomorrow, sport.id)
+            const tomorrowGamesWithOdds = tomorrowGames.filter(game => {
+              const competition = game.competitions?.[0]
+              const status = competition?.status
+              const isScheduled = status?.type?.state === 'pre'
+              if (!isScheduled) return false
+              return gameHasOdds(game, sport.id)
+            })
+            
+            // Store tomorrow's games if they have odds, otherwise today's
+            gamesBySport.value[sport.id] = tomorrowGamesWithOdds.length > 0 ? tomorrowGames : todayGames
+          } else {
+            // Store today's games
+            gamesBySport.value[sport.id] = todayGames
+          }
         } catch (err) {
           console.error(`Error fetching data for ${sport.name}:`, err)
           gamesBySport.value[sport.id] = []
@@ -327,8 +473,11 @@ export default {
       // Initial fetch with loading
       fetchData(true)
       
-      // Set up interval to refresh every 10 seconds (without loading indicator)
-      refreshInterval.value = setInterval(() => fetchData(false), 10000)
+      // Set up interval to refresh every 30 seconds (without loading indicator)
+      // This also refreshes odds data to catch new games
+      refreshInterval.value = setInterval(() => {
+        fetchData(false)
+      }, 30000)
     }
 
     // Stop live refresh
@@ -341,10 +490,12 @@ export default {
 
     // Start periodic refresh for all sports (to update available sports list)
     const startAllSportsRefresh = () => {
-      // Check all sports every 60 seconds to update availability
-      allSportsRefreshInterval.value = setInterval(() => {
-        checkAllSports()
-      }, 60000)
+      // Check all sports every 5 minutes to update availability
+      // Also refresh odds data periodically
+      allSportsRefreshInterval.value = setInterval(async () => {
+        await fetchAllOdds()
+        await checkAllSports()
+      }, 300000) // 5 minutes
     }
 
     // Stop all sports refresh
@@ -369,6 +520,8 @@ export default {
 
     onMounted(async () => {
       await fetchUserLeagues()
+      // Fetch odds data first
+      await fetchAllOdds()
       // Check all sports first to see which have games available
       await checkAllSports()
       
@@ -389,7 +542,7 @@ export default {
       stopAllSportsRefresh()
     })
 
-    return {
+      return {
       games,
       loading,
       error,
@@ -405,7 +558,8 @@ export default {
       isAdmin,
       fetchData,
       setActiveLeague,
-      userLeaguesForLeaderboard
+      userLeaguesForLeaderboard,
+      showingDate
     }
   }
 }
