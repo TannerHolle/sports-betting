@@ -323,6 +323,12 @@ export default {
     const placeBet = async () => {
       if (!canPlaceBet.value) return
       
+      // Get game start time from game data
+      const competition = props.game.competitions?.[0]
+      const status = competition?.status
+      const gameStartTime = props.game.date || competition?.date
+      const gameStartTimeFormatted = status?.type?.shortDetail || null
+
       const betData = {
         gameId: props.game.id,
         betType: selectedBet.value.type,
@@ -335,7 +341,9 @@ export default {
         gameData: {
           homeTeam: homeTeam.value,
           awayTeam: awayTeam.value,
-          gameName: props.game.name
+          gameName: props.game.name,
+          gameStartTime: gameStartTime,
+          gameStartTimeFormatted: gameStartTimeFormatted
         }
       }
       

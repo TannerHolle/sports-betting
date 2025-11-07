@@ -218,7 +218,29 @@ export default {
         }
       }
       
-      // If no live data yet, we can't show start time
+      // Fallback: Check stored gameData for start time (from when bet was placed)
+      if (bet.gameData) {
+        // Try formatted time first
+        if (bet.gameData.gameStartTimeFormatted) {
+          return this.formatGameStartTime(bet.gameData.gameStartTimeFormatted)
+        }
+        
+        // Otherwise, format from ISO date
+        if (bet.gameData.gameStartTime) {
+          const date = new Date(bet.gameData.gameStartTime)
+          if (!isNaN(date.getTime())) {
+            return date.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              timeZoneName: 'short'
+            })
+          }
+        }
+      }
+      
+      // If no data available, return null
       return null
     },
     getFinalScoreData(bet) {
