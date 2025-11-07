@@ -59,9 +59,10 @@
           <p>Loading games...</p>
         </div>
 
-        <div v-else-if="games.length === 0" class="no-games">
-          <h3>No games found</h3>
-          <p>There are no games scheduled for this week.</p>
+        <div v-else-if="filteredGames.length === 0" class="no-games">
+          <div class="no-games-icon">{{ currentSport?.icon || '🏈' }}</div>
+          <h3>{{ emptyStateTitle }}</h3>
+          <p>{{ emptyStateMessage }}</p>
         </div>
 
         <div v-else class="games-grid">
@@ -187,6 +188,45 @@ export default {
 
     const currentGameCardComponent = computed(() => {
       return currentSport.value?.component || 'NCAAFootballCard'
+    })
+
+    const emptyStateTitle = computed(() => {
+      if (games.value.length === 0) {
+        return 'No games scheduled'
+      }
+      return 'No games match your filters'
+    })
+
+    const emptyStateMessage = computed(() => {
+      if (games.value.length === 0) {
+        if (selectedDate.value) {
+          const date = new Date(selectedDate.value)
+          const formattedDate = date.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })
+          return `There are no games scheduled for ${formattedDate}.`
+        }
+        return 'There are no games scheduled for the selected date.'
+      }
+      
+      // Games exist but don't match filter
+      const filterLabel = currentSportFilters.value.find(f => f.value === selectedFilter.value)?.label || 'your filter'
+      
+      if (selectedDate.value) {
+        const date = new Date(selectedDate.value)
+        const formattedDate = date.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })
+        return `No games match the "${filterLabel}" filter for ${formattedDate}. Try selecting a different filter or date.`
+      }
+      
+      return `No games match the "${filterLabel}" filter. Try selecting a different filter or date.`
     })
 
     const filteredGames = computed(() => {
@@ -528,6 +568,8 @@ export default {
       currentSport,
       currentSportFilters,
       currentGameCardComponent,
+      emptyStateTitle,
+      emptyStateMessage,
       fetchData,
       setActiveLeague
     }
