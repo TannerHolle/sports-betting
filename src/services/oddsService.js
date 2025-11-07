@@ -24,16 +24,6 @@ class OddsService {
       const response = await axios.get(`${API_BASE_URL}/odds`)
       this.cachedOdds = response.data
       this.lastFetchTime = new Date()
-      
-      // Check if we're using mock data (indicated by mock IDs)
-      const isUsingMockData = Object.values(response.data).some(sportOdds => 
-        Array.isArray(sportOdds) && sportOdds.some(game => game.id.startsWith('mock-'))
-      )
-      
-      if (isUsingMockData) {
-        console.warn('Using mock odds data due to API quota limits')
-      }
-      
       return response.data
     } catch (error) {
       console.error('Error fetching all odds:', error)
