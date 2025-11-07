@@ -1,39 +1,50 @@
 <template>
   <div class="friends-bets" v-if="isAuthenticated">
     <div class="league-selector-section" v-if="userLeagues.length > 0 || isAdmin">
-      <div class="league-selector-left">
-        <label class="league-selector-label">Select League:</label>
-        <select 
-          v-model="selectedLeagueId" 
-          @change="fetchFriendsBets"
-          class="league-selector"
-          :disabled="isDropdownDisabled"
-        >
-          <option v-if="isAdmin" value="all-bets">All Bets from All Users</option>
-          <option value="">All My Leagues</option>
-          <option 
-            v-for="league in userLeagues" 
-            :key="league._id"
-            :value="league._id"
-          >
-            {{ league.name }}
-          </option>
-        </select>
+      <div class="search-filter-left">
+        <label class="search-filter-label">Search Username:</label>
+        <input 
+          v-model="searchUsername"
+          type="text"
+          placeholder="Enter username..."
+          class="search-input"
+        />
       </div>
-      <div class="status-filter-right">
-        <label class="status-filter-label">Filter:</label>
-        <select 
-          v-model="selectedStatusFilter"
-          class="status-filter-select"
-        >
-          <option value="">All</option>
-          <option value="won">Won</option>
-          <option value="lost">Lost</option>
-          <option value="pending">Pending</option>
-          <option value="huge-bets">Huge Bets</option>
-          <option value="big-underdogs">Big Underdogs</option>
-          <option value="live-bets">Live Bets</option>
-        </select>
+      <div class="filters-right">
+        <div class="league-selector-right">
+          <label class="league-selector-label">Select League:</label>
+          <select 
+            v-model="selectedLeagueId" 
+            @change="fetchFriendsBets"
+            class="league-selector"
+            :disabled="isDropdownDisabled"
+          >
+            <option v-if="isAdmin" value="all-bets">All Bets from All Users</option>
+            <option value="">All My Leagues</option>
+            <option 
+              v-for="league in userLeagues" 
+              :key="league._id"
+              :value="league._id"
+            >
+              {{ league.name }}
+            </option>
+          </select>
+        </div>
+        <div class="status-filter-right">
+          <label class="status-filter-label">Filter:</label>
+          <select 
+            v-model="selectedStatusFilter"
+            class="status-filter-select"
+          >
+            <option value="">All</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+            <option value="pending">Pending</option>
+            <option value="huge-bets">Huge Bets</option>
+            <option value="big-underdogs">Big Underdogs</option>
+            <option value="live-bets">Live Bets</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -89,6 +100,7 @@ export default {
     const selectedLeagueId = ref('')
     const friendsBets = ref([])
     const selectedStatusFilter = ref('')
+    const searchUsername = ref('')
     const loading = ref(false)
     const error = ref('')
     const liveScores = ref(new Map())
@@ -151,39 +163,50 @@ export default {
 
     // Filter bets by status or special filters
     const filteredFriendsBets = computed(() => {
+      let filtered = friendsBets.value
+      
+      // Filter by username search
+      if (searchUsername.value.trim()) {
+        const searchTerm = searchUsername.value.trim().toLowerCase()
+        filtered = filtered.filter(betWithUser => 
+          betWithUser.user.username.toLowerCase().includes(searchTerm)
+        )
+      }
+      
+      // Filter by status or special filters
       if (!selectedStatusFilter.value) {
-        return friendsBets.value
+        return filtered
       }
       
       // Handle status filters (won, lost, pending)
       if (['won', 'lost', 'pending'].includes(selectedStatusFilter.value)) {
-        return friendsBets.value.filter(betWithUser => 
+        return filtered.filter(betWithUser => 
           betWithUser.bet.status === selectedStatusFilter.value
         )
       }
       
       // Handle "huge bets" filter
       if (selectedStatusFilter.value === 'huge-bets') {
-        return friendsBets.value.filter(betWithUser => 
+        return filtered.filter(betWithUser => 
           isHugeBet(betWithUser.bet.amount)
         )
       }
       
       // Handle "big underdogs" filter
       if (selectedStatusFilter.value === 'big-underdogs') {
-        return friendsBets.value.filter(betWithUser => 
+        return filtered.filter(betWithUser => 
           isBigUnderdog(betWithUser.bet.odds)
         )
       }
       
       // Handle "live bets" filter - bets on games currently in progress
       if (selectedStatusFilter.value === 'live-bets') {
-        return friendsBets.value.filter(betWithUser => 
+        return filtered.filter(betWithUser => 
           isGameLive(betWithUser.bet)
         )
       }
       
-      return friendsBets.value
+      return filtered
     })
 
     // Set default selected league based on user type and league count
@@ -431,6 +454,7 @@ export default {
       userLeagues,
       selectedLeagueId,
       selectedStatusFilter,
+      searchUsername,
       friendsBets,
       filteredFriendsBets,
       loading,
@@ -463,8 +487,22 @@ export default {
   flex-wrap: wrap;
 }
 
-.league-selector-left {
+.search-filter-left {
   flex: 1;
+  min-width: 200px;
+}
+
+.filters-right {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.league-selector-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   min-width: 200px;
 }
 
@@ -478,7 +516,7 @@ export default {
 
 .league-selector {
   width: 100%;
-  max-width: 400px;
+  max-width: 300px;
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db;
   border-radius: 8px;
@@ -512,6 +550,36 @@ export default {
   background: white;
   cursor: pointer;
   transition: border-color 0.2s ease;
+}
+
+
+.search-filter-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
 }
 
 .status-filter-select:focus {
@@ -893,6 +961,28 @@ export default {
   .league-selector-section {
     flex-direction: column;
     align-items: stretch;
+  }
+  
+  .search-filter-left {
+    width: 100%;
+  }
+  
+  .search-input {
+    max-width: 100%;
+  }
+  
+  .filters-right {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .league-selector-right {
+    width: 100%;
+  }
+  
+  .league-selector {
+    max-width: 100%;
   }
   
   .status-filter-right {
