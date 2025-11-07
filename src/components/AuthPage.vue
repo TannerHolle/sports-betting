@@ -35,6 +35,7 @@
           <input 
             id="login-username"
             v-model="loginForm.username" 
+            @input="removeSpacesFromUsername('login')"
             type="text" 
             required 
             placeholder="Enter your username"
@@ -122,6 +123,7 @@
             <input 
             id="signup-username"
             v-model="signupForm.username" 
+            @input="removeSpacesFromUsername('signup')"
             type="text" 
             required 
             placeholder="Choose a username"
@@ -306,6 +308,15 @@ export default {
       signupForm.value.phoneNumber = formatted
     }
 
+    // Remove spaces from username as user types
+    const removeSpacesFromUsername = (formType) => {
+      if (formType === 'login') {
+        loginForm.value.username = loginForm.value.username.replace(/\s/g, '')
+      } else if (formType === 'signup') {
+        signupForm.value.username = signupForm.value.username.replace(/\s/g, '')
+      }
+    }
+
     const handleLogin = async () => {
       loading.value = true
       error.value = ''
@@ -447,6 +458,7 @@ export default {
       toggleLoginPasswordVisibility,
       toggleSignupPasswordVisibility,
       formatPhoneNumber,
+      removeSpacesFromUsername,
       handleLogin,
       handleSignup,
       goToBetting
