@@ -11,7 +11,7 @@
     
     <div class="bet-header">
       <div class="bet-game">
-        <h4>{{ bet.gameData.gameName }}</h4>
+        <h4>{{ bet.gameData.gameName.replace(' at ', ' @ ') }}</h4>
         <span class="bet-date">Bet placed at {{ formatDate(bet.createdAt) }}</span>
         <span v-if="getGameStartTime(bet)" class="game-start-time">Game starts at {{ getGameStartTime(bet) }}</span>
       </div>

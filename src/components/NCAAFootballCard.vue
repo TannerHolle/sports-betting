@@ -2,7 +2,7 @@
   <div class="game-card" :class="{ collapsed: isCollapsed }">
     <div class="game-header">
       <div class="game-info">
-        <h3 class="game-title">{{ game.name }}</h3>
+        <h3 class="game-title">{{ game.name.replace(' at ', ' @ ') }}</h3>
         <div class="game-meta">
           <span class="venue">{{ venue }}</span>
           <span class="broadcast" v-if="broadcast && !isCollapsed">{{ broadcast }}</span>
