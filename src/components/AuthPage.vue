@@ -63,6 +63,16 @@
             </button>
           </div>
         </div>
+        <div class="form-group remember-me-group">
+          <label class="remember-me-label">
+            <input 
+              type="checkbox" 
+              v-model="loginForm.rememberMe"
+              class="remember-me-checkbox"
+            />
+            <span>Remember me</span>
+          </label>
+        </div>
         <button type="submit" class="submit-btn" :disabled="loading">
           {{ loading ? 'Signing in...' : 'Sign In' }}
         </button>
@@ -215,7 +225,8 @@ export default {
     
     const loginForm = ref({
       username: '',
-      password: ''
+      password: '',
+      rememberMe: false
     })
     
     const signupForm = ref({
@@ -301,7 +312,11 @@ export default {
       successMessage.value = ''
       
       try {
-        const user = await userStore.login(loginForm.value.username, loginForm.value.password)
+        const user = await userStore.login(
+          loginForm.value.username, 
+          loginForm.value.password,
+          loginForm.value.rememberMe
+        )
         if (user) {
           // Join league if invite code is in URL
           if (pendingInviteCode.value) {
@@ -742,6 +757,31 @@ export default {
 
 .success-btn:hover {
   background: #047857;
+}
+
+.remember-me-group {
+  margin-bottom: 1rem;
+}
+
+.remember-me-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #374151;
+  user-select: none;
+}
+
+.remember-me-checkbox {
+  margin-right: 0.5rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+.remember-me-label:hover {
+  color: #1f2937;
 }
 
 @media (max-width: 768px) {

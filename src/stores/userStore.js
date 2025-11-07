@@ -8,7 +8,14 @@ const isAuthenticated = ref(false)
 
 // Check for existing session on initialization
 const initializeSession = async () => {
-  const savedUser = sessionStorage.getItem('currentUser')
+  // Check localStorage first (persistent sessions), then sessionStorage (temporary sessions)
+  let savedUser = localStorage.getItem('currentUser')
+  const storageType = savedUser ? 'localStorage' : sessionStorage.getItem('currentUser') ? 'sessionStorage' : null
+  
+  if (!savedUser) {
+    savedUser = sessionStorage.getItem('currentUser')
+  }
+  
   if (savedUser) {
     try {
       const parsedUser = JSON.parse(savedUser)
@@ -18,7 +25,7 @@ const initializeSession = async () => {
       // Refresh user data from API to get latest bets
       if (parsedUser.username) {
         try {
-          const freshData = await loadUserFromAPI(parsedUser.username)
+          const freshData = await loadUserFromAPI(parsedUser.username, storageType === 'localStorage')
           if (freshData) {
           }
         } catch (error) {
@@ -27,6 +34,7 @@ const initializeSession = async () => {
       }
     } catch (error) {
       console.error('Error restoring user session:', error)
+      localStorage.removeItem('currentUser')
       sessionStorage.removeItem('currentUser')
     }
   }
@@ -36,14 +44,18 @@ const initializeSession = async () => {
 const STARTING_BALANCE = 1000
 
 // Load user from backend API
-const loadUserFromAPI = async (username) => {
+const loadUserFromAPI = async (username, useLocalStorage = false) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/user/${username}`)
     if (response.data) {
       currentUser.value = response.data
       isAuthenticated.value = true
-      // Persist latest user state
-      sessionStorage.setItem('currentUser', JSON.stringify(response.data))
+      // Persist latest user state - use same storage type as before
+      if (useLocalStorage || localStorage.getItem('currentUser')) {
+        localStorage.setItem('currentUser', JSON.stringify(response.data))
+      } else {
+        sessionStorage.setItem('currentUser', JSON.stringify(response.data))
+      }
       return response.data
     }
   } catch (error) {
@@ -57,7 +69,7 @@ const loadUserFromAPI = async (username) => {
 
 
 // Create new user account
-const createAccount = async (username, password, name, email, phoneNumber) => {
+const createAccount = async (username, password, name, email, phoneNumber, rememberMe = false) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/user`, {
       username: username.toLowerCase(),
@@ -70,8 +82,12 @@ const createAccount = async (username, password, name, email, phoneNumber) => {
     if (response.data) {
       currentUser.value = response.data
       isAuthenticated.value = true
-      // Save to sessionStorage for persistence
-      sessionStorage.setItem('currentUser', JSON.stringify(response.data))
+      // Save to localStorage if rememberMe is true, otherwise sessionStorage
+      if (rememberMe) {
+        localStorage.setItem('currentUser', JSON.stringify(response.data))
+      } else {
+        sessionStorage.setItem('currentUser', JSON.stringify(response.data))
+      }
       return response.data
     }
   } catch (error) {
@@ -96,7 +112,7 @@ const createAccount = async (username, password, name, email, phoneNumber) => {
 }
 
 // Login user
-const login = async (username, password) => {
+const login = async (username, password, rememberMe = false) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/auth/login`, {
       username: username.toLowerCase(),
@@ -106,8 +122,12 @@ const login = async (username, password) => {
     if (response.data) {
       currentUser.value = response.data
       isAuthenticated.value = true
-      // Save to sessionStorage for persistence
-      sessionStorage.setItem('currentUser', JSON.stringify(response.data))
+      // Save to localStorage if rememberMe is true, otherwise sessionStorage
+      if (rememberMe) {
+        localStorage.setItem('currentUser', JSON.stringify(response.data))
+      } else {
+        sessionStorage.setItem('currentUser', JSON.stringify(response.data))
+      }
       return response.data
     }
   } catch (error) {
@@ -124,7 +144,8 @@ const login = async (username, password) => {
 const logout = () => {
   currentUser.value = null
   isAuthenticated.value = false
-  // Clear sessionStorage
+  // Clear both localStorage and sessionStorage
+  localStorage.removeItem('currentUser')
   sessionStorage.removeItem('currentUser')
 }
 
