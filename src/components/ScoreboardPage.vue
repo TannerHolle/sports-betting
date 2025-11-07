@@ -119,7 +119,8 @@ export default {
           { value: 'big10', label: 'Big Ten' },
           { value: 'acc', label: 'ACC' },
           { value: 'big12', label: 'Big 12' },
-          { value: 'mountainwest', label: 'Mountain West' }
+          { value: 'mountainwest', label: 'Mountain West' },
+          { value: 'american', label: 'American Athletic' }
         ]
       },
       {
@@ -386,6 +387,8 @@ export default {
           return groups?.id === '4' || groups?.shortName === 'Big 12'
         case 'mountainwest':
           return groups?.id === '17' || groups?.shortName === 'Mountain West'
+        case 'american':
+          return groups?.id === '151' || groups?.shortName === 'American'
         default:
           return true
       }
