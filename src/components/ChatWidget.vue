@@ -32,23 +32,66 @@
           </button>
         </div>
 
+        <!-- League and Game Selectors -->
+        <div class="game-selector-container" v-if="availableGames.length > 0">
+          <div class="selectors-row">
+            <!-- League Selector -->
+            <div class="selector-group league-selector-group">
+              <label class="game-selector-label">
+                <span>Select a league:</span>
+              </label>
+              <select
+                v-model="selectedLeague"
+                class="game-selector"
+                @change="onLeagueChange"
+              >
+                <option value="">All leagues</option>
+                <option
+                  v-for="sport in sports"
+                  :key="sport.id"
+                  :value="sport.id"
+                >
+                  {{ sport.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Game Selector -->
+            <div class="selector-group game-selector-group">
+              <label class="game-selector-label">
+                <span>Select a game:</span>
+              </label>
+              <select
+                v-model="selectedGameId"
+                class="game-selector"
+                @change="onGameChange"
+                :disabled="!selectedLeague"
+              >
+                <option value="">No game selected</option>
+                <option
+                  v-for="game in filteredGames"
+                  :key="game.id"
+                  :value="game.id"
+                >
+                  {{ game.awayTeam }} @ {{ game.homeTeam }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         <!-- Chat Messages -->
         <div class="chat-widget-messages" ref="messagesContainer">
           <div v-if="messages.length === 0" class="welcome-message">
-            <p class="welcome-text">Want to learn about sports betting? I'm an AI bot that's here to help! 😊</p>
-            <p class="welcome-prompt">What would you like to do next?</p>
+            <p class="welcome-text">I'm an AI bot that's here to help! Select a game above to get personalized insights, or feel free to ask me general questions about sports betting without the need to select a game.</p>
             <div class="suggested-actions">
               <button class="action-button" @click="sendSuggestedMessage('How do I read betting odds?')">
                 <span class="action-icon">💬</span>
                 <span>Learn about odds</span>
               </button>
-              <button class="action-button" @click="sendSuggestedMessage('What types of bets can I make?')">
+              <button class="action-button" @click="sendSuggestedMessage('What types of bets can I make on this app?')">
                 <span class="action-icon">📊</span>
                 <span>Bet types</span>
-              </button>
-              <button class="action-button" @click="sendSuggestedMessage('How do I manage my bankroll?')">
-                <span class="action-icon">💰</span>
-                <span>Bankroll tips</span>
               </button>
               <button class="action-button" @click="sendSuggestedMessage('What is expected value in betting?')">
                 <span class="action-icon">📈</span>
@@ -94,7 +137,7 @@
             <input
               v-model="currentQuestion"
               type="text"
-              placeholder="Ask me anything..."
+              :placeholder="selectedGameContext ? `Ask about ${selectedGameContext.awayTeam} @ ${selectedGameContext.homeTeam}...` : 'Ask me anything...'"
               class="chat-input"
               :disabled="isLoading"
               ref="chatInput"
@@ -122,6 +165,7 @@ import { ref, nextTick, watch, computed } from 'vue'
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
 import { useUserStore } from '../stores/userStore.js'
+import oddsService from '../services/oddsService.js'
 
 export default {
   name: 'ChatWidget',
@@ -134,6 +178,247 @@ export default {
     const isLoading = ref(false)
     const messagesContainer = ref(null)
     const chatInput = ref(null)
+    const availableGames = ref([])
+    const loadingGames = ref(false)
+    const selectedLeague = ref('')
+    const selectedGameId = ref('')
+    const selectedGameContext = ref(null)
+
+    // Filter games by selected league
+    const filteredGames = computed(() => {
+      if (!selectedLeague.value) {
+        return []
+      }
+      return availableGames.value.filter(game => game.sport === selectedLeague.value)
+    })
+
+    // Sports configuration
+    const sports = [
+      {
+        id: 'nba',
+        name: 'NBA',
+        apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard'
+      },
+      {
+        id: 'nfl',
+        name: 'NFL',
+        apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
+      },
+      {
+        id: 'ncaa-basketball',
+        name: 'NCAA Basketball',
+        apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard'
+      },
+      {
+        id: 'ncaa-football',
+        name: 'NCAA Football',
+        apiUrl: 'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard'
+      }
+    ]
+
+    // Format date for ESPN API (YYYYMMDD)
+    const formatDateForAPI = (date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${year}${month}${day}`
+    }
+
+
+    // Fetch available games with odds
+    const fetchAvailableGames = async () => {
+      if (loadingGames.value) return
+      loadingGames.value = true
+
+      try {
+        // Fetch all odds first
+        const allOdds = await oddsService.getAllOdds()
+
+        // Fetch games for today and tomorrow from all sports
+        const today = new Date()
+        const tomorrow = new Date(today)
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        const todayFormatted = formatDateForAPI(today)
+        const tomorrowFormatted = formatDateForAPI(tomorrow)
+        
+        const gamesPromises = sports.map(async (sport) => {
+          try {
+            let allGames = []
+            
+            // Fetch today's games
+            let apiUrl = sport.apiUrl
+            if (sport.id === 'nba' || sport.id === 'ncaa-basketball' || sport.id === 'ncaa-football') {
+              apiUrl = `${sport.apiUrl}?dates=${todayFormatted}`
+            }
+            const todayResponse = await axios.get(apiUrl)
+            allGames = allGames.concat(todayResponse.data.events || [])
+            
+            // Also fetch tomorrow's games for sports that need date filtering
+            if (sport.id === 'nba' || sport.id === 'ncaa-basketball' || sport.id === 'ncaa-football') {
+              const tomorrowApiUrl = `${sport.apiUrl}?dates=${tomorrowFormatted}`
+              try {
+                const tomorrowResponse = await axios.get(tomorrowApiUrl)
+                allGames = allGames.concat(tomorrowResponse.data.events || [])
+              } catch (err) {
+                // If tomorrow's games fail, continue with today's
+                console.warn(`Failed to fetch tomorrow's games for ${sport.name}:`, err)
+              }
+            }
+            
+            const games = allGames
+
+            // Filter for scheduled games that have odds available
+            return games
+              .filter(game => {
+                const competition = game.competitions?.[0]
+                const status = competition?.status
+                const isScheduled = status?.type?.state === 'pre'
+                if (!isScheduled) return false
+
+                const competitors = competition.competitors || []
+                const homeTeam = competitors.find(c => c.homeAway === 'home')
+                const awayTeam = competitors.find(c => c.homeAway === 'away')
+
+                if (!homeTeam || !awayTeam) return false
+
+                const homeTeamName = homeTeam.team?.shortDisplayName || homeTeam.team?.displayName || ''
+                const awayTeamName = awayTeam.team?.shortDisplayName || awayTeam.team?.displayName || ''
+                const sportId = sport.id
+
+                // Only include games that have odds
+                const gameOdds = oddsService.findGameOdds(allOdds, sportId, homeTeamName, awayTeamName)
+                return !!gameOdds
+              })
+              .map(game => {
+                const competition = game.competitions?.[0]
+                const competitors = competition.competitors || []
+                const homeTeam = competitors.find(c => c.homeAway === 'home')
+                const awayTeam = competitors.find(c => c.homeAway === 'away')
+                const homeTeamName = homeTeam.team?.shortDisplayName || homeTeam.team?.displayName || ''
+                const awayTeamName = awayTeam.team?.shortDisplayName || awayTeam.team?.displayName || ''
+
+                // Use the sport from the API call (we're already iterating through sports)
+                const sportId = sport.id
+
+                // Find odds (we know it exists from the filter above)
+                const gameOdds = oddsService.findGameOdds(allOdds, sportId, homeTeamName, awayTeamName)
+
+                return {
+                  id: game.id,
+                  sport: sportId,
+                  homeTeam: homeTeamName,
+                  awayTeam: awayTeamName,
+                  gameData: game,
+                  gameOdds
+                }
+              })
+          } catch (error) {
+            console.error(`Error fetching games for ${sport.name}:`, error)
+            return []
+          }
+        })
+
+        const allGamesArrays = await Promise.all(gamesPromises)
+        // Flatten all games and deduplicate by game ID
+        const allGames = allGamesArrays.flat()
+        const uniqueGames = []
+        const seenGameIds = new Set()
+        
+        for (const game of allGames) {
+          if (!seenGameIds.has(game.id)) {
+            seenGameIds.add(game.id)
+            uniqueGames.push(game)
+          }
+        }
+        
+        // Include all games - no limit since we're filtering by league now
+        availableGames.value = uniqueGames
+        console.log(`[ChatWidget] Loaded ${uniqueGames.length} unique games across all sports`)
+      } catch (error) {
+        console.error('Error fetching available games:', error)
+        availableGames.value = []
+      } finally {
+        loadingGames.value = false
+      }
+    }
+
+    // Format game data for AI context
+    const formatGameForContext = (game) => {
+      const competition = game.gameData?.competitions?.[0]
+      if (!competition) return null
+
+      const competitors = competition.competitors || []
+      const homeTeam = competitors.find(c => c.homeAway === 'home')
+      const awayTeam = competitors.find(c => c.homeAway === 'away')
+
+      if (!homeTeam || !awayTeam) return null
+
+      const context = {
+        gameId: game.id,
+        sport: game.sport,
+        homeTeam: game.homeTeam,
+        awayTeam: game.awayTeam,
+        commenceTime: game.gameData?.date || competition.date,
+        venue: competition.venue?.fullName || null,
+        status: competition.status?.type?.shortDetail || 'Scheduled'
+      }
+
+      // Add odds if available
+      if (game.gameOdds && game.gameOdds.odds) {
+        const actualHomeTeam = game.gameOdds.homeTeam
+        const actualAwayTeam = game.gameOdds.awayTeam
+
+        context.odds = {}
+
+        // Moneyline
+        const homeMoneylineKey = `${actualHomeTeam}_moneyline`
+        const awayMoneylineKey = `${actualAwayTeam}_moneyline`
+        if (game.gameOdds.odds[homeMoneylineKey]) {
+          context.odds.homeMoneyline = game.gameOdds.odds[homeMoneylineKey]
+        }
+        if (game.gameOdds.odds[awayMoneylineKey]) {
+          context.odds.awayMoneyline = game.gameOdds.odds[awayMoneylineKey]
+        }
+
+        // Spread
+        const homeSpreadKey = `${actualHomeTeam}_spread`
+        const awaySpreadKey = `${actualAwayTeam}_spread`
+        if (game.gameOdds.odds[homeSpreadKey]) {
+          context.odds.homeSpread = game.gameOdds.odds[homeSpreadKey]
+        }
+        if (game.gameOdds.odds[awaySpreadKey]) {
+          context.odds.awaySpread = game.gameOdds.odds[awaySpreadKey]
+        }
+
+        // Totals
+        if (game.gameOdds.odds['Over_total']) {
+          context.odds.overTotal = game.gameOdds.odds['Over_total']
+        }
+        if (game.gameOdds.odds['Under_total']) {
+          context.odds.underTotal = game.gameOdds.odds['Under_total']
+        }
+      }
+
+      return context
+    }
+
+    const onLeagueChange = () => {
+      // Clear game selection when league changes
+      selectedGameId.value = ''
+      selectedGameContext.value = null
+    }
+
+    const onGameChange = () => {
+      if (!selectedGameId.value) {
+        selectedGameContext.value = null
+        return
+      }
+
+      const selectedGame = filteredGames.value.find(g => g.id === selectedGameId.value)
+      if (selectedGame) {
+        selectedGameContext.value = formatGameForContext(selectedGame)
+      }
+    }
 
     const toggleChat = () => {
       if (isOpen.value) {
@@ -141,6 +426,12 @@ export default {
         messages.value = []
         currentQuestion.value = ''
         isLoading.value = false
+        selectedLeague.value = ''
+        selectedGameId.value = ''
+        selectedGameContext.value = null
+      } else {
+        // Opening the chat - fetch available games
+        fetchAvailableGames()
       }
       isOpen.value = !isOpen.value
       if (isOpen.value) {
@@ -177,8 +468,10 @@ export default {
       scrollToBottom()
 
       try {
+        // Send selected game context if a game is selected, otherwise send null
         const response = await axios.post(`${API_BASE_URL}/ai/ask`, {
-          question: question
+          question: question,
+          gameContext: selectedGameContext.value
         })
 
         // Add assistant response
@@ -198,8 +491,7 @@ export default {
         messages.value.push(errorMessage)
       } finally {
         isLoading.value = false
-        await nextTick()
-        scrollToBottom()
+        await scrollToLastAssistantMessage()
         // Focus input after response
         if (chatInput.value) {
           chatInput.value.focus()
@@ -210,6 +502,39 @@ export default {
     const scrollToBottom = () => {
       if (messagesContainer.value) {
         messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+      }
+    }
+
+    const scrollToLastAssistantMessage = async () => {
+      if (messagesContainer.value) {
+        await nextTick()
+        // Find all message elements
+        const allMessages = messagesContainer.value.querySelectorAll('.message')
+        if (allMessages.length > 0) {
+          // Find the last user message (which should be right before the assistant response)
+          let lastUserMessage = null
+          for (let i = allMessages.length - 1; i >= 0; i--) {
+            if (allMessages[i].classList.contains('user')) {
+              lastUserMessage = allMessages[i]
+              break
+            }
+          }
+          
+          // If we found a user message, scroll to show it (which will also show the assistant message below)
+          if (lastUserMessage) {
+            lastUserMessage.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          } else {
+            // Fallback: scroll to the last assistant message
+            const assistantMessages = messagesContainer.value.querySelectorAll('.message.assistant')
+            if (assistantMessages.length > 0) {
+              assistantMessages[assistantMessages.length - 1].scrollIntoView({ behavior: 'smooth', block: 'start' })
+            } else {
+              scrollToBottom()
+            }
+          }
+        } else {
+          scrollToBottom()
+        }
       }
     }
 
@@ -229,7 +554,16 @@ export default {
     // Watch for messages changes to auto-scroll
     watch(() => messages.value.length, () => {
       nextTick(() => {
-        scrollToBottom()
+        // If the last message is from assistant, scroll to show its top
+        // Otherwise, scroll to bottom for user messages
+        if (messages.value.length > 0) {
+          const lastMessage = messages.value[messages.value.length - 1]
+          if (lastMessage.type === 'assistant') {
+            scrollToLastAssistantMessage()
+          } else {
+            scrollToBottom()
+          }
+        }
       })
     })
 
@@ -241,11 +575,20 @@ export default {
       isLoading,
       messagesContainer,
       chatInput,
+      selectedLeague,
+      selectedGameId,
+      selectedGameContext,
+      filteredGames,
+      availableGames,
+      loadingGames,
+      sports,
       toggleChat,
       sendMessage,
       sendSuggestedMessage,
       formatMessage,
-      formatTime
+      formatTime,
+      onLeagueChange,
+      onGameChange,
     }
   }
 }
@@ -572,6 +915,80 @@ export default {
   border-top: 1px solid #e5e7eb;
   background: white;
   flex-shrink: 0;
+}
+
+/* Game Selector */
+.game-selector-container {
+  padding: 12px 16px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.selectors-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.selector-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.league-selector-group {
+  flex: 0 0 auto;
+  max-width: 140px;
+}
+
+.game-selector-group {
+  flex: 1;
+}
+
+.game-selector-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.game-selector {
+  flex: 1;
+  padding: 6px 28px 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 12px;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+.game-selector:hover {
+  border-color: #d1d5db;
+}
+
+.game-selector:focus {
+  border-color: #4169e1;
+  box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.1);
+}
+
+.game-selector:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
 }
 
 .chat-form {
