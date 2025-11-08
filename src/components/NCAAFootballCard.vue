@@ -180,8 +180,22 @@ export default {
     const fetchGameOdds = async () => {
       try {
         const allOdds = await oddsService.getAllOdds()
-        const gameOddsData = oddsService.findGameOdds(allOdds, 'ncaa-football', homeTeamName.value, awayTeamName.value)
         
+        // Try matching with shortDisplayName first
+        let gameOddsData = oddsService.findGameOdds(allOdds, 'ncaa-football', homeTeamName.value, awayTeamName.value)
+
+        // If no match, try with displayName as fallback
+        if (!gameOddsData) {
+          const homeTeam = competitors.value.find(c => c.homeAway === 'home')
+          const awayTeam = competitors.value.find(c => c.homeAway === 'away')
+          const homeDisplayName = homeTeam?.team?.displayName || ''
+          const awayDisplayName = awayTeam?.team?.displayName || ''
+          
+          if (homeDisplayName && awayDisplayName && 
+              (homeDisplayName !== homeTeamName.value || awayDisplayName !== awayTeamName.value)) {
+            gameOddsData = oddsService.findGameOdds(allOdds, 'ncaa-football', homeDisplayName, awayDisplayName)
+          }
+        }
         if (gameOddsData) {
           gameOdds.value = gameOddsData
         }
