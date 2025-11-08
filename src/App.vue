@@ -22,13 +22,14 @@
     <AuthPage v-if="currentPage === 'auth'" @change-page="setCurrentPage" />
     
     <!-- Chat Widget (Available on all pages) -->
-    <ChatWidget />
+    <ChatWidget v-if="showAiChat" />
   </div>
 </template>
 
 <script>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useUserStore } from './stores/userStore.js'
+import { FEATURES } from './config/features.js'
 import Navigation from './components/Navigation.vue'
 import ScoreboardPage from './components/ScoreboardPage.vue'
 import BettingPage from './components/BettingPage.vue'
@@ -86,10 +87,14 @@ export default {
       window.removeEventListener('change-page', handlePageChangeEvent)
     })
 
+    // Feature flags
+    const showAiChat = computed(() => FEATURES.SHOW_AI_CHAT)
+
     return {
       currentPage,
       isAuthenticated,
-      setCurrentPage
+      setCurrentPage,
+      showAiChat
     }
   }
 }
