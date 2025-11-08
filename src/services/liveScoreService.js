@@ -39,7 +39,7 @@ class LiveScoreService {
           apiUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${formattedDate}`
           break
         case 'ncaa-football':
-          apiUrl = 'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard'
+          apiUrl = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${formattedDate}`
           break
         default:
           apiUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${formattedDate}`
