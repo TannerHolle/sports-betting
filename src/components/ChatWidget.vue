@@ -2,17 +2,12 @@
   <div class="chat-widget-container">
     <!-- Persistent Toggle Button (Bottom Right) -->
     <button 
+      v-if="!isOpen"
       class="chat-toggle-button"
       @click="toggleChat"
-      :aria-label="isOpen ? 'Close chat' : 'Open chat'"
+      aria-label="Open chat"
     >
-      <svg v-if="!isOpen" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H6L4 18V4H20V16Z" fill="currentColor"/>
-        <path d="M7 9H17V11H7V9ZM7 12H14V14H7V12Z" fill="currentColor"/>
-      </svg>
-      <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"/>
-      </svg>
+      <img src="../assets/icons/ai-icon.png" alt="AI Assistant" class="ai-icon" />
     </button>
 
     <!-- Chat Widget -->
@@ -26,6 +21,15 @@
               <h3>Betting Assistant</h3>
             </div>
           </div>
+          <button 
+            class="header-close-button"
+            @click="toggleChat"
+            aria-label="Close chat"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"/>
+            </svg>
+          </button>
         </div>
 
         <!-- Chat Messages -->
@@ -58,15 +62,15 @@
             :key="index"
             :class="['message', message.type]"
           >
-            <div class="message-avatar" v-if="message.type === 'user'">
-              <span>👤</span>
+            <div class="message-avatar" v-if="message.type === 'assistant'">
+              <span>🤖</span>
+            </div>
+            <div class="message-avatar user-avatar" v-if="message.type === 'user'">
+              <span class="avatar-text">{{ currentUser?.username ? currentUser.username.charAt(0).toUpperCase() : 'U' }}</span>
             </div>
             <div class="message-content">
               <div class="message-text" v-html="formatMessage(message.text)"></div>
               <div class="message-time">{{ formatTime(message.timestamp) }}</div>
-            </div>
-            <div class="message-avatar" v-if="message.type === 'assistant'">
-              <span>🤖</span>
             </div>
           </div>
 
@@ -114,13 +118,16 @@
 </template>
 
 <script>
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick, watch, computed } from 'vue'
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
+import { useUserStore } from '../stores/userStore.js'
 
 export default {
   name: 'ChatWidget',
   setup() {
+    const userStore = useUserStore()
+    const currentUser = computed(() => userStore.currentUser.value)
     const isOpen = ref(false)
     const messages = ref([])
     const currentQuestion = ref('')
@@ -129,6 +136,12 @@ export default {
     const chatInput = ref(null)
 
     const toggleChat = () => {
+      if (isOpen.value) {
+        // Closing the chat - clear messages and reset
+        messages.value = []
+        currentQuestion.value = ''
+        isLoading.value = false
+      }
       isOpen.value = !isOpen.value
       if (isOpen.value) {
         nextTick(() => {
@@ -221,6 +234,7 @@ export default {
     })
 
     return {
+      currentUser,
       isOpen,
       messages,
       currentQuestion,
@@ -276,17 +290,23 @@ export default {
   transform: scale(0.95);
 }
 
+.chat-toggle-button .ai-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
 /* Chat Widget */
 .chat-widget {
   position: fixed;
-  bottom: 96px;
+  bottom: 0;
   right: 24px;
   width: 380px;
   max-width: calc(100vw - 48px);
   height: 600px;
-  max-height: calc(100vh - 120px);
+  max-height: calc(100vh - 24px);
   background: white;
-  border-radius: 12px;
+  border-radius: 12px 12px 0 0;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
@@ -343,6 +363,28 @@ export default {
   font-size: 16px;
   font-weight: 600;
   color: white;
+}
+
+.header-close-button {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.header-close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.header-close-button:active {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Chat Messages */
@@ -431,8 +473,14 @@ export default {
   font-size: 16px;
 }
 
-.message.user .message-avatar {
-  background: #4169e1;
+.message.user .message-avatar.user-avatar {
+  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+}
+
+.message.user .message-avatar.user-avatar .avatar-text {
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
 }
 
 .message-content {
@@ -442,6 +490,10 @@ export default {
 
 .message.user .message-content {
   text-align: right;
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .message-text {
@@ -452,6 +504,8 @@ export default {
   color: #1f2937;
   font-size: 14px;
   word-wrap: break-word;
+  display: inline-block;
+  max-width: 100%;
 }
 
 .message.user .message-text {
@@ -618,9 +672,10 @@ export default {
   .chat-widget {
     width: calc(100vw - 24px);
     right: 12px;
-    bottom: 88px;
-    height: calc(100vh - 100px);
-    max-height: calc(100vh - 100px);
+    bottom: 0;
+    height: calc(100vh - 24px);
+    max-height: calc(100vh - 24px);
+    border-radius: 12px 12px 0 0;
   }
 
   .chat-toggle-button {
