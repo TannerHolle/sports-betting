@@ -39,6 +39,12 @@
         </div>
         <div class="stat-label">Current Streak</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-value" :class="{ 'positive': userStats.todaysProfitLoss > 0, 'negative': userStats.todaysProfitLoss < 0 }">
+          {{ userStats.todaysProfitLoss >= 0 ? '+' : '' }}${{ userStats.todaysProfitLoss.toLocaleString() }}
+        </div>
+        <div class="stat-label">Today's P/L</div>
+      </div>
     </div>
 
     <!-- Bet History -->

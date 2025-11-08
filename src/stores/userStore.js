@@ -268,6 +268,28 @@ const userStats = computed(() => {
     return streak
   })()
   
+  // Calculate today's profit/loss
+  const todaysProfitLoss = (() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    const todaysBets = completedBets.filter(bet => {
+      const resolvedDate = bet.resolvedAt ? new Date(bet.resolvedAt) : null
+      if (!resolvedDate) return false
+      resolvedDate.setHours(0, 0, 0, 0)
+      return resolvedDate.getTime() === today.getTime()
+    })
+    
+    return todaysBets.reduce((total, bet) => {
+      if (bet.status === 'won') {
+        return total + (bet.potentialWin || 0)
+      } else if (bet.status === 'lost') {
+        return total - (bet.amount || 0)
+      }
+      return total
+    }, 0)
+  })()
+  
   return {
     totalWagered,
     totalWon,
@@ -275,7 +297,8 @@ const userStats = computed(() => {
     winRate,
     activeBets,
     totalBets: bets.length,
-    currentStreak
+    currentStreak,
+    todaysProfitLoss
   }
 })
 
