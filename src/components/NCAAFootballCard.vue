@@ -113,7 +113,14 @@
             </span>
           </div>
         </div>
-        
+        <!-- Ask AI Button -->
+        <button 
+          v-if="betting && gameScheduled && FEATURES.SHOW_AI_CHAT" 
+          @click="handleAskAI" 
+          class="ask-ai-button"
+        >
+          Get help understanding these betting lines from AI
+        </button>
         <!-- Betting Interface -->
         <BettingInterface :game="game" :betting="betting" :sport="sport" />
       </div>
@@ -139,6 +146,8 @@ import { computed, ref, onMounted } from 'vue'
 import BettingInterface from './BettingInterface.vue'
 import oddsService from '../services/oddsService.js'
 import { convertToLocalTime, formatRelativeTime } from '../utils/timezoneUtils.js'
+import { useChatWidget } from '../composables/useChatWidget.js'
+import { FEATURES } from '../config/features.js'
 
 export default {
   name: 'NCAAFootballCard',
@@ -348,6 +357,15 @@ export default {
       }
     }
 
+    // Get the openChatWithGame method from the composable
+    const { openChatWithGame } = useChatWidget()
+
+    const handleAskAI = () => {
+      const homeTeam = getHomeTeamName()
+      const awayTeam = getAwayTeamName()
+      openChatWithGame('ncaa-football', homeTeam, awayTeam, props.game.id)
+    }
+
     return {
       isCollapsed,
       competitors,
@@ -369,7 +387,9 @@ export default {
       getHomeTeamName,
       getAwayTeamName,
       isWinning,
-      getTeamStyle
+      getTeamStyle,
+      handleAskAI,
+      FEATURES
     }
   }
 }
@@ -401,6 +421,34 @@ export default {
   color: #059669;
   font-weight: 500;
   cursor: pointer;
+}
+
+.ask-ai-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: #4169e1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ask-ai-button:hover {
+  background: #3151c7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(65, 105, 225, 0.3);
+}
+
+.ask-ai-button:active {
+  transform: translateY(0);
 }
 
 </style>

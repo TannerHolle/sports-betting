@@ -82,7 +82,7 @@
 
         <!-- Chat Messages -->
         <div class="chat-widget-messages" ref="messagesContainer">
-          <div v-if="messages.length === 0" class="welcome-message">
+          <div v-if="messages.length === 0 && !selectedGameContext" class="welcome-message">
             <p class="welcome-text">I'm an AI bot that's here to help! Select a game above to get personalized insights, or feel free to ask me general questions about sports betting without the need to select a game.</p>
             <div class="suggested-actions">
               <button class="action-button" @click="sendSuggestedMessage('How do I read betting odds?')">
@@ -98,6 +98,11 @@
                 <span>Betting strategy</span>
               </button>
             </div>
+          </div>
+          
+          <div v-if="messages.length === 0 && selectedGameContext" class="game-welcome-message">
+            <p class="welcome-text">I'm ready to help you with <strong>{{ selectedGameContext.awayTeam }} @ {{ selectedGameContext.homeTeam }}</strong>!</p>
+            <p class="welcome-subtext">Ask me anything about the betting odds for this game - recommendations, analysis, or how to interpret the lines.</p>
           </div>
 
           <div
@@ -161,11 +166,12 @@
 </template>
 
 <script>
-import { ref, nextTick, watch, computed } from 'vue'
+import { ref, nextTick, watch, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
 import { useUserStore } from '../stores/userStore.js'
 import oddsService from '../services/oddsService.js'
+import { useChatWidget } from '../composables/useChatWidget.js'
 
 export default {
   name: 'ChatWidget',
@@ -444,6 +450,51 @@ export default {
       }
     }
 
+    // Method to open chat with a specific game pre-selected
+    const openChatWithGame = async (sport, homeTeam, awayTeam, gameId = null) => {
+      // If chat is not open, open it and fetch games
+      if (!isOpen.value) {
+        isOpen.value = true
+        await fetchAvailableGames()
+      }
+      
+      // Wait for games to be loaded
+      await nextTick()
+      
+      // Set the league first
+      selectedLeague.value = sport
+      
+      // Wait for filtered games to update
+      await nextTick()
+      
+      // Find the matching game
+      const matchingGame = filteredGames.value.find(game => {
+        // Try to match by gameId first if provided
+        if (gameId && game.id === gameId) {
+          return true
+        }
+        // Otherwise match by team names
+        return game.homeTeam === homeTeam && game.awayTeam === awayTeam
+      })
+      
+      if (matchingGame) {
+        selectedGameId.value = matchingGame.id
+        selectedGameContext.value = formatGameForContext(matchingGame)
+      }
+      
+      // Focus the input
+      await nextTick()
+      if (chatInput.value) {
+        chatInput.value.focus()
+      }
+    }
+
+    // Register the method globally so game cards can use it
+    const { setOpenChatWithGame } = useChatWidget()
+    onMounted(() => {
+      setOpenChatWithGame(openChatWithGame)
+    })
+
     const sendSuggestedMessage = (message) => {
       currentQuestion.value = message
       sendMessage()
@@ -583,6 +634,7 @@ export default {
       loadingGames,
       sports,
       toggleChat,
+      openChatWithGame,
       sendMessage,
       sendSuggestedMessage,
       formatMessage,
@@ -753,6 +805,19 @@ export default {
   color: #374151;
   font-size: 14px;
   line-height: 1.5;
+}
+
+.welcome-subtext {
+  margin: 8px 0 0 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.game-welcome-message {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .welcome-prompt {
