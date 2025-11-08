@@ -323,7 +323,6 @@ export default {
       
       const formattedDate = formatDateForAPI(date)
       const apiUrl = `${sport.apiUrl}?dates=${formattedDate}`
-      console.log(apiUrl)
       
       try {
         const response = await axios.get(apiUrl)
