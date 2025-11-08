@@ -39,7 +39,7 @@
         </div>
         <div class="stat-label">Current Streak</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" v-if="userStats.todaysProfitLoss !== 0">
         <div class="stat-value" :class="{ 'positive': userStats.todaysProfitLoss > 0, 'negative': userStats.todaysProfitLoss < 0 }">
           {{ userStats.todaysProfitLoss >= 0 ? '+' : '' }}${{ userStats.todaysProfitLoss.toLocaleString() }}
         </div>
