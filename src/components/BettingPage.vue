@@ -323,6 +323,7 @@ export default {
       
       const formattedDate = formatDateForAPI(date)
       const apiUrl = `${sport.apiUrl}?dates=${formattedDate}`
+      console.log(apiUrl)
       
       try {
         const response = await axios.get(apiUrl)
@@ -343,7 +344,7 @@ export default {
       }
     }
 
-    // Main fetch function: tries today first, then tomorrow if no games with odds
+    // Main fetch function: checks all sports for today first, then tomorrow only if NO sports have games today
     const fetchData = async (showLoading = true) => {
       if (showLoading) {
         loading.value = true
@@ -359,47 +360,67 @@ export default {
         const tomorrow = new Date(today)
         tomorrow.setDate(tomorrow.getDate() + 1)
         
-        // Try today's games first - just show all scheduled games from the fetch (like ScoreboardPage does)
-        let todayGames = await fetchGamesForDate(today, sportId)
-        
-        // Filter to only scheduled games with odds (don't re-filter by date since we already fetched for that date)
-        let todayGamesWithOdds = todayGames.filter(game => {
-          const competition = game.competitions?.[0]
-          const status = competition?.status
-          const isScheduled = status?.type?.state === 'pre'
-          if (!isScheduled) return false
-          return gameHasOdds(game, sportId)
+        // Check all sports for today's games first
+        const todayCheckPromises = sports.value.map(async (sport) => {
+          try {
+            let todayGames = await fetchGamesForDate(today, sport.id)
+            let todayGamesWithOdds = todayGames.filter(game => {
+              const competition = game.competitions?.[0]
+              const status = competition?.status
+              const isScheduled = status?.type?.state === 'pre'
+              if (!isScheduled) return false
+              return gameHasOdds(game, sport.id)
+            })
+            return { sportId: sport.id, hasGames: todayGamesWithOdds.length > 0, games: todayGames }
+          } catch (err) {
+            console.error(`Error fetching today's data for ${sport.name}:`, err)
+            return { sportId: sport.id, hasGames: false, games: [] }
+          }
         })
         
-        if (todayGamesWithOdds.length > 0) {
-          // We have games with odds for today
+        const todayResults = await Promise.all(todayCheckPromises)
+        
+        // Check if ANY sport has games today
+        const hasAnyGamesToday = todayResults.some(result => result.hasGames)
+        
+        if (hasAnyGamesToday) {
+          // At least one sport has games today - use today's games
           showingDate.value = 'today'
-          games.value = todayGames
-          gamesBySport.value[sportId] = todayGames
+          const activeSportResult = todayResults.find(r => r.sportId === sportId)
+          games.value = activeSportResult ? activeSportResult.games : []
+          // Update gamesBySport for all sports
+          todayResults.forEach(result => {
+            gamesBySport.value[result.sportId] = result.games
+          })
         } else {
-          // No games with odds today, try tomorrow
-          let tomorrowGames = await fetchGamesForDate(tomorrow, sportId)
+          // No sports have games today - check tomorrow for all sports
+          console.log('No games with odds today across all sports, checking tomorrow')
+          showingDate.value = 'tomorrow'
           
-          // Filter to only scheduled games with odds (don't re-filter by date since we already fetched for that date)
-          let tomorrowGamesWithOdds = tomorrowGames.filter(game => {
-            const competition = game.competitions?.[0]
-            const status = competition?.status
-            const isScheduled = status?.type?.state === 'pre'
-            if (!isScheduled) return false
-            return gameHasOdds(game, sportId)
+          const tomorrowCheckPromises = sports.value.map(async (sport) => {
+            try {
+              const tomorrowGames = await fetchGamesForDate(tomorrow, sport.id)
+              const tomorrowGamesWithOdds = tomorrowGames.filter(game => {
+                const competition = game.competitions?.[0]
+                const status = competition?.status
+                const isScheduled = status?.type?.state === 'pre'
+                if (!isScheduled) return false
+                return gameHasOdds(game, sport.id)
+              })
+              return { sportId: sport.id, games: tomorrowGames }
+            } catch (err) {
+              console.error(`Error fetching tomorrow's data for ${sport.name}:`, err)
+              return { sportId: sport.id, games: [] }
+            }
           })
           
-          if (tomorrowGamesWithOdds.length > 0) {
-            // We have games with odds for tomorrow
-            showingDate.value = 'tomorrow'
-            games.value = tomorrowGames
-            gamesBySport.value[sportId] = tomorrowGames
-          } else {
-            // No games with odds for today or tomorrow
-            showingDate.value = 'today'
-            games.value = []
-            gamesBySport.value[sportId] = []
-          }
+          const tomorrowResults = await Promise.all(tomorrowCheckPromises)
+          const activeSportResult = tomorrowResults.find(r => r.sportId === sportId)
+          games.value = activeSportResult ? activeSportResult.games : []
+          // Update gamesBySport for all sports
+          tomorrowResults.forEach(result => {
+            gamesBySport.value[result.sportId] = result.games
+          })
         }
         
       } catch (err) {
@@ -413,6 +434,7 @@ export default {
     }
 
     // Check all sports to see which have games available (today or tomorrow)
+    // Only checks tomorrow if NO sports have games today
     const checkAllSports = async () => {
       // Ensure we have odds data
       if (Object.keys(allOdds.value).length === 0) {
@@ -423,9 +445,9 @@ export default {
       const tomorrow = new Date(today)
       tomorrow.setDate(tomorrow.getDate() + 1)
       
-      const checkPromises = sports.value.map(async (sport) => {
+      // First, check all sports for today's games
+      const todayCheckPromises = sports.value.map(async (sport) => {
         try {
-          // Try today first
           let todayGames = await fetchGamesForDate(today, sport.id)
           let todayGamesWithOdds = todayGames.filter(game => {
             const competition = game.competitions?.[0]
@@ -434,9 +456,28 @@ export default {
             if (!isScheduled) return false
             return gameHasOdds(game, sport.id)
           })
-          
-          // If no games with odds today, try tomorrow
-          if (todayGamesWithOdds.length === 0) {
+          return { sportId: sport.id, hasGames: todayGamesWithOdds.length > 0, games: todayGames }
+        } catch (err) {
+          console.error(`Error fetching today's data for ${sport.name}:`, err)
+          return { sportId: sport.id, hasGames: false, games: [] }
+        }
+      })
+      
+      const todayResults = await Promise.all(todayCheckPromises)
+      
+      // Check if ANY sport has games today
+      const hasAnyGamesToday = todayResults.some(result => result.hasGames)
+      
+      if (hasAnyGamesToday) {
+        // At least one sport has games today - store today's games for all sports
+        todayResults.forEach(result => {
+          gamesBySport.value[result.sportId] = result.games
+        })
+      } else {
+        // No sports have games today - check tomorrow for all sports
+        console.log('No games with odds today across all sports, checking tomorrow')
+        const tomorrowCheckPromises = sports.value.map(async (sport) => {
+          try {
             const tomorrowGames = await fetchGamesForDate(tomorrow, sport.id)
             const tomorrowGamesWithOdds = tomorrowGames.filter(game => {
               const competition = game.competitions?.[0]
@@ -445,20 +486,18 @@ export default {
               if (!isScheduled) return false
               return gameHasOdds(game, sport.id)
             })
-            
-            // Store tomorrow's games if they have odds, otherwise today's
-            gamesBySport.value[sport.id] = tomorrowGamesWithOdds.length > 0 ? tomorrowGames : todayGames
-          } else {
-            // Store today's games
-            gamesBySport.value[sport.id] = todayGames
+            return { sportId: sport.id, games: tomorrowGames }
+          } catch (err) {
+            console.error(`Error fetching tomorrow's data for ${sport.name}:`, err)
+            return { sportId: sport.id, games: [] }
           }
-        } catch (err) {
-          console.error(`Error fetching data for ${sport.name}:`, err)
-          gamesBySport.value[sport.id] = []
-        }
-      })
-      
-      await Promise.all(checkPromises)
+        })
+        
+        const tomorrowResults = await Promise.all(tomorrowCheckPromises)
+        tomorrowResults.forEach(result => {
+          gamesBySport.value[result.sportId] = result.games
+        })
+      }
     }
 
     const setActiveLeague = (league) => {
