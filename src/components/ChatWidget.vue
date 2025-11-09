@@ -1,23 +1,178 @@
 <template>
   <div class="chat-widget-container">
-    <!-- Persistent Toggle Button (Bottom Right) -->
+    <!-- Toggle Button (Shows on both desktop and mobile) -->
     <button 
       v-if="!isOpen"
       class="chat-toggle-button"
+      :class="{ 'mobile-toggle': isMobile }"
       @click="toggleChat"
       aria-label="Open chat"
     >
       <img src="../assets/icons/ai-icon.png" alt="AI Assistant" class="ai-icon" />
     </button>
 
-    <!-- Backdrop Overlay -->
-    <transition name="backdrop">
-      <div v-if="isOpen" class="chat-backdrop" @click="toggleChat"></div>
+    <!-- Mobile: Full Screen Modal -->
+    <transition name="modal">
+      <div v-if="isOpen && isMobile" class="chat-modal-mobile">
+        <!-- Backdrop -->
+        <div class="chat-modal-backdrop" @click="toggleChat"></div>
+        
+        <!-- Modal Content -->
+        <div class="chat-modal-content" @click.stop>
+          <!-- Chat Header -->
+          <div class="chat-widget-header">
+            <div class="header-content">
+              <div class="header-icon">🤖</div>
+              <div class="header-text">
+                <h3>Betting Assistant</h3>
+              </div>
+            </div>
+            <button 
+              class="header-close-button"
+              @click="toggleChat"
+              aria-label="Close chat"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- League and Game Selectors -->
+          <div class="game-selector-container" v-if="availableGames.length > 0">
+            <div class="selectors-row">
+              <!-- League Selector -->
+              <div class="selector-group league-selector-group">
+                <label class="game-selector-label">
+                  <span>Select a league:</span>
+                </label>
+                <select
+                  v-model="selectedLeague"
+                  class="game-selector"
+                  @change="onLeagueChange"
+                >
+                  <option value="">All leagues</option>
+                  <option
+                    v-for="sport in sports"
+                    :key="sport.id"
+                    :value="sport.id"
+                  >
+                    {{ sport.name }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Game Selector -->
+              <div class="selector-group game-selector-group">
+                <label class="game-selector-label">
+                  <span>Select a game:</span>
+                </label>
+                <select
+                  v-model="selectedGameId"
+                  class="game-selector"
+                  @change="onGameChange"
+                  :disabled="!selectedLeague"
+                >
+                  <option value="">No game selected</option>
+                  <option
+                    v-for="game in filteredGames"
+                    :key="game.id"
+                    :value="game.id"
+                  >
+                    {{ game.awayTeam }} @ {{ game.homeTeam }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Messages -->
+          <div class="chat-widget-messages" ref="messagesContainerMobile">
+            <div v-if="messages.length === 0 && !selectedGameContext" class="welcome-message">
+              <p class="welcome-text">I'm an AI bot that's here to help! Select a game above to get personalized insights, or feel free to ask me general questions about sports betting without the need to select a game.</p>
+              <div class="suggested-actions">
+                <button class="action-button" @click="sendSuggestedMessage('How do I read betting odds?')">
+                  <span class="action-icon">💬</span>
+                  <span>Learn about odds</span>
+                </button>
+                <button class="action-button" @click="sendSuggestedMessage('What types of bets can I make on this app?')">
+                  <span class="action-icon">📊</span>
+                  <span>Bet types</span>
+                </button>
+                <button class="action-button" @click="sendSuggestedMessage('What is expected value in betting?')">
+                  <span class="action-icon">📈</span>
+                  <span>Betting strategy</span>
+                </button>
+              </div>
+            </div>
+            
+            <div v-if="messages.length === 0 && selectedGameContext" class="game-welcome-message">
+              <p class="welcome-text">I'm ready to help you with <strong>{{ selectedGameContext.awayTeam }} @ {{ selectedGameContext.homeTeam }}</strong>!</p>
+              <p class="welcome-subtext">Ask me anything about the betting odds for this game - recommendations, analysis, or how to interpret the lines.</p>
+            </div>
+
+            <div
+              v-for="(message, index) in messages"
+              :key="index"
+              :class="['message', message.type]"
+            >
+              <div class="message-avatar" v-if="message.type === 'assistant'">
+                <span>🤖</span>
+              </div>
+              <div class="message-avatar user-avatar" v-if="message.type === 'user'">
+                <span class="avatar-text">{{ currentUser?.username ? currentUser.username.charAt(0).toUpperCase() : 'U' }}</span>
+              </div>
+              <div class="message-content">
+                <div class="message-text" v-html="formatMessage(message.text)"></div>
+                <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+              </div>
+            </div>
+
+            <div v-if="isLoading" class="message assistant loading">
+              <div class="message-avatar">
+                <span>🤖</span>
+              </div>
+              <div class="message-content">
+                <div class="loading-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input -->
+          <div class="chat-widget-input-container">
+            <form @submit.prevent="sendMessage" class="chat-form">
+              <input
+                v-model="currentQuestion"
+                type="text"
+                :placeholder="selectedGameContext ? `Ask about ${selectedGameContext.awayTeam} @ ${selectedGameContext.homeTeam}...` : 'Ask me anything...'"
+                class="chat-input"
+                :disabled="isLoading"
+                ref="chatInputMobile"
+              />
+              <button
+                type="submit"
+                class="send-button"
+                :disabled="isLoading || !currentQuestion.trim()"
+              >
+                <svg v-if="!isLoading" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div v-else class="spinner"></div>
+              </button>
+            </form>
+            <p class="ai-disclaimer">AI-generated content may be inaccurate.</p>
+          </div>
+        </div>
+      </div>
     </transition>
 
-    <!-- Chat Widget -->
+    <!-- Desktop: Chat Widget -->
     <transition name="chat-widget">
-      <div v-if="isOpen" class="chat-widget" @click.stop>
+      <div v-if="isOpen && !isMobile" class="chat-widget" @click.stop>
         <!-- Chat Header -->
         <div class="chat-widget-header">
           <div class="header-content">
@@ -188,12 +343,24 @@ export default {
     const currentQuestion = ref('')
     const isLoading = ref(false)
     const messagesContainer = ref(null)
+    const messagesContainerMobile = ref(null)
     const chatInput = ref(null)
+    const chatInputMobile = ref(null)
     const availableGames = ref([])
     const loadingGames = ref(false)
     const selectedLeague = ref('')
     const selectedGameId = ref('')
     const selectedGameContext = ref(null)
+    
+    // Mobile detection
+    const isMobile = ref(false)
+    const checkMobile = () => {
+      isMobile.value = window.innerWidth <= 768
+    }
+    
+    // Initialize and watch for resize
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
 
     // Filter games by selected league
     const filteredGames = computed(() => {
@@ -535,32 +702,37 @@ export default {
         selectedLeague.value = ''
         selectedGameId.value = ''
         selectedGameContext.value = null
-        // Restore body scroll
-        document.body.style.overflow = ''
-        document.body.style.position = ''
-        document.body.style.width = ''
-        document.body.style.height = ''
-        // Remove touch event listeners
-        document.removeEventListener('touchmove', preventScroll, { passive: false })
-        document.removeEventListener('wheel', preventScroll, { passive: false })
+        // Restore body scroll (only on mobile)
+        if (isMobile.value) {
+          document.body.style.overflow = ''
+          document.body.style.position = ''
+          document.body.style.width = ''
+          document.body.style.height = ''
+          // Remove touch event listeners
+          document.removeEventListener('touchmove', preventScroll, { passive: false })
+          document.removeEventListener('wheel', preventScroll, { passive: false })
+        }
       } else {
         // Opening the chat - fetch available games
         fetchAvailableGames()
-        // Prevent body scroll
-        document.body.style.overflow = 'hidden'
-        document.body.style.position = 'fixed'
-        document.body.style.width = '100%'
-        document.body.style.height = '100%'
-        // Prevent touch scrolling
-        document.addEventListener('touchmove', preventScroll, { passive: false })
-        document.addEventListener('wheel', preventScroll, { passive: false })
+        // Prevent body scroll (only on mobile)
+        if (isMobile.value) {
+          document.body.style.overflow = 'hidden'
+          document.body.style.position = 'fixed'
+          document.body.style.width = '100%'
+          document.body.style.height = '100%'
+          // Prevent touch scrolling
+          document.addEventListener('touchmove', preventScroll, { passive: false })
+          document.addEventListener('wheel', preventScroll, { passive: false })
+        }
       }
       isOpen.value = !isOpen.value
       if (isOpen.value) {
         nextTick(() => {
           scrollToBottom()
-          if (chatInput.value) {
-            chatInput.value.focus()
+          const input = isMobile.value ? chatInputMobile.value : chatInput.value
+          if (input) {
+            input.focus()
           }
         })
       }
@@ -571,14 +743,16 @@ export default {
       // If chat is not open, open it and fetch games
       if (!isOpen.value) {
         isOpen.value = true
-        // Prevent body scroll
-        document.body.style.overflow = 'hidden'
-        document.body.style.position = 'fixed'
-        document.body.style.width = '100%'
-        document.body.style.height = '100%'
-        // Prevent touch scrolling
-        document.addEventListener('touchmove', preventScroll, { passive: false })
-        document.addEventListener('wheel', preventScroll, { passive: false })
+        // Prevent body scroll (only on mobile)
+        if (isMobile.value) {
+          document.body.style.overflow = 'hidden'
+          document.body.style.position = 'fixed'
+          document.body.style.width = '100%'
+          document.body.style.height = '100%'
+          // Prevent touch scrolling
+          document.addEventListener('touchmove', preventScroll, { passive: false })
+          document.addEventListener('wheel', preventScroll, { passive: false })
+        }
         await fetchAvailableGames()
       }
       
@@ -608,8 +782,9 @@ export default {
       
       // Focus the input
       await nextTick()
-      if (chatInput.value) {
-        chatInput.value.focus()
+      const input = isMobile.value ? chatInputMobile.value : chatInput.value
+      if (input) {
+        input.focus()
       }
     }
 
@@ -621,6 +796,7 @@ export default {
 
     // Cleanup on unmount
     onUnmounted(() => {
+      window.removeEventListener('resize', checkMobile)
       // Restore body scroll if chat was open
       if (isOpen.value) {
         document.body.style.overflow = ''
@@ -682,23 +858,26 @@ export default {
         isLoading.value = false
         await scrollToLastAssistantMessage()
         // Focus input after response
-        if (chatInput.value) {
-          chatInput.value.focus()
+        const input = isMobile.value ? chatInputMobile.value : chatInput.value
+        if (input) {
+          input.focus()
         }
       }
     }
 
     const scrollToBottom = () => {
-      if (messagesContainer.value) {
-        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+      const container = isMobile.value ? messagesContainerMobile.value : messagesContainer.value
+      if (container) {
+        container.scrollTop = container.scrollHeight
       }
     }
 
     const scrollToLastAssistantMessage = async () => {
-      if (messagesContainer.value) {
+      const container = isMobile.value ? messagesContainerMobile.value : messagesContainer.value
+      if (container) {
         await nextTick()
         // Find all message elements
-        const allMessages = messagesContainer.value.querySelectorAll('.message')
+        const allMessages = container.querySelectorAll('.message')
         if (allMessages.length > 0) {
           // Find the last user message (which should be right before the assistant response)
           let lastUserMessage = null
@@ -714,7 +893,7 @@ export default {
             lastUserMessage.scrollIntoView({ behavior: 'smooth', block: 'start' })
           } else {
             // Fallback: scroll to the last assistant message
-            const assistantMessages = messagesContainer.value.querySelectorAll('.message.assistant')
+            const assistantMessages = container.querySelectorAll('.message.assistant')
             if (assistantMessages.length > 0) {
               assistantMessages[assistantMessages.length - 1].scrollIntoView({ behavior: 'smooth', block: 'start' })
             } else {
@@ -759,11 +938,14 @@ export default {
     return {
       currentUser,
       isOpen,
+      isMobile,
       messages,
       currentQuestion,
       isLoading,
       messagesContainer,
+      messagesContainerMobile,
       chatInput,
+      chatInputMobile,
       selectedLeague,
       selectedGameId,
       selectedGameContext,
@@ -1315,90 +1497,98 @@ export default {
   background: #9ca3af;
 }
 
-/* Mobile Responsiveness */
+/* Mobile Full Screen Modal */
+.chat-modal-mobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+}
+
+.chat-modal-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  z-index: 10001;
+  overflow: hidden;
+}
+
+/* Modal Animations */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-active .chat-modal-content,
+.modal-leave-active .chat-modal-content {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .chat-modal-content,
+.modal-leave-to .chat-modal-content {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+/* Mobile Responsiveness - Desktop widget hidden on mobile */
 @media (max-width: 768px) {
-  .chat-backdrop {
-    background: rgba(0, 0, 0, 0.7);
-    width: 100vw !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
-    min-height: -webkit-fill-available !important;
-  }
-
-  @supports (height: 100dvh) {
-    .chat-backdrop {
-      height: 100dvh !important;
-      min-height: 100dvh !important;
-    }
-  }
-
-  .chat-widget-container {
-    right: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    top: 0 !important;
-    bottom: 0 !important;
-  }
-
   .chat-widget {
-    width: 100% !important;
-    max-width: 100% !important;
-    right: 0 !important;
-    left: 0 !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    min-height: 100vh !important;
-    min-height: -webkit-fill-available !important;
-    border-radius: 0;
-    z-index: 1001;
+    display: none;
   }
-
+  
+  .chat-backdrop {
+    display: none;
+  }
+  
+  /* Ensure mobile modal uses full viewport */
+  .chat-modal-mobile {
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+  
   @supports (height: 100dvh) {
-    .chat-widget {
-      height: 100dvh !important;
-      max-height: 100dvh !important;
-      min-height: 100dvh !important;
+    .chat-modal-mobile {
+      height: 100dvh;
     }
+  }
+  
+  .chat-modal-content {
+    height: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .chat-widget {
-    top: 0 !important;
-    right: 0 !important;
-    left: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    /* Use dynamic viewport height for better mobile support, with fallback */
-    height: calc(100vh - env(safe-area-inset-bottom, 0px)) !important;
-    max-height: calc(100vh - env(safe-area-inset-bottom, 0px)) !important;
-    min-height: calc(100vh - env(safe-area-inset-bottom, 0px)) !important;
-  }
-
-  /* Use dvh if supported for better mobile browser UI handling */
-  @supports (height: 100dvh) {
-    .chat-widget {
-      height: 100dvh !important;
-      max-height: 100dvh !important;
-      min-height: 100dvh !important;
-    }
-  }
-
-  .chat-widget-header {
-    /* Ensure header is always visible and accessible */
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  .chat-toggle-button {
+  .chat-toggle-button.mobile-toggle {
     bottom: 16px;
     right: 16px;
     width: 52px;
     height: 52px;
+    z-index: 9999;
   }
 
   .message-content {
