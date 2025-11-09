@@ -111,10 +111,11 @@
       <!-- Place Bet Button -->
       <button 
         @click="placeBet"
-        :disabled="!canPlaceBet"
+        :disabled="!canPlaceBet || isPlacingBet"
         class="place-bet-btn"
       >
-        Place Bet
+        <span v-if="isPlacingBet">Placing Bet...</span>
+        <span v-else>Place Bet</span>
       </button>
       
       <p v-if="error" class="error-message">{{ error }}</p>
@@ -150,6 +151,7 @@ export default {
     const betAmount = ref(0)
     const error = ref('')
     const success = ref('')
+    const isPlacingBet = ref(false)
     
     const quickAmounts = [10, 25, 50, 100, 250, 500]
 
@@ -305,7 +307,8 @@ export default {
       return selectedBet.value && 
              betAmount.value > 0 && 
              betAmount.value <= userBalance.value &&
-             !error.value
+             !error.value &&
+             !isPlacingBet.value
     })
 
     const selectBet = (type, option) => {
@@ -321,7 +324,10 @@ export default {
     }
 
     const placeBet = async () => {
-      if (!canPlaceBet.value) return
+      if (!canPlaceBet.value || isPlacingBet.value) return
+      
+      isPlacingBet.value = true
+      error.value = ''
       
       // Get game start time from game data
       const competition = props.game.competitions?.[0]
@@ -367,6 +373,8 @@ export default {
       } catch (err) {
         error.value = 'Failed to place bet'
         console.error('Error placing bet:', err)
+      } finally {
+        isPlacingBet.value = false
       }
     }
 
@@ -383,6 +391,7 @@ export default {
       totalOptions,
       potentialWin,
       canPlaceBet,
+      isPlacingBet,
       selectBet,
       placeBet
     }
