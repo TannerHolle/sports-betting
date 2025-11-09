@@ -171,7 +171,7 @@
 </template>
 
 <script>
-import { ref, nextTick, watch, computed, onMounted } from 'vue'
+import { ref, nextTick, watch, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
 import { useUserStore } from '../stores/userStore.js'
@@ -521,6 +521,11 @@ export default {
       }
     }
 
+    // Prevent scrolling on backdrop
+    const preventScroll = (e) => {
+      e.preventDefault()
+    }
+
     const toggleChat = () => {
       if (isOpen.value) {
         // Closing the chat - clear messages and reset
@@ -532,11 +537,23 @@ export default {
         selectedGameContext.value = null
         // Restore body scroll
         document.body.style.overflow = ''
+        document.body.style.position = ''
+        document.body.style.width = ''
+        document.body.style.height = ''
+        // Remove touch event listeners
+        document.removeEventListener('touchmove', preventScroll, { passive: false })
+        document.removeEventListener('wheel', preventScroll, { passive: false })
       } else {
         // Opening the chat - fetch available games
         fetchAvailableGames()
         // Prevent body scroll
         document.body.style.overflow = 'hidden'
+        document.body.style.position = 'fixed'
+        document.body.style.width = '100%'
+        document.body.style.height = '100%'
+        // Prevent touch scrolling
+        document.addEventListener('touchmove', preventScroll, { passive: false })
+        document.addEventListener('wheel', preventScroll, { passive: false })
       }
       isOpen.value = !isOpen.value
       if (isOpen.value) {
@@ -556,6 +573,12 @@ export default {
         isOpen.value = true
         // Prevent body scroll
         document.body.style.overflow = 'hidden'
+        document.body.style.position = 'fixed'
+        document.body.style.width = '100%'
+        document.body.style.height = '100%'
+        // Prevent touch scrolling
+        document.addEventListener('touchmove', preventScroll, { passive: false })
+        document.addEventListener('wheel', preventScroll, { passive: false })
         await fetchAvailableGames()
       }
       
@@ -594,6 +617,19 @@ export default {
     const { setOpenChatWithGame } = useChatWidget()
     onMounted(() => {
       setOpenChatWithGame(openChatWithGame)
+    })
+
+    // Cleanup on unmount
+    onUnmounted(() => {
+      // Restore body scroll if chat was open
+      if (isOpen.value) {
+        document.body.style.overflow = ''
+        document.body.style.position = ''
+        document.body.style.width = ''
+        document.body.style.height = ''
+        document.removeEventListener('touchmove', preventScroll, { passive: false })
+        document.removeEventListener('wheel', preventScroll, { passive: false })
+      }
     })
 
     const sendSuggestedMessage = (message) => {
@@ -764,9 +800,14 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.5);
   z-index: 999;
   backdrop-filter: blur(4px);
+  touch-action: none;
+  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 
 /* Backdrop Animations */
@@ -1278,12 +1319,25 @@ export default {
 @media (max-width: 768px) {
   .chat-backdrop {
     background: rgba(0, 0, 0, 0.7);
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    min-height: -webkit-fill-available !important;
+  }
+
+  @supports (height: 100dvh) {
+    .chat-backdrop {
+      height: 100dvh !important;
+      min-height: 100dvh !important;
+    }
   }
 
   .chat-widget-container {
     right: 0 !important;
     left: 0 !important;
     width: 100% !important;
+    top: 0 !important;
+    bottom: 0 !important;
   }
 
   .chat-widget {
@@ -1291,9 +1345,22 @@ export default {
     max-width: 100% !important;
     right: 0 !important;
     left: 0 !important;
-    bottom: 0;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    min-height: 100vh !important;
+    min-height: -webkit-fill-available !important;
     border-radius: 0;
     z-index: 1001;
+  }
+
+  @supports (height: 100dvh) {
+    .chat-widget {
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      min-height: 100dvh !important;
+    }
   }
 }
 
@@ -1308,6 +1375,7 @@ export default {
     /* Use dynamic viewport height for better mobile support, with fallback */
     height: calc(100vh - env(safe-area-inset-bottom, 0px)) !important;
     max-height: calc(100vh - env(safe-area-inset-bottom, 0px)) !important;
+    min-height: calc(100vh - env(safe-area-inset-bottom, 0px)) !important;
   }
 
   /* Use dvh if supported for better mobile browser UI handling */
@@ -1315,6 +1383,7 @@ export default {
     .chat-widget {
       height: 100dvh !important;
       max-height: 100dvh !important;
+      min-height: 100dvh !important;
     }
   }
 
