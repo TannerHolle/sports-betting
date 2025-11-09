@@ -10,9 +10,14 @@
       <img src="../assets/icons/ai-icon.png" alt="AI Assistant" class="ai-icon" />
     </button>
 
+    <!-- Backdrop Overlay -->
+    <transition name="backdrop">
+      <div v-if="isOpen" class="chat-backdrop" @click="toggleChat"></div>
+    </transition>
+
     <!-- Chat Widget -->
     <transition name="chat-widget">
-      <div v-if="isOpen" class="chat-widget">
+      <div v-if="isOpen" class="chat-widget" @click.stop>
         <!-- Chat Header -->
         <div class="chat-widget-header">
           <div class="header-content">
@@ -525,9 +530,13 @@ export default {
         selectedLeague.value = ''
         selectedGameId.value = ''
         selectedGameContext.value = null
+        // Restore body scroll
+        document.body.style.overflow = ''
       } else {
         // Opening the chat - fetch available games
         fetchAvailableGames()
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden'
       }
       isOpen.value = !isOpen.value
       if (isOpen.value) {
@@ -545,6 +554,8 @@ export default {
       // If chat is not open, open it and fetch games
       if (!isOpen.value) {
         isOpen.value = true
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden'
         await fetchAvailableGames()
       }
       
@@ -746,6 +757,29 @@ export default {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Backdrop Overlay */
+.chat-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  backdrop-filter: blur(4px);
+}
+
+/* Backdrop Animations */
+.backdrop-enter-active,
+.backdrop-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.backdrop-enter-from,
+.backdrop-leave-to {
+  opacity: 0;
+}
+
 /* Toggle Button */
 .chat-toggle-button {
   position: fixed;
@@ -797,7 +831,7 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  z-index: 1000;
+  z-index: 1001;
 }
 
 /* Chat Widget Animations */
@@ -1242,6 +1276,10 @@ export default {
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+  .chat-backdrop {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
   .chat-widget-container {
     right: 0 !important;
     left: 0 !important;
@@ -1255,6 +1293,7 @@ export default {
     left: 0 !important;
     bottom: 0;
     border-radius: 0;
+    z-index: 1001;
   }
 }
 
