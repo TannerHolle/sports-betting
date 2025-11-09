@@ -67,22 +67,44 @@
         <p>No pending or recent bets from your friends yet.</p>
       </div>
 
-      <div v-else class="bets-list">
-        <BetCard
-          v-for="betWithUser in filteredFriendsBets" 
-          :key="`${betWithUser.user.username}-${betWithUser.bet._id}`"
-          :bet="betWithUser.bet"
-          :user="betWithUser.user"
-          :live-scores="liveScores"
-          :show-cancel-button="false"
-        />
+      <div v-else>
+        <div class="bets-list">
+          <BetCard
+            v-for="(betWithUser, index) in paginatedFriendsBets" 
+            :key="`${betWithUser.user.username}-${betWithUser.bet._id}-${index}`"
+            :bet="betWithUser.bet"
+            :user="betWithUser.user"
+            :live-scores="liveScores"
+            :show-cancel-button="false"
+          />
+        </div>
+        <!-- Pagination Controls -->
+        <div v-if="totalPages > 1" class="pagination">
+          <button 
+            @click="goToPage(currentPage - 1)" 
+            :disabled="currentPage === 1"
+            class="pagination-btn"
+          >
+            Previous
+          </button>
+          <div class="pagination-info">
+            Page {{ currentPage }} of {{ totalPages }}
+          </div>
+          <button 
+            @click="goToPage(currentPage + 1)" 
+            :disabled="currentPage === totalPages"
+            class="pagination-btn"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
@@ -105,6 +127,8 @@ export default {
     const error = ref('')
     const liveScores = ref(new Map())
     const refreshInterval = ref(null)
+    const currentPage = ref(1)
+    const itemsPerPage = ref(18)
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
@@ -211,6 +235,16 @@ export default {
       return filtered
     })
 
+    const totalPages = computed(() => {
+      return Math.ceil(filteredFriendsBets.value.length / itemsPerPage.value)
+    })
+
+    const paginatedFriendsBets = computed(() => {
+      const start = (currentPage.value - 1) * itemsPerPage.value
+      const end = start + itemsPerPage.value
+      return filteredFriendsBets.value.slice(start, end)
+    })
+
     // Set default selected league based on user type and league count
     const setDefaultLeague = () => {
       if (isAdmin.value) {
@@ -247,6 +281,7 @@ export default {
       
       loading.value = true
       error.value = ''
+      currentPage.value = 1 // Reset to first page when fetching new bets
       
       try {
         let users = {}
@@ -436,6 +471,28 @@ export default {
       }
     }
 
+    // Pagination functions
+    const goToPage = (page) => {
+      if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page
+        // Scroll to top of friends bets section
+        const friendsBetsElement = document.querySelector('.friends-bets')
+        if (friendsBetsElement) {
+          friendsBetsElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }
+    }
+
+    // Watch for filter changes and reset to page 1
+    const watchFilters = () => {
+      currentPage.value = 1
+    }
+
+    // Watch for filter changes and reset pagination
+    watch([selectedStatusFilter, searchUsername, selectedLeagueId], () => {
+      watchFilters()
+    })
+
     onMounted(async () => {
       await fetchUserLeagues()
       // Fetch bets if user has leagues OR is an admin (admins can see all bets)
@@ -459,11 +516,15 @@ export default {
       searchUsername,
       friendsBets,
       filteredFriendsBets,
+      paginatedFriendsBets,
+      totalPages,
+      currentPage,
       loading,
       error,
       fetchFriendsBets,
       liveScores,
-      isGameLive
+      isGameLive,
+      goToPage
     }
   }
 }
@@ -993,6 +1054,61 @@ export default {
   
   .status-filter-select {
     max-width: 100%;
+  }
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination-btn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f9fafb;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  min-width: 100px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .pagination-btn {
+    width: 100%;
   }
 }
 </style>
