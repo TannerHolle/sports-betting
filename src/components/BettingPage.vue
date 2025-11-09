@@ -228,7 +228,7 @@ export default {
       return `${year}${month}${day}`
     }
 
-    // Check if a game has odds available in the odds database
+    // Check if a game has odds available (check external odds API first, then ESPN embedded odds)
     const gameHasOdds = (game, sportId) => {
       if (!game || !game.competitions?.[0]) return false
       
@@ -246,24 +246,32 @@ export default {
         return false
       }
       
-      // Check if odds exist for this game
-      if (!allOdds.value || !allOdds.value[sportId]) {
-        return false
-      }
-      
-      // Try matching with shortDisplayName first (same as game cards do)
-      let gameOdds = oddsService.findGameOdds(allOdds.value, sportId, homeTeamName, awayTeamName)
-      
-      if (!gameOdds) {
-        // Try with displayName if shortDisplayName didn't match
-        const homeDisplayName = homeTeam.team?.displayName || ''
-        const awayDisplayName = awayTeam.team?.displayName || ''
-        if (homeDisplayName && awayDisplayName && (homeDisplayName !== homeTeamName || awayDisplayName !== awayTeamName)) {
-          gameOdds = oddsService.findGameOdds(allOdds.value, sportId, homeDisplayName, awayDisplayName)
+      // First, check external odds database
+      if (allOdds.value && allOdds.value[sportId]) {
+        // Try matching with shortDisplayName first (same as game cards do)
+        let gameOdds = oddsService.findGameOdds(allOdds.value, sportId, homeTeamName, awayTeamName)
+        
+        if (!gameOdds) {
+          // Try with displayName if shortDisplayName didn't match
+          const homeDisplayName = homeTeam.team?.displayName || ''
+          const awayDisplayName = awayTeam.team?.displayName || ''
+          if (homeDisplayName && awayDisplayName && (homeDisplayName !== homeTeamName || awayDisplayName !== awayTeamName)) {
+            gameOdds = oddsService.findGameOdds(allOdds.value, sportId, homeDisplayName, awayDisplayName)
+          }
+        }
+        
+        if (gameOdds) {
+          return true
         }
       }
       
-      return gameOdds !== null
+      // Fall back to checking if odds are embedded in the game data (ESPN format)
+      const embeddedOdds = competition.odds?.[0]
+      if (embeddedOdds && (embeddedOdds.pointSpread || embeddedOdds.moneyline || embeddedOdds.total)) {
+        return true
+      }
+      
+      return false
     }
 
 

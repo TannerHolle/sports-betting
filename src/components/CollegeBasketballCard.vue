@@ -139,7 +139,7 @@
 </template>
 
 <script>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import BettingInterface from './BettingInterface.vue'
 import oddsService from '../services/oddsService.js'
 import { convertToLocalTime, formatRelativeTime } from '../utils/timezoneUtils.js'
@@ -181,8 +181,70 @@ export default {
       return awayTeam ? awayTeam.team.shortDisplayName : ''
     })
     
-    // Fetch odds data for this game
+    // Convert ESPN odds format to betting format
+    const convertESPNOddsToBettingFormat = (espnOdds) => {
+      if (!espnOdds) return null
+      
+      const betting = {}
+      
+      // Point Spread
+      if (espnOdds.pointSpread) {
+        betting.pointSpread = {
+          home: {
+            close: {
+              line: espnOdds.pointSpread.home.close.line,
+              odds: espnOdds.pointSpread.home.close.odds
+            }
+          },
+          away: {
+            close: {
+              line: espnOdds.pointSpread.away.close.line,
+              odds: espnOdds.pointSpread.away.close.odds
+            }
+          }
+        }
+      }
+      
+      // Moneyline
+      if (espnOdds.moneyline) {
+        betting.moneyline = {
+          home: {
+            close: {
+              odds: espnOdds.moneyline.home.close.odds
+            }
+          },
+          away: {
+            close: {
+              odds: espnOdds.moneyline.away.close.odds
+            }
+          }
+        }
+      }
+      
+      // Total (Over/Under)
+      if (espnOdds.total) {
+        betting.total = {
+          over: {
+            close: {
+              line: espnOdds.total.over.close.line,
+              odds: espnOdds.total.over.close.odds
+            }
+          },
+          under: {
+            close: {
+              line: espnOdds.total.under.close.line,
+              odds: espnOdds.total.under.close.odds
+            }
+          }
+        }
+      }
+      
+      return Object.keys(betting).length > 0 ? betting : null
+    }
+    
+    // Fetch odds from odds service first, fall back to ESPN embedded odds
     const fetchGameOdds = async () => {
+      // First, try external odds service
       try {
         const allOdds = await oddsService.getAllOdds()
         
@@ -201,12 +263,21 @@ export default {
             gameOddsData = oddsService.findGameOdds(allOdds, 'ncaa-basketball', homeDisplayName, awayDisplayName)
           }
         }
-        
         if (gameOddsData) {
           gameOdds.value = gameOddsData
+          return
         }
       } catch (error) {
-        console.error('Error fetching game odds:', error)
+        console.error('Error fetching game odds from service:', error)
+      }
+      
+      // Fall back to embedded odds in game data (ESPN format)
+      const embeddedOdds = competition.value?.odds?.[0]
+      if (embeddedOdds) {
+        const convertedOdds = convertESPNOddsToBettingFormat(embeddedOdds)
+        if (convertedOdds) {
+          gameOdds.value = { type: 'espn', betting: convertedOdds }
+        }
       }
     }
     
@@ -214,6 +285,12 @@ export default {
     const betting = computed(() => {
       if (!gameOdds.value) return null
       
+      // If odds are from ESPN (embedded), use the already converted format
+      if (gameOdds.value.type === 'espn') {
+        return gameOdds.value.betting
+      }
+      
+      // Otherwise, convert from external odds service format
       return oddsService.convertOddsToBettingFormat(
         gameOdds.value,
         homeTeamName.value,
@@ -224,6 +301,11 @@ export default {
     onMounted(() => {
       fetchGameOdds()
     })
+    
+    // Watch for changes in game data (especially for embedded odds)
+    watch(() => props.game.competitions?.[0]?.odds, () => {
+      fetchGameOdds()
+    }, { deep: true })
     
     const gameInProgress = computed(() => status.value?.type?.state === 'in')
     const gameCompleted = computed(() => status.value?.type?.completed)
