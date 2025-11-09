@@ -1243,12 +1243,30 @@ export default {
 /* Mobile Responsiveness */
 @media (max-width: 480px) {
   .chat-widget {
-    width: calc(100vw - 24px);
-    right: 12px;
+    width: 100vw;
+    right: 0;
+    left: 0;
     bottom: 0;
-    height: calc(100vh - 24px);
-    max-height: calc(100vh - 24px);
-    border-radius: 12px 12px 0 0;
+    top: 0;
+    /* Use dynamic viewport height for better mobile support, with fallback */
+    height: calc(100vh - env(safe-area-inset-bottom, 0px));
+    max-height: calc(100vh - env(safe-area-inset-bottom, 0px));
+    border-radius: 0;
+  }
+
+  /* Use dvh if supported for better mobile browser UI handling */
+  @supports (height: 100dvh) {
+    .chat-widget {
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+  }
+
+  .chat-widget-header {
+    /* Ensure header is always visible and accessible */
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
 
   .chat-toggle-button {
