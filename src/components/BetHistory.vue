@@ -132,7 +132,7 @@ export default {
     const pendingCancelBetId = ref(null)
     const cancelBetAmount = ref(null)
     const currentPage = ref(1)
-    const itemsPerPage = ref(2)
+    const itemsPerPage = ref(10)
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
