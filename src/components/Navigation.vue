@@ -34,6 +34,15 @@
           >
             <span class="nav-text">Leagues</span>
           </button>
+
+          <!-- Admin - only when authenticated and is admin -->
+          <button 
+            v-if="isAuthenticated && isAdmin"
+            @click="$emit('change-page', 'admin')"
+            :class="['nav-link', { active: currentPage === 'admin' }]"
+          >
+            <span class="nav-text">Admin</span>
+          </button>
         </div>
 
         <!-- User Authentication -->
@@ -142,6 +151,15 @@
           <span class="nav-text">Leagues</span>
         </button>
 
+        <!-- Admin - only when authenticated and is admin -->
+        <button 
+          v-if="isAuthenticated && isAdmin"
+          @click="handleNavClick('admin')"
+          :class="['mobile-nav-link', { active: currentPage === 'admin' }]"
+        >
+          <span class="nav-text">Admin</span>
+        </button>
+
         <!-- Sign In - only when not authenticated -->
         <button 
           v-if="!isAuthenticated"
@@ -202,6 +220,11 @@ export default {
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
     const userBalance = computed(() => userStore.userBalance.value)
+    
+    // Check if current user is admin
+    const isAdmin = computed(() => {
+      return currentUser.value?.username === 'tannerholle' || currentUser.value?.username === 'tanner'
+    })
     
     // Calculate total cash (available + outstanding bets)
     const totalCash = computed(() => {
@@ -277,6 +300,7 @@ export default {
       currentUser,
       userBalance,
       totalCash,
+      isAdmin,
       isMobileMenuOpen,
       isUserMenuOpen,
       isSuggestionsModalOpen,

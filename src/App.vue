@@ -18,6 +18,12 @@
       <LeaguesPage v-else />
     </div>
     
+    <!-- Admin Page (Protected - Auth Required + Admin Only) -->
+    <div v-if="currentPage === 'admin'">
+      <AuthPage v-if="!isAuthenticated" @change-page="setCurrentPage" />
+      <AdminPage v-else />
+    </div>
+    
     <!-- Auth Page -->
     <AuthPage v-if="currentPage === 'auth'" @change-page="setCurrentPage" />
     
@@ -34,6 +40,7 @@ import Navigation from './components/Navigation.vue'
 import ScoreboardPage from './components/ScoreboardPage.vue'
 import BettingPage from './components/BettingPage.vue'
 import LeaguesPage from './components/LeaguesPage.vue'
+import AdminPage from './components/AdminPage.vue'
 import AuthPage from './components/AuthPage.vue'
 import ChatWidget from './components/ChatWidget.vue'
 
@@ -44,6 +51,7 @@ export default {
     ScoreboardPage,
     BettingPage,
     LeaguesPage,
+    AdminPage,
     AuthPage,
     ChatWidget
   },

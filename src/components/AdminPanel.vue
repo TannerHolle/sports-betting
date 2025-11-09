@@ -7,6 +7,13 @@
       </p>
     </div>
 
+
+    <!-- Sportsbook Revenue -->
+    <SportsbookRevenue />
+
+    <!-- Bet Resolver -->
+    <BetResolver />
+
     <div class="admin-actions">
       <div class="action-group">
         <h4>Bet Resolution</h4>
@@ -133,9 +140,15 @@ import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '../stores/userStore.js'
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
+import SportsbookRevenue from './SportsbookRevenue.vue'
+import BetResolver from './BetResolver.vue'
 
 export default {
   name: 'AdminPanel',
+  components: {
+    SportsbookRevenue,
+    BetResolver
+  },
   setup() {
     const userStore = useUserStore()
     const isLoading = ref(false)

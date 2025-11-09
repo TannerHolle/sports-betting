@@ -109,15 +109,6 @@
         />
       </div>
     </div>
-    
-    <!-- Sportsbook Revenue -->
-    <SportsbookRevenue v-if="isAdmin" />
-
-    <!-- Bet Resolver -->
-    <BetResolver v-if="isAdmin" />
-
-    <!-- Admin Panel -->
-    <AdminPanel v-if="isAdmin" />
   </div>
 </template>
 
@@ -128,9 +119,6 @@ import { useUserStore } from '../stores/userStore.js'
 import { API_BASE_URL } from '../config/api.js'
 import oddsService from '../services/oddsService.js'
 import BetHistory from './BetHistory.vue'
-import BetResolver from './BetResolver.vue'
-import AdminPanel from './AdminPanel.vue'
-import SportsbookRevenue from './SportsbookRevenue.vue'
 import Leaderboard from './Leaderboard.vue'
 import NCAAFootballCard from './NCAAFootballCard.vue'
 import NFLGameCard from './NFLGameCard.vue'
@@ -141,9 +129,6 @@ export default {
   name: 'BettingPage',
   components: {
     BetHistory,
-    BetResolver,
-    AdminPanel,
-    SportsbookRevenue,
     Leaderboard,
     NCAAFootballCard,
     NFLGameCard,
