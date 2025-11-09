@@ -348,8 +348,34 @@ export default {
       }
     }
 
+    // Fetch team information from ESPN API
+    const fetchTeamInfo = async (teamId, sport) => {
+      if (!teamId || !sport) return null
+
+      // Map sport IDs to ESPN API endpoints
+      const sportEndpoints = {
+        'nfl': 'football/nfl',
+        'nba': 'basketball/nba',
+        'ncaa-basketball': 'basketball/mens-college-basketball',
+        'ncaa-football': 'football/college-football'
+      }
+
+      const endpoint = sportEndpoints[sport]
+      if (!endpoint) return null
+
+      try {
+        const response = await axios.get(
+          `https://site.api.espn.com/apis/site/v2/sports/${endpoint}/teams/${teamId}`
+        )
+        return response.data.team || null
+      } catch (error) {
+        console.warn(`Failed to fetch team info for ${sport} team ${teamId}:`, error)
+        return null
+      }
+    }
+
     // Format game data for AI context
-    const formatGameForContext = (game) => {
+    const formatGameForContext = async (game) => {
       const competition = game.gameData?.competitions?.[0]
       if (!competition) return null
 
@@ -367,6 +393,70 @@ export default {
         commenceTime: game.gameData?.date || competition.date,
         venue: competition.venue?.fullName || null,
         status: competition.status?.type?.shortDetail || 'Scheduled'
+      }
+
+      // Fetch team information for all supported sports
+      const supportedSports = ['nfl', 'nba', 'ncaa-basketball', 'ncaa-football']
+      if (supportedSports.includes(game.sport)) {
+        const homeTeamId = homeTeam.team?.id
+        const awayTeamId = awayTeam.team?.id
+
+        if (homeTeamId && awayTeamId) {
+          const [homeTeamInfo, awayTeamInfo] = await Promise.all([
+            fetchTeamInfo(homeTeamId, game.sport),
+            fetchTeamInfo(awayTeamId, game.sport)
+          ])
+
+          if (homeTeamInfo) {
+            // Extract only essential info for betting analysis
+            const totalRecord = homeTeamInfo.record?.items?.find(item => item.type === 'total')
+            const homeRecord = homeTeamInfo.record?.items?.find(item => item.type === 'home')
+            const awayRecord = homeTeamInfo.record?.items?.find(item => item.type === 'road')
+            
+            const winPercent = totalRecord?.stats?.find(stat => stat.name === 'winPercent')?.value
+            const avgPointsFor = totalRecord?.stats?.find(stat => stat.name === 'avgPointsFor')?.value
+            const avgPointsAgainst = totalRecord?.stats?.find(stat => stat.name === 'avgPointsAgainst')?.value
+            const streak = totalRecord?.stats?.find(stat => stat.name === 'streak')?.value
+            const pointDifferential = totalRecord?.stats?.find(stat => stat.name === 'pointDifferential')?.value
+            
+            context.homeTeamInfo = {
+              record: totalRecord?.summary || null, // e.g., "5-3"
+              winPercent: winPercent ? Math.round(winPercent * 1000) / 10 : null, // e.g., 62.5
+              standing: homeTeamInfo.standingSummary || null, // e.g., "2nd in NFC North"
+              homeRecord: homeRecord?.summary || null, // e.g., "2-1" (important for home team)
+              awayRecord: awayRecord?.summary || null, // e.g., "3-2"
+              avgPointsFor: avgPointsFor ? Math.round(avgPointsFor * 10) / 10 : null, // e.g., 26.9 (for totals betting)
+              avgPointsAgainst: avgPointsAgainst ? Math.round(avgPointsAgainst * 10) / 10 : null, // e.g., 28.4
+              streak: streak || null, // e.g., 1 (positive = wins, negative = losses)
+              pointDifferential: pointDifferential || null // e.g., -12 (total point diff)
+            }
+          }
+
+          if (awayTeamInfo) {
+            // Extract only essential info for betting analysis
+            const totalRecord = awayTeamInfo.record?.items?.find(item => item.type === 'total')
+            const homeRecord = awayTeamInfo.record?.items?.find(item => item.type === 'home')
+            const awayRecord = awayTeamInfo.record?.items?.find(item => item.type === 'road')
+            
+            const winPercent = totalRecord?.stats?.find(stat => stat.name === 'winPercent')?.value
+            const avgPointsFor = totalRecord?.stats?.find(stat => stat.name === 'avgPointsFor')?.value
+            const avgPointsAgainst = totalRecord?.stats?.find(stat => stat.name === 'avgPointsAgainst')?.value
+            const streak = totalRecord?.stats?.find(stat => stat.name === 'streak')?.value
+            const pointDifferential = totalRecord?.stats?.find(stat => stat.name === 'pointDifferential')?.value
+            
+            context.awayTeamInfo = {
+              record: totalRecord?.summary || null, // e.g., "5-3"
+              winPercent: winPercent ? Math.round(winPercent * 1000) / 10 : null, // e.g., 62.5
+              standing: awayTeamInfo.standingSummary || null, // e.g., "2nd in NFC North"
+              homeRecord: homeRecord?.summary || null, // e.g., "2-1"
+              awayRecord: awayRecord?.summary || null, // e.g., "3-2" (important for away team)
+              avgPointsFor: avgPointsFor ? Math.round(avgPointsFor * 10) / 10 : null, // e.g., 26.9
+              avgPointsAgainst: avgPointsAgainst ? Math.round(avgPointsAgainst * 10) / 10 : null, // e.g., 28.4
+              streak: streak || null, // e.g., 1
+              pointDifferential: pointDifferential || null // e.g., -12
+            }
+          }
+        }
       }
 
       // Add odds if available
@@ -414,7 +504,7 @@ export default {
       selectedGameContext.value = null
     }
 
-    const onGameChange = () => {
+    const onGameChange = async () => {
       if (!selectedGameId.value) {
         selectedGameContext.value = null
         return
@@ -422,7 +512,7 @@ export default {
 
       const selectedGame = filteredGames.value.find(g => g.id === selectedGameId.value)
       if (selectedGame) {
-        selectedGameContext.value = formatGameForContext(selectedGame)
+        selectedGameContext.value = await formatGameForContext(selectedGame)
       }
     }
 
@@ -479,7 +569,7 @@ export default {
       
       if (matchingGame) {
         selectedGameId.value = matchingGame.id
-        selectedGameContext.value = formatGameForContext(matchingGame)
+        selectedGameContext.value = await formatGameForContext(matchingGame)
       }
       
       // Focus the input

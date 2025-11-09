@@ -1,0 +1,2434 @@
+{
+    "team": {
+      "id": "3",
+      "uid": "s:20~l:28~t:3",
+      "slug": "chicago-bears",
+      "location": "Chicago",
+      "name": "Bears",
+      "nickname": "Bears",
+      "abbreviation": "CHI",
+      "displayName": "Chicago Bears",
+      "shortDisplayName": "Bears",
+      "color": "0b1c3a",
+      "alternateColor": "e64100",
+      "isActive": true,
+      "logos": [
+        {
+          "href": "https://a.espncdn.com/i/teamlogos/nfl/500/chi.png",
+          "width": 500,
+          "height": 500,
+          "alt": "",
+          "rel": [
+            "full",
+            "default"
+          ],
+          "lastUpdated": "2024-06-25T18:46Z"
+        },
+        {
+          "href": "https://a.espncdn.com/i/teamlogos/nfl/500-dark/chi.png",
+          "width": 500,
+          "height": 500,
+          "alt": "",
+          "rel": [
+            "full",
+            "dark"
+          ],
+          "lastUpdated": "2024-06-25T18:46Z"
+        },
+        {
+          "href": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/chi.png",
+          "width": 500,
+          "height": 500,
+          "alt": "",
+          "rel": [
+            "full",
+            "scoreboard"
+          ],
+          "lastUpdated": "2024-06-25T18:46Z"
+        },
+        {
+          "href": "https://a.espncdn.com/i/teamlogos/nfl/500-dark/scoreboard/chi.png",
+          "width": 500,
+          "height": 500,
+          "alt": "",
+          "rel": [
+            "full",
+            "scoreboard",
+            "dark"
+          ],
+          "lastUpdated": "2024-06-25T18:46Z"
+        },
+        {
+          "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/primary_logo_on_white_color.png",
+          "width": 4096,
+          "height": 4096,
+          "alt": "",
+          "rel": [
+            "full",
+            "primary_logo_on_white_color"
+          ],
+          "lastUpdated": "2024-12-03T20:48Z"
+        },
+        {
+          "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/primary_logo_on_black_color.png",
+          "width": 4096,
+          "height": 4096,
+          "alt": "",
+          "rel": [
+            "full",
+            "primary_logo_on_black_color"
+          ],
+          "lastUpdated": "2024-12-03T20:48Z"
+        },
+        {
+          "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/primary_logo_on_primary_color.png",
+          "width": 4096,
+          "height": 4096,
+          "alt": "",
+          "rel": [
+            "full",
+            "primary_logo_on_primary_color"
+          ],
+          "lastUpdated": "2024-12-03T20:48Z"
+        },
+        {
+          "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/primary_logo_on_secondary_color.png",
+          "width": 4096,
+          "height": 4096,
+          "alt": "",
+          "rel": [
+            "full",
+            "primary_logo_on_secondary_color"
+          ],
+          "lastUpdated": "2024-12-03T20:48Z"
+        },
+        {
+          "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/secondary_logo_on_white_color.png",
+          "width": 4096,
+          "height": 4096,
+          "alt": "",
+          "rel": [
+            "full",
+            "secondary_logo_on_white_color"
+          ],
+          "lastUpdated": "2024-12-03T20:48Z"
+        },
+        {
+          "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/secondary_logo_on_black_color.png",
+          "width": 4096,
+          "height": 4096,
+          "alt": "",
+          "rel": [
+            "full",
+            "secondary_logo_on_black_color"
+          ],
+          "lastUpdated": "2024-12-03T20:48Z"
+        },
+        {
+          "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/secondary_logo_on_primary_color.png",
+          "width": 4096,
+          "height": 4096,
+          "alt": "",
+          "rel": [
+            "full",
+            "secondary_logo_on_primary_color"
+          ],
+          "lastUpdated": "2024-12-03T20:48Z"
+        },
+        {
+          "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/secondary_logo_on_secondary_color.png",
+          "width": 4096,
+          "height": 4096,
+          "alt": "",
+          "rel": [
+            "full",
+            "secondary_logo_on_secondary_color"
+          ],
+          "lastUpdated": "2024-12-03T20:48Z"
+        }
+      ],
+      "record": {
+        "items": [
+          {
+            "type": "total",
+            "summary": "5-3",
+            "stats": [
+              {
+                "name": "OTLosses",
+                "value": 0
+              },
+              {
+                "name": "OTWins",
+                "value": 0
+              },
+              {
+                "name": "avgPointsAgainst",
+                "value": 28.375
+              },
+              {
+                "name": "avgPointsFor",
+                "value": 26.875
+              },
+              {
+                "name": "differential",
+                "value": -12
+              },
+              {
+                "name": "divisionWinPercent",
+                "value": 0
+              },
+              {
+                "name": "gamesBehind",
+                "value": 0
+              },
+              {
+                "name": "gamesPlayed",
+                "value": 8
+              },
+              {
+                "name": "leagueWinPercent",
+                "value": 0.6
+              },
+              {
+                "name": "losses",
+                "value": 3
+              },
+              {
+                "name": "playoffSeed",
+                "value": 8
+              },
+              {
+                "name": "pointDifferential",
+                "value": -12
+              },
+              {
+                "name": "points",
+                "value": 1
+              },
+              {
+                "name": "pointsAgainst",
+                "value": 227
+              },
+              {
+                "name": "pointsFor",
+                "value": 215
+              },
+              {
+                "name": "streak",
+                "value": 1
+              },
+              {
+                "name": "ties",
+                "value": 0
+              },
+              {
+                "name": "winPercent",
+                "value": 0.625
+              },
+              {
+                "name": "wins",
+                "value": 5
+              },
+              {
+                "name": "divisionLosses",
+                "value": 2
+              },
+              {
+                "name": "divisionRecord",
+                "value": 0
+              },
+              {
+                "name": "divisionTies",
+                "value": 0
+              },
+              {
+                "name": "divisionWins",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "description": "Home Record",
+            "type": "home",
+            "summary": "2-1",
+            "stats": [
+              {
+                "name": "wins",
+                "value": 2
+              },
+              {
+                "name": "losses",
+                "value": 1
+              },
+              {
+                "name": "ties",
+                "value": 0
+              },
+              {
+                "name": "winPercent",
+                "value": 0.666666686534882
+              },
+              {
+                "name": "OTLosses",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "description": "Away Record",
+            "type": "road",
+            "summary": "3-2",
+            "stats": [
+              {
+                "name": "wins",
+                "value": 3
+              },
+              {
+                "name": "losses",
+                "value": 2
+              },
+              {
+                "name": "ties",
+                "value": 0
+              },
+              {
+                "name": "winPercent",
+                "value": 0.600000023841858
+              },
+              {
+                "name": "OTLosses",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "groups": {
+        "id": "10",
+        "parent": {
+          "id": "7"
+        },
+        "isConference": false
+      },
+      "links": [
+        {
+          "language": "en-US",
+          "rel": [
+            "clubhouse",
+            "desktop",
+            "team"
+          ],
+          "href": "https://www.espn.com/nfl/team/_/name/chi/chicago-bears",
+          "text": "Clubhouse",
+          "shortText": "Clubhouse",
+          "isExternal": false,
+          "isPremium": false
+        },
+        {
+          "language": "en-US",
+          "rel": [
+            "roster",
+            "desktop",
+            "team"
+          ],
+          "href": "https://www.espn.com/nfl/team/roster/_/name/chi/chicago-bears",
+          "text": "Roster",
+          "shortText": "Roster",
+          "isExternal": false,
+          "isPremium": false
+        },
+        {
+          "language": "en-US",
+          "rel": [
+            "stats",
+            "desktop",
+            "team"
+          ],
+          "href": "https://www.espn.com/nfl/team/stats/_/name/chi/chicago-bears",
+          "text": "Statistics",
+          "shortText": "Statistics",
+          "isExternal": false,
+          "isPremium": false
+        },
+        {
+          "language": "en-US",
+          "rel": [
+            "schedule",
+            "desktop",
+            "team"
+          ],
+          "href": "https://www.espn.com/nfl/team/schedule/_/name/chi",
+          "text": "Schedule",
+          "shortText": "Schedule",
+          "isExternal": false,
+          "isPremium": false
+        },
+        {
+          "language": "en-US",
+          "rel": [
+            "photos",
+            "desktop",
+            "team"
+          ],
+          "href": "https://www.espn.com/nfl/team/photos/_/name/chi",
+          "text": "photos",
+          "shortText": "photos",
+          "isExternal": false,
+          "isPremium": false
+        },
+        {
+          "language": "en-US",
+          "rel": [
+            "tickets",
+            "desktop",
+            "team"
+          ],
+          "href": "https://www.vividseats.com/chicago-bears-tickets--sports-nfl-football/performer/159?wsUser=717",
+          "text": "Tickets",
+          "shortText": "Tickets",
+          "isExternal": true,
+          "isPremium": false
+        },
+        {
+          "language": "en-US",
+          "rel": [
+            "draftpicks",
+            "desktop",
+            "team"
+          ],
+          "href": "https://www.espn.com/nfl/draft/teams/_/name/chi/chicago-bears",
+          "text": "Draft Picks",
+          "shortText": "Draft Picks",
+          "isExternal": false,
+          "isPremium": true
+        },
+        {
+          "language": "en-US",
+          "rel": [
+            "transactions",
+            "desktop",
+            "team"
+          ],
+          "href": "https://www.espn.com/nfl/team/transactions/_/name/chi",
+          "text": "Transactions",
+          "shortText": "Transactions",
+          "isExternal": false,
+          "isPremium": false
+        },
+        {
+          "language": "en-US",
+          "rel": [
+            "injuries",
+            "desktop",
+            "team"
+          ],
+          "href": "https://www.espn.com/nfl/team/injuries/_/name/chi",
+          "text": "Injuries",
+          "shortText": "Injuries",
+          "isExternal": false,
+          "isPremium": false
+        },
+        {
+          "language": "en-US",
+          "rel": [
+            "depthchart",
+            "desktop",
+            "team"
+          ],
+          "href": "https://www.espn.com/nfl/team/depth/_/name/chi",
+          "text": "Depth Chart",
+          "shortText": "Depth Chart",
+          "isExternal": false,
+          "isPremium": false
+        }
+      ],
+      "franchise": {
+        "$ref": "http://sports.core.api.espn.pvt/v2/sports/football/leagues/nfl/franchises/3?lang=en&region=us",
+        "id": "3",
+        "uid": "s:20~l:28~f:3",
+        "slug": "chicago-bears",
+        "location": "Chicago",
+        "name": "Bears",
+        "nickname": "Bears",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bears",
+        "shortDisplayName": "Bears",
+        "color": "0b1c3a",
+        "isActive": true,
+        "venue": {
+          "$ref": "http://sports.core.api.espn.pvt/v2/sports/football/leagues/nfl/venues/3933?lang=en&region=us",
+          "id": "3933",
+          "guid": "adbe5c1d-8923-3bf4-8e31-fe78211484a9",
+          "fullName": "Soldier Field",
+          "address": {
+            "city": "Chicago",
+            "state": "IL",
+            "zipCode": "60605",
+            "country": "USA"
+          },
+          "grass": true,
+          "indoor": false,
+          "images": [
+            {
+              "href": "https://a.espncdn.com/i/venues/nfl/day/3933.jpg",
+              "width": 2000,
+              "height": 1125,
+              "alt": "",
+              "rel": [
+                "full",
+                "day"
+              ]
+            },
+            {
+              "href": "https://a.espncdn.com/i/venues/nfl/day/interior/3933.jpg",
+              "width": 2000,
+              "height": 1125,
+              "alt": "",
+              "rel": [
+                "full",
+                "day",
+                "interior"
+              ]
+            }
+          ]
+        },
+        "team": {
+          "$ref": "http://sports.core.api.espn.pvt/v2/sports/football/leagues/nfl/seasons/2025/teams/3?lang=en&region=us"
+        }
+      },
+      "nextEvent": [
+        {
+          "id": "401772875",
+          "date": "2025-11-09T18:00Z",
+          "name": "New York Giants at Chicago Bears",
+          "shortName": "NYG @ CHI",
+          "season": {
+            "year": 2025,
+            "displayName": "2025"
+          },
+          "seasonType": {
+            "id": "2",
+            "type": 2,
+            "name": "Regular Season",
+            "abbreviation": "reg"
+          },
+          "week": {
+            "number": 10,
+            "text": "Week 10"
+          },
+          "timeValid": true,
+          "competitions": [
+            {
+              "id": "401772875",
+              "date": "2025-11-09T18:00Z",
+              "attendance": 0,
+              "type": {
+                "id": "1",
+                "text": "Standard",
+                "abbreviation": "STD",
+                "slug": "standard",
+                "type": "standard"
+              },
+              "timeValid": true,
+              "neutralSite": false,
+              "boxscoreAvailable": true,
+              "ticketsAvailable": true,
+              "venue": {
+                "fullName": "Soldier Field",
+                "address": {
+                  "city": "Chicago",
+                  "state": "IL",
+                  "zipCode": "60605",
+                  "country": "USA"
+                }
+              },
+              "competitors": [
+                {
+                  "id": "3",
+                  "type": "team",
+                  "order": 0,
+                  "homeAway": "home",
+                  "team": {
+                    "id": "3",
+                    "location": "Chicago",
+                    "nickname": "Bears",
+                    "abbreviation": "CHI",
+                    "displayName": "Chicago Bears",
+                    "shortDisplayName": "Bears",
+                    "logos": [
+                      {
+                        "href": "https://a.espncdn.com/i/teamlogos/nfl/500/chi.png",
+                        "width": 500,
+                        "height": 500,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "default"
+                        ],
+                        "lastUpdated": "2024-06-25T18:46Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/i/teamlogos/nfl/500-dark/chi.png",
+                        "width": 500,
+                        "height": 500,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "dark"
+                        ],
+                        "lastUpdated": "2024-06-25T18:46Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/chi.png",
+                        "width": 500,
+                        "height": 500,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "scoreboard"
+                        ],
+                        "lastUpdated": "2024-06-25T18:46Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/i/teamlogos/nfl/500-dark/scoreboard/chi.png",
+                        "width": 500,
+                        "height": 500,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "scoreboard",
+                          "dark"
+                        ],
+                        "lastUpdated": "2024-06-25T18:46Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/primary_logo_on_white_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "primary_logo_on_white_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:48Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/primary_logo_on_black_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "primary_logo_on_black_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:48Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/primary_logo_on_primary_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "primary_logo_on_primary_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:48Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/primary_logo_on_secondary_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "primary_logo_on_secondary_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:48Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/secondary_logo_on_white_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "secondary_logo_on_white_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:48Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/secondary_logo_on_black_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "secondary_logo_on_black_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:48Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/secondary_logo_on_primary_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "secondary_logo_on_primary_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:48Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/19d73366-b5a5-cca2-a176-a2c024ce0bb3/logos/secondary_logo_on_secondary_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "secondary_logo_on_secondary_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:48Z"
+                      }
+                    ],
+                    "links": [
+                      {
+                        "rel": [
+                          "clubhouse",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/_/name/chi/chicago-bears",
+                        "text": "Clubhouse"
+                      },
+                      {
+                        "rel": [
+                          "roster",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/roster/_/name/chi/chicago-bears",
+                        "text": "Roster"
+                      },
+                      {
+                        "rel": [
+                          "stats",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/stats/_/name/chi/chicago-bears",
+                        "text": "Statistics"
+                      },
+                      {
+                        "rel": [
+                          "schedule",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/schedule/_/name/chi",
+                        "text": "Schedule"
+                      },
+                      {
+                        "rel": [
+                          "photos",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/photos/_/name/chi",
+                        "text": "photos"
+                      },
+                      {
+                        "rel": [
+                          "tickets",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.vividseats.com/chicago-bears-tickets--sports-nfl-football/performer/159?wsUser=717",
+                        "text": "Tickets"
+                      },
+                      {
+                        "rel": [
+                          "draftpicks",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/draft/teams/_/name/chi/chicago-bears",
+                        "text": "Draft Picks"
+                      },
+                      {
+                        "rel": [
+                          "transactions",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/transactions/_/name/chi",
+                        "text": "Transactions"
+                      },
+                      {
+                        "rel": [
+                          "injuries",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/injuries/_/name/chi",
+                        "text": "Injuries"
+                      },
+                      {
+                        "rel": [
+                          "depthchart",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/depth/_/name/chi",
+                        "text": "Depth Chart"
+                      }
+                    ]
+                  },
+                  "leaders": [
+                    {
+                      "name": "passingLeader",
+                      "displayName": "Passing Leader",
+                      "abbreviation": "PYDS",
+                      "leaders": [
+                        {
+                          "displayValue": "7/14, 89 YDS",
+                          "value": 89,
+                          "athlete": {
+                            "id": "4431611",
+                            "lastName": "Williams",
+                            "displayName": "Caleb Williams",
+                            "shortName": "C. Williams",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431611/caleb-williams"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "rushingLeader",
+                      "displayName": "Rushing Leader",
+                      "abbreviation": "RYDS",
+                      "leaders": [
+                        {
+                          "displayValue": "4 CAR, 19 YDS",
+                          "value": 19,
+                          "athlete": {
+                            "id": "4259545",
+                            "lastName": "Swift",
+                            "displayName": "D'Andre Swift",
+                            "shortName": "D. Swift",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4259545/dandre-swift"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "receivingLeader",
+                      "displayName": "Receiving Leader",
+                      "abbreviation": "RECYDS",
+                      "leaders": [
+                        {
+                          "displayValue": "4 REC, 66 YDS",
+                          "value": 66,
+                          "athlete": {
+                            "id": "4431299",
+                            "lastName": "Odunze",
+                            "displayName": "Rome Odunze",
+                            "shortName": "R. Odunze",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431299/rome-odunze"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "passingYards",
+                      "displayName": "Passing Yards",
+                      "abbreviation": "YDS",
+                      "leaders": [
+                        {
+                          "displayValue": "89",
+                          "value": 89,
+                          "athlete": {
+                            "id": "4431611",
+                            "lastName": "Williams",
+                            "displayName": "Caleb Williams",
+                            "shortName": "C. Williams",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431611/caleb-williams"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "rushingYards",
+                      "displayName": "Rushing Yards",
+                      "abbreviation": "YDS",
+                      "leaders": [
+                        {
+                          "displayValue": "19",
+                          "value": 19,
+                          "athlete": {
+                            "id": "4259545",
+                            "lastName": "Swift",
+                            "displayName": "D'Andre Swift",
+                            "shortName": "D. Swift",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4259545/dandre-swift"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4259545/dandre-swift"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "receivingYards",
+                      "displayName": "Receiving Yards",
+                      "abbreviation": "YDS",
+                      "leaders": [
+                        {
+                          "displayValue": "66",
+                          "value": 66,
+                          "athlete": {
+                            "id": "4431299",
+                            "lastName": "Odunze",
+                            "displayName": "Rome Odunze",
+                            "shortName": "R. Odunze",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431299/rome-odunze"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "totalTackles",
+                      "displayName": "Tackles",
+                      "abbreviation": "TOT",
+                      "leaders": [
+                        {
+                          "displayValue": "4",
+                          "value": 4,
+                          "athlete": {
+                            "id": "4034953",
+                            "lastName": "Gardner-Johnson",
+                            "displayName": "C.J. Gardner-Johnson",
+                            "shortName": "C.J. Gardner-Johnson",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4034953/cj-gardner-johnson"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "sacks",
+                      "displayName": "Sacks",
+                      "abbreviation": "SACK",
+                      "leaders": [
+                        {
+                          "displayValue": "1",
+                          "value": 1,
+                          "athlete": {
+                            "id": "4034953",
+                            "lastName": "Gardner-Johnson",
+                            "displayName": "C.J. Gardner-Johnson",
+                            "shortName": "C.J. Gardner-Johnson",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4034953/cj-gardner-johnson"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4034953/cj-gardner-johnson"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "interceptions",
+                      "displayName": "Interceptions",
+                      "abbreviation": "INT"
+                    },
+                    {
+                      "name": "puntReturns",
+                      "displayName": "Punt Returns",
+                      "abbreviation": "PR",
+                      "leaders": [
+                        {
+                          "displayValue": "1",
+                          "value": 1,
+                          "athlete": {
+                            "id": "4039050",
+                            "lastName": "Duvernay",
+                            "displayName": "Devin Duvernay",
+                            "shortName": "D. Duvernay",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4039050/devin-duvernay"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4039050/devin-duvernay"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4039050/devin-duvernay"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4039050/devin-duvernay"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4039050/devin-duvernay"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4039050/devin-duvernay"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4039050/devin-duvernay"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "kickReturns",
+                      "displayName": "Kick Returns",
+                      "abbreviation": "KR"
+                    },
+                    {
+                      "name": "punts",
+                      "displayName": "Punts",
+                      "abbreviation": "P",
+                      "leaders": [
+                        {
+                          "displayValue": "2",
+                          "value": 2,
+                          "athlete": {
+                            "id": "4686889",
+                            "lastName": "Taylor",
+                            "displayName": "Tory Taylor",
+                            "shortName": "T. Taylor",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4686889/tory-taylor"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4686889/tory-taylor"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4686889/tory-taylor"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4686889/tory-taylor"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4686889/tory-taylor"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4686889/tory-taylor"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4686889/tory-taylor"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "totalKickingPoints",
+                      "displayName": "Kicking Points",
+                      "abbreviation": "TP",
+                      "leaders": [
+                        {
+                          "displayValue": "1",
+                          "value": 1,
+                          "athlete": {
+                            "id": "17427",
+                            "lastName": "Santos",
+                            "displayName": "Cairo Santos",
+                            "shortName": "C. Santos",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/17427/cairo-santos"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/17427/cairo-santos"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/17427/cairo-santos"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/17427/cairo-santos"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/17427/cairo-santos"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/17427/cairo-santos"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/17427/cairo-santos"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "fumbles",
+                      "displayName": "Fumbles",
+                      "abbreviation": "F"
+                    },
+                    {
+                      "name": "fumblesLost",
+                      "displayName": "Fumbles Lost",
+                      "abbreviation": "FL"
+                    },
+                    {
+                      "name": "fumblesRecovered",
+                      "displayName": "Fumbles Recovered",
+                      "abbreviation": "CMP"
+                    },
+                    {
+                      "name": "espnRating",
+                      "displayName": "ESPN Rating Leader",
+                      "abbreviation": "ESPNRating",
+                      "leaders": [
+                        {
+                          "displayValue": "4 CAR, 13 YDS, 1 TD",
+                          "value": 7.30000019073486,
+                          "athlete": {
+                            "id": "4608686",
+                            "lastName": "Monangai",
+                            "displayName": "Kyle Monangai",
+                            "shortName": "K. Monangai",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4608686/kyle-monangai"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "passingTouchdowns",
+                      "displayName": "Passing Touchdowns",
+                      "abbreviation": "TD"
+                    },
+                    {
+                      "name": "quarterbackRating",
+                      "displayName": "Quarterback Rating",
+                      "abbreviation": "RAT",
+                      "leaders": [
+                        {
+                          "displayValue": "70.2",
+                          "value": 70.1999969482422,
+                          "athlete": {
+                            "id": "4431611",
+                            "lastName": "Williams",
+                            "displayName": "Caleb Williams",
+                            "shortName": "C. Williams",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4431611/caleb-williams"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431611/caleb-williams"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "rushingTouchdowns",
+                      "displayName": "Rushing Touchdowns",
+                      "abbreviation": "TD",
+                      "leaders": [
+                        {
+                          "displayValue": "1",
+                          "value": 1,
+                          "athlete": {
+                            "id": "4608686",
+                            "lastName": "Monangai",
+                            "displayName": "Kyle Monangai",
+                            "shortName": "K. Monangai",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4608686/kyle-monangai"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4608686/kyle-monangai"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "receptions",
+                      "displayName": "Receptions",
+                      "abbreviation": "REC",
+                      "leaders": [
+                        {
+                          "displayValue": "4",
+                          "value": 4,
+                          "athlete": {
+                            "id": "4431299",
+                            "lastName": "Odunze",
+                            "displayName": "Rome Odunze",
+                            "shortName": "R. Odunze",
+                            "links": [
+                              {
+                                "rel": [
+                                  "playercard",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "stats",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/stats/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "splits",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/splits/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "gamelog",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/gamelog/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "news",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/news/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "bio",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/bio/_/id/4431299/rome-odunze"
+                              },
+                              {
+                                "rel": [
+                                  "overview",
+                                  "desktop",
+                                  "athlete"
+                                ],
+                                "href": "https://www.espn.com/nfl/player/_/id/4431299/rome-odunze"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "receivingTouchdowns",
+                      "displayName": "Receiving Touchdowns",
+                      "abbreviation": "TD"
+                    }
+                  ]
+                },
+                {
+                  "id": "19",
+                  "type": "team",
+                  "order": 1,
+                  "homeAway": "away",
+                  "team": {
+                    "id": "19",
+                    "location": "New York",
+                    "nickname": "Giants",
+                    "abbreviation": "NYG",
+                    "displayName": "New York Giants",
+                    "shortDisplayName": "Giants",
+                    "logos": [
+                      {
+                        "href": "https://a.espncdn.com/i/teamlogos/nfl/500/nyg.png",
+                        "width": 500,
+                        "height": 500,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "default"
+                        ],
+                        "lastUpdated": "2024-06-25T18:55Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/i/teamlogos/nfl/500-dark/nyg.png",
+                        "width": 500,
+                        "height": 500,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "dark"
+                        ],
+                        "lastUpdated": "2024-06-25T18:59Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/nyg.png",
+                        "width": 500,
+                        "height": 500,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "scoreboard"
+                        ],
+                        "lastUpdated": "2024-06-25T18:55Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/i/teamlogos/nfl/500-dark/scoreboard/nyg.png",
+                        "width": 500,
+                        "height": 500,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "scoreboard",
+                          "dark"
+                        ],
+                        "lastUpdated": "2024-06-25T18:59Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/378600ea-2397-8364-8399-b7c1606a49a7/logos/primary_logo_on_white_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "primary_logo_on_white_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:49Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/378600ea-2397-8364-8399-b7c1606a49a7/logos/primary_logo_on_black_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "primary_logo_on_black_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:49Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/378600ea-2397-8364-8399-b7c1606a49a7/logos/primary_logo_on_primary_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "primary_logo_on_primary_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:49Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/378600ea-2397-8364-8399-b7c1606a49a7/logos/primary_logo_on_secondary_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "primary_logo_on_secondary_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:49Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/378600ea-2397-8364-8399-b7c1606a49a7/logos/secondary_logo_on_white_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "secondary_logo_on_white_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:49Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/378600ea-2397-8364-8399-b7c1606a49a7/logos/secondary_logo_on_black_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "secondary_logo_on_black_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:49Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/378600ea-2397-8364-8399-b7c1606a49a7/logos/secondary_logo_on_primary_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "secondary_logo_on_primary_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:49Z"
+                      },
+                      {
+                        "href": "https://a.espncdn.com/guid/378600ea-2397-8364-8399-b7c1606a49a7/logos/secondary_logo_on_secondary_color.png",
+                        "width": 4096,
+                        "height": 4096,
+                        "alt": "",
+                        "rel": [
+                          "full",
+                          "secondary_logo_on_secondary_color"
+                        ],
+                        "lastUpdated": "2024-12-03T20:49Z"
+                      }
+                    ],
+                    "links": [
+                      {
+                        "rel": [
+                          "clubhouse",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/_/name/nyg/new-york-giants",
+                        "text": "Clubhouse"
+                      },
+                      {
+                        "rel": [
+                          "roster",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/roster/_/name/nyg/new-york-giants",
+                        "text": "Roster"
+                      },
+                      {
+                        "rel": [
+                          "stats",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/stats/_/name/nyg/new-york-giants",
+                        "text": "Statistics"
+                      },
+                      {
+                        "rel": [
+                          "schedule",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/schedule/_/name/nyg",
+                        "text": "Schedule"
+                      },
+                      {
+                        "rel": [
+                          "photos",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/photos/_/name/nyg",
+                        "text": "photos"
+                      },
+                      {
+                        "rel": [
+                          "tickets",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.vividseats.com/new-york-giants-tickets--sports-nfl-football/performer/599?wsUser=717",
+                        "text": "Tickets"
+                      },
+                      {
+                        "rel": [
+                          "draftpicks",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/draft/teams/_/name/nyg/new-york-giants",
+                        "text": "Draft Picks"
+                      },
+                      {
+                        "rel": [
+                          "transactions",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/transactions/_/name/nyg",
+                        "text": "Transactions"
+                      },
+                      {
+                        "rel": [
+                          "injuries",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/injuries/_/name/nyg",
+                        "text": "Injuries"
+                      },
+                      {
+                        "rel": [
+                          "depthchart",
+                          "desktop",
+                          "team"
+                        ],
+                        "href": "https://www.espn.com/nfl/team/depth/_/name/nyg",
+                        "text": "Depth Chart"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "notes": [],
+              "broadcasts": [
+                {
+                  "type": {
+                    "id": "1",
+                    "shortName": "TV"
+                  },
+                  "market": {
+                    "id": "1",
+                    "type": "National"
+                  },
+                  "media": {
+                    "shortName": "FOX"
+                  },
+                  "lang": "en",
+                  "region": "us",
+                  "partnered": false
+                }
+              ],
+              "tickets": [
+                {
+                  "id": "5470715",
+                  "summary": "Tickets as low as $165",
+                  "description": "New York Giants at Chicago Bears",
+                  "maxPrice": 5899.16,
+                  "startingPrice": 165.65,
+                  "numberAvailable": 57,
+                  "totalPostings": 26,
+                  "links": [
+                    {
+                      "rel": [
+                        "tickets",
+                        "desktop",
+                        "event"
+                      ],
+                      "href": "https://www.vividseats.com/chicago-bears-tickets-soldier-field-3-5-2026--sports-nfl-football/production/5470715?wsUser=717"
+                    },
+                    {
+                      "rel": [
+                        "tickets",
+                        "desktop",
+                        "venue"
+                      ],
+                      "href": "https://www.vividseats.com/soldier-field-tickets/venue/1567?wsUser=717"
+                    }
+                  ]
+                }
+              ],
+              "status": {
+                "clock": 479,
+                "displayClock": "7:59",
+                "period": 2,
+                "type": {
+                  "id": "2",
+                  "name": "STATUS_IN_PROGRESS",
+                  "state": "in",
+                  "completed": false,
+                  "description": "In Progress",
+                  "detail": "7:59 - 2nd Quarter",
+                  "shortDetail": "7:59 - 2nd"
+                },
+                "isTBDFlex": false
+              }
+            }
+          ],
+          "links": [
+            {
+              "language": "en-US",
+              "rel": [
+                "live",
+                "desktop",
+                "event"
+              ],
+              "href": "https://www.espn.com/nfl/game?gameId=401772875",
+              "text": "Gamecast",
+              "shortText": "Gamecast",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "live",
+                "sportscenter",
+                "app",
+                "event"
+              ],
+              "href": "sportscenter://x-callback-url/showGame?sportName=football&leagueAbbrev=nfl&gameId=401772875",
+              "text": "Gamecast",
+              "shortText": "Gamecast",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "now",
+                "desktop",
+                "event"
+              ],
+              "href": "https://www.espn.com/nfl/game/_/gameId/401772875",
+              "text": "Now",
+              "shortText": "Now",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "teamstats",
+                "desktop",
+                "event"
+              ],
+              "href": "https://www.espn.com/nfl/matchup?gameId=401772875",
+              "text": "Team Stats",
+              "shortText": "Team Stats",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "boxscore",
+                "desktop",
+                "event"
+              ],
+              "href": "https://www.espn.com/nfl/boxscore/_/gameId/401772875",
+              "text": "Box Score",
+              "shortText": "Box Score",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "boxscore",
+                "sportscenter",
+                "app",
+                "event"
+              ],
+              "href": "sportscenter://x-callback-url/showGame?sportName=football&leagueAbbrev=nfl&gameId=401772875",
+              "text": "Box Score",
+              "shortText": "Box Score",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "gamecast",
+                "desktop",
+                "event"
+              ],
+              "href": "https://www.espn.com/nfl/game/_/gameId/401772875",
+              "text": "Gamecast",
+              "shortText": "Gamecast",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "gamecast",
+                "mobile",
+                "event"
+              ],
+              "href": "http://m.espn.com/nfl/gamecast?gameId=401772875&action=summary",
+              "text": "Gamecast",
+              "shortText": "Gamecast",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "gamecast",
+                "sportscenter",
+                "app",
+                "event"
+              ],
+              "href": "sportscenter://x-callback-url/showGame?sportName=football&leagueAbbrev=nfl&gameId=401772875",
+              "text": "Gamecast",
+              "shortText": "Gamecast",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "pbp",
+                "desktop",
+                "event"
+              ],
+              "href": "https://www.espn.com/nfl/playbyplay/_/gameId/401772875",
+              "text": "Play-by-Play",
+              "shortText": "Play-by-Play",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "videos",
+                "desktop",
+                "event"
+              ],
+              "href": "https://www.espn.com/nfl/video?gameId=401772875",
+              "text": "Videos",
+              "shortText": "Videos",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "odds",
+                "desktop",
+                "event"
+              ],
+              "href": "https://www.espn.com/nfl/odds/_/gameId/401772875",
+              "text": "Odds",
+              "shortText": "Odds",
+              "isExternal": false,
+              "isPremium": false
+            },
+            {
+              "language": "en-US",
+              "rel": [
+                "odds",
+                "mobile",
+                "event"
+              ],
+              "href": "https://m.espn.com/nfl/odds/_/gameId/401772875",
+              "text": "Odds",
+              "shortText": "Odds",
+              "isExternal": false,
+              "isPremium": false
+            }
+          ]
+        }
+      ],
+      "standingSummary": "2nd in NFC North"
+    }
+  }
