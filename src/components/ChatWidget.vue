@@ -1241,24 +1241,41 @@ export default {
 }
 
 /* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .chat-widget-container {
+    right: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
+
+  .chat-widget {
+    width: 100% !important;
+    max-width: 100% !important;
+    right: 0 !important;
+    left: 0 !important;
+    bottom: 0;
+    border-radius: 0;
+  }
+}
+
 @media (max-width: 480px) {
   .chat-widget {
-    width: 100vw;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    top: 0;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
     /* Use dynamic viewport height for better mobile support, with fallback */
-    height: calc(100vh - env(safe-area-inset-bottom, 0px));
-    max-height: calc(100vh - env(safe-area-inset-bottom, 0px));
-    border-radius: 0;
+    height: calc(100vh - env(safe-area-inset-bottom, 0px)) !important;
+    max-height: calc(100vh - env(safe-area-inset-bottom, 0px)) !important;
   }
 
   /* Use dvh if supported for better mobile browser UI handling */
   @supports (height: 100dvh) {
     .chat-widget {
-      height: 100dvh;
-      max-height: 100dvh;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
     }
   }
 
