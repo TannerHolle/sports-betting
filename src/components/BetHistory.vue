@@ -4,14 +4,14 @@
       <h3>Your Bets</h3>
       <div class="bet-tabs">
         <button 
-          @click="activeTab = 'active'" 
+          @click="switchTab('active')" 
           :class="{ active: activeTab === 'active' }"
           class="tab-btn"
         >
           Active ({{ activeBets.length }})
         </button>
         <button 
-          @click="activeTab = 'history'" 
+          @click="switchTab('history')" 
           :class="{ active: activeTab === 'history' }"
           class="tab-btn"
         >
@@ -27,8 +27,8 @@
       </div>
       <div v-else class="bets-list">
         <BetCard
-          v-for="bet in activeBets" 
-          :key="bet._id"
+          v-for="(bet, index) in activeBets" 
+          :key="`active-bet-${bet._id}-${index}`"
           :bet="bet"
           :live-scores="liveScores"
           :show-cancel-button="true"
@@ -44,14 +44,36 @@
       <div v-if="completedBets.length === 0" class="no-bets">
         <p>No completed bets yet.</p>
       </div>
-      <div v-else class="bets-list">
-        <BetCard
-          v-for="bet in completedBets" 
-          :key="bet._id"
-          :bet="bet"
-          :live-scores="liveScores"
-          :show-cancel-button="false"
-        />
+      <div v-else>
+        <div class="bets-list">
+          <BetCard
+            v-for="(bet, index) in paginatedCompletedBets" 
+            :key="`bet-${bet._id}-${index}`"
+            :bet="bet"
+            :live-scores="liveScores"
+            :show-cancel-button="false"
+          />
+        </div>
+        <!-- Pagination Controls -->
+        <div v-if="totalPages > 1" class="pagination">
+          <button 
+            @click="goToPage(currentPage - 1)" 
+            :disabled="currentPage === 1"
+            class="pagination-btn"
+          >
+            Previous
+          </button>
+          <div class="pagination-info">
+            Page {{ currentPage }} of {{ totalPages }}
+          </div>
+          <button 
+            @click="goToPage(currentPage + 1)" 
+            :disabled="currentPage === totalPages"
+            class="pagination-btn"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
 
@@ -98,6 +120,8 @@ export default {
     const showCancelModal = ref(false)
     const pendingCancelBetId = ref(null)
     const cancelBetAmount = ref(null)
+    const currentPage = ref(1)
+    const itemsPerPage = ref(10)
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
@@ -112,6 +136,16 @@ export default {
       return currentUser.value.bets
         .filter(bet => bet.status === 'won' || bet.status === 'lost')
         .sort((a, b) => new Date(b.resolvedAt || b.createdAt) - new Date(a.resolvedAt || a.createdAt))
+    })
+
+    const totalPages = computed(() => {
+      return Math.ceil(completedBets.value.length / itemsPerPage.value)
+    })
+
+    const paginatedCompletedBets = computed(() => {
+      const start = (currentPage.value - 1) * itemsPerPage.value
+      const end = start + itemsPerPage.value
+      return completedBets.value.slice(start, end)
     })
 
     // Get all bets (active + completed) for live score checking
@@ -287,6 +321,24 @@ export default {
       }
     }
 
+    // Pagination functions
+    const goToPage = (page) => {
+      if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page
+        // Scroll to top of bet history section
+        const betHistoryElement = document.querySelector('.bet-history')
+        if (betHistoryElement) {
+          betHistoryElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }
+    }
+
+    const switchTab = (tab) => {
+      activeTab.value = tab
+      // Reset to page 1 when switching tabs
+      currentPage.value = 1
+    }
+
     // Load user data when component mounts
     onMounted(async () => {
       if (isAuthenticated.value && currentUser.value?.username) {
@@ -313,6 +365,9 @@ export default {
       isAuthenticated,
       activeBets,
       completedBets,
+      paginatedCompletedBets,
+      totalPages,
+      currentPage,
       liveScores,
       canCancelBet,
       handleCancelBet,
@@ -320,7 +375,9 @@ export default {
       showCancelModal,
       closeCancelModal,
       confirmCancelBet,
-      cancelBetAmount
+      cancelBetAmount,
+      goToPage,
+      switchTab
     }
   }
 }
@@ -864,6 +921,61 @@ export default {
   }
   
   .modal-btn {
+    width: 100%;
+  }
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination-btn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f9fafb;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  min-width: 100px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .pagination-btn {
     width: 100%;
   }
 }

@@ -2,7 +2,6 @@
   <div 
     class="bet-card"
     :class="bet.status === 'pending' ? 'active' : bet.status"
-    :key="`bet-${bet._id}-${liveScoresSize}`"
   >
     <!-- Username for friends' bets (simple label at top) -->
     <div v-if="user" class="bet-username">
