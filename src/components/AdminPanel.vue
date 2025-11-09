@@ -132,6 +132,72 @@
         </div>
       </div>
     </div>
+
+    <!-- AI Questions Section -->
+    <div class="ai-questions-section">
+      <div class="ai-questions-header">
+        <h3>AI Questions & Answers</h3>
+        <div class="ai-actions">
+          <button @click="fetchAIQuestions" class="refresh-btn" :disabled="isLoadingAIQuestions">
+            <svg width="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1V5M8 11V15M3 8H7M9 8H13M3.293 3.293L5.586 5.586M10.414 10.414L12.707 12.707M3.293 12.707L5.586 10.414M10.414 5.586L12.707 3.293" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Refresh
+          </button>
+          <button @click="deleteAllAIQuestions" class="delete-all-btn" :disabled="isDeletingAIQuestions || aiQuestions.length === 0">
+            {{ isDeletingAIQuestions ? 'Deleting...' : 'Delete All' }}
+          </button>
+        </div>
+      </div>
+
+      <div v-if="isLoadingAIQuestions" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading AI questions...</p>
+      </div>
+
+      <div v-else-if="aiQuestions.length === 0" class="empty-state">
+        <p>No AI questions found</p>
+      </div>
+
+      <div v-else class="ai-questions-list">
+        <div 
+          v-for="question in aiQuestions" 
+          :key="question._id"
+          class="ai-question-card"
+        >
+          <div class="question-header">
+            <div class="question-meta">
+              <span v-if="question.username" class="username">{{ question.username }}</span>
+              <span v-else class="username anonymous">Anonymous</span>
+              <span class="date">{{ formatDate(question.createdAt) }}</span>
+            </div>
+            <div v-if="question.gameContext?.sport" class="game-context-badge">
+              {{ question.gameContext.sport.toUpperCase() }}
+            </div>
+          </div>
+          
+          <div v-if="question.gameContext?.homeTeam && question.gameContext?.awayTeam" class="game-info">
+            <strong>Game:</strong> {{ question.gameContext.awayTeam }} @ {{ question.gameContext.homeTeam }}
+          </div>
+
+          <div class="question-text">
+            <strong>Question:</strong>
+            <p>{{ question.question }}</p>
+          </div>
+
+          <div v-if="question.answer" class="answer-text">
+            <strong>AI Answer:</strong>
+            <p>{{ question.answer }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="hasMoreAIQuestions" class="load-more-container">
+        <button @click="loadMoreAIQuestions" class="load-more-btn" :disabled="isLoadingAIQuestions">
+          Load More
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -160,6 +226,12 @@ export default {
     const filterStatus = ref('all')
     const editingNotesId = ref(null)
     const notesText = ref('')
+    const aiQuestions = ref([])
+    const isLoadingAIQuestions = ref(false)
+    const isDeletingAIQuestions = ref(false)
+    const aiQuestionsSkip = ref(0)
+    const aiQuestionsLimit = ref(50)
+    const hasMoreAIQuestionsData = ref(false)
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     
@@ -246,9 +318,61 @@ export default {
         minute: '2-digit'
       })
     }
-    
+
+    const hasMoreAIQuestions = computed(() => {
+      return hasMoreAIQuestionsData.value
+    })
+
+    const fetchAIQuestions = async (loadMore = false) => {
+      isLoadingAIQuestions.value = true
+      try {
+        const params = new URLSearchParams({
+          limit: aiQuestionsLimit.value.toString(),
+          skip: loadMore ? aiQuestions.value.length : 0
+        })
+
+        const response = await axios.get(`${API_BASE_URL}/ai/questions?${params}`)
+        
+        if (loadMore) {
+          aiQuestions.value = [...aiQuestions.value, ...response.data.questions]
+        } else {
+          aiQuestions.value = response.data.questions
+          aiQuestionsSkip.value = 0
+        }
+        
+        hasMoreAIQuestionsData.value = response.data.pagination?.hasMore || false
+      } catch (error) {
+        console.error('Error fetching AI questions:', error)
+      } finally {
+        isLoadingAIQuestions.value = false
+      }
+    }
+
+    const loadMoreAIQuestions = () => {
+      fetchAIQuestions(true)
+    }
+
+    const deleteAllAIQuestions = async () => {
+      if (!confirm('Are you sure you want to delete all AI questions? This action cannot be undone.')) {
+        return
+      }
+
+      isDeletingAIQuestions.value = true
+      try {
+        await axios.delete(`${API_BASE_URL}/ai/questions`)
+        aiQuestions.value = []
+        hasMoreAIQuestionsData.value = false
+      } catch (error) {
+        console.error('Error deleting AI questions:', error)
+        alert('Failed to delete AI questions. Please try again.')
+      } finally {
+        isDeletingAIQuestions.value = false
+      }
+    }
+
     onMounted(() => {
       fetchSuggestions()
+      fetchAIQuestions()
     })
 
     const forceResolveBets = async () => {
@@ -339,7 +463,14 @@ export default {
       showNotesEditor,
       cancelNotesEditor,
       saveNotes,
-      formatDate
+      formatDate,
+      aiQuestions,
+      isLoadingAIQuestions,
+      isDeletingAIQuestions,
+      hasMoreAIQuestions,
+      fetchAIQuestions,
+      loadMoreAIQuestions,
+      deleteAllAIQuestions
     }
   }
 }
@@ -540,6 +671,31 @@ export default {
 }
 
 .refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.delete-all-btn {
+  padding: 0.5rem 1rem;
+  border: 2px solid #dc2626;
+  background: white;
+  color: #dc2626;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.delete-all-btn:hover:not(:disabled) {
+  background: #dc2626;
+  color: white;
+}
+
+.delete-all-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -747,6 +903,198 @@ export default {
   
   .status-select {
     width: 100%;
+  }
+}
+
+/* AI Questions Section Styles */
+.ai-questions-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.ai-questions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ai-questions-header h3 {
+  margin: 0;
+  color: #1a1a1a;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.ai-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.ai-questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ai-question-card {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.ai-question-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.question-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.question-meta .username {
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 0.95rem;
+}
+
+.question-meta .username.anonymous {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.question-meta .date {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.game-context-badge {
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.game-info {
+  background: #eff6ff;
+  border-left: 3px solid #4169e1;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #1e3a8a;
+}
+
+.game-info strong {
+  color: #1e3a8a;
+}
+
+.question-text {
+  margin-bottom: 1rem;
+}
+
+.question-text strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.question-text p {
+  color: #1a1a1a;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.answer-text {
+  background: #f0fdf4;
+  border-left: 3px solid #10b981;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+
+.answer-text strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #065f46;
+  font-size: 0.9rem;
+}
+
+.answer-text p {
+  color: #1a1a1a;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.load-more-container {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.load-more-btn {
+  padding: 0.75rem 2rem;
+  border: 2px solid #4169e1;
+  background: white;
+  color: #4169e1;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  background: #4169e1;
+  color: white;
+}
+
+.load-more-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .ai-questions-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ai-actions {
+    width: 100%;
+  }
+
+  .refresh-btn,
+  .delete-all-btn {
+    flex: 1;
+  }
+
+  .question-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>

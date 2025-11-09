@@ -612,7 +612,8 @@ export default {
         // Send selected game context if a game is selected, otherwise send null
         const response = await axios.post(`${API_BASE_URL}/ai/ask`, {
           question: question,
-          gameContext: selectedGameContext.value
+          gameContext: selectedGameContext.value,
+          username: currentUser.value?.username || null
         })
 
         // Add assistant response
