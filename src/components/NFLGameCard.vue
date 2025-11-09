@@ -12,6 +12,9 @@
         <div class="game-status" :class="statusClass">
           {{ statusText }}
         </div>
+        <div v-if="hasBets" class="bet-indicator" @click="openBetsModal">
+          <span class="bet-badge">{{ betCount }} bet{{ betCount > 1 ? 's' : '' }}</span>
+        </div>
         <button @click="toggleCollapsed" class="collapse-btn">
           {{ isCollapsed ? '▼' : '▲' }}
         </button>
@@ -139,21 +142,31 @@
         </a>
       </div>
     </div>
+    
+    <!-- Game Bets Modal -->
+    <GameBetsModal 
+      :is-open="showBetsModal" 
+      :bets="gameBets" 
+      @close="closeBetsModal" 
+    />
   </div>
 </template>
 
 <script>
 import { computed, ref, onMounted } from 'vue'
 import BettingInterface from './BettingInterface.vue'
+import GameBetsModal from './GameBetsModal.vue'
 import { convertToLocalTime, formatRelativeTime } from '../utils/timezoneUtils.js'
 import oddsService from '../services/oddsService.js'
 import { useChatWidget } from '../composables/useChatWidget.js'
 import { FEATURES } from '../config/features.js'
+import { useUserStore } from '../stores/userStore.js'
 
 export default {
   name: 'NFLGameCard',
   components: {
-    BettingInterface
+    BettingInterface,
+    GameBetsModal
   },
   props: {
     game: {
@@ -166,14 +179,33 @@ export default {
     }
   },
   setup(props) {
+    const userStore = useUserStore()
     const isCollapsed = ref(true)
     const gameOdds = ref(null)
+    const showBetsModal = ref(false)
     const competition = computed(() => props.game.competitions?.[0])
     const competitors = computed(() => competition.value?.competitors || [])
     const venue = computed(() => competition.value?.venue?.fullName || 'TBD')
     const broadcast = computed(() => competition.value?.broadcast || competition.value?.broadcasts?.[0]?.names?.[0])
     const status = computed(() => competition.value?.status)
     const situation = computed(() => competition.value?.situation)
+    
+    // Check if user has bets on this game
+    const gameBets = computed(() => {
+      if (!userStore.currentUser.value?.bets) return []
+      return userStore.currentUser.value.bets.filter(bet => bet.gameId === props.game.id)
+    })
+    
+    const hasBets = computed(() => gameBets.value.length > 0)
+    const betCount = computed(() => gameBets.value.length)
+    
+    const openBetsModal = () => {
+      showBetsModal.value = true
+    }
+    
+    const closeBetsModal = () => {
+      showBetsModal.value = false
+    }
     
     const homeTeamName = computed(() => {
       const homeTeam = competitors.value.find(c => c.homeAway === 'home')
@@ -373,7 +405,13 @@ export default {
       isWinning,
       getTeamStyle,
       handleAskAI,
-      FEATURES
+      FEATURES,
+      hasBets,
+      betCount,
+      gameBets,
+      showBetsModal,
+      openBetsModal,
+      closeBetsModal
     }
   }
 }
@@ -497,5 +535,37 @@ export default {
 
 .ask-ai-button:active {
   transform: translateY(0);
+}
+
+.bet-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.bet-indicator:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.bet-badge {
+  background: transparent;
+  color: white;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.bet-icon {
+  font-size: 0.9rem;
 }
 </style>
