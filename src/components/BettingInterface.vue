@@ -1,5 +1,5 @@
 <template>
-  <div class="betting-interface" v-if="isAuthenticated && betting">
+  <div class="betting-interface" v-if="isAuthenticated && betting && gameScheduled">
     <h4 class="betting-title">Place Your Bet</h4>
     
     <div class="bet-options">
@@ -175,6 +175,12 @@ export default {
       return status?.type?.state === 'in'
     })
 
+    // Check if game is scheduled (not started yet)
+    const gameScheduled = computed(() => {
+      const status = props.game.competitions?.[0]?.status
+      return status?.type?.state === 'pre' && !status?.type?.completed
+    })
+
     const homeScore = computed(() => {
       const competitor = props.game.competitions?.[0]?.competitors?.find(c => c.homeAway === 'home')
       return competitor?.score || '0'
@@ -308,7 +314,8 @@ export default {
              betAmount.value > 0 && 
              betAmount.value <= userBalance.value &&
              !error.value &&
-             !isPlacingBet.value
+             !isPlacingBet.value &&
+             gameScheduled.value
     })
 
     const selectBet = (type, option) => {
@@ -324,7 +331,7 @@ export default {
     }
 
     const placeBet = async () => {
-      if (!canPlaceBet.value || isPlacingBet.value) return
+      if (!canPlaceBet.value || isPlacingBet.value || !gameScheduled.value) return
       
       isPlacingBet.value = true
       error.value = ''
@@ -392,6 +399,7 @@ export default {
       potentialWin,
       canPlaceBet,
       isPlacingBet,
+      gameScheduled,
       selectBet,
       placeBet
     }

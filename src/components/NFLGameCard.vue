@@ -91,7 +91,7 @@
       </div>
 
       <!-- Betting Information -->
-      <div class="betting-info" v-if="betting && !isCollapsed">
+      <div class="betting-info" v-if="betting && !isCollapsed && gameScheduled">
         <h4 class="betting-title">Betting Lines</h4>
         <div class="betting-lines">
           <div class="betting-line" v-if="betting.pointSpread">
