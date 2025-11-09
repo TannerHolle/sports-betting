@@ -79,24 +79,36 @@
           />
         </div>
         <!-- Pagination Controls -->
-        <div v-if="totalPages > 1" class="pagination">
-          <button 
-            @click="goToPage(currentPage - 1)" 
-            :disabled="currentPage === 1"
-            class="pagination-btn"
-          >
-            Previous
-          </button>
-          <div class="pagination-info">
-            Page {{ currentPage }} of {{ totalPages }}
+        <div v-if="totalPages > 1 || filteredFriendsBets.length > 0" class="pagination">
+          <div class="pagination-left">
+            <label class="page-size-label">Items per page:</label>
+            <select v-model="itemsPerPage" @change="handlePageSizeChange" class="page-size-select">
+              <option :value="5">5</option>
+              <option :value="10">10</option>
+              <option :value="20">20</option>
+              <option :value="50">50</option>
+              <option :value="100">100</option>
+            </select>
           </div>
-          <button 
-            @click="goToPage(currentPage + 1)" 
-            :disabled="currentPage === totalPages"
-            class="pagination-btn"
-          >
-            Next
-          </button>
+          <div v-if="totalPages > 1" class="pagination-right">
+            <button 
+              @click="goToPage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+              class="pagination-btn"
+            >
+              Previous
+            </button>
+            <div class="pagination-info">
+              Page {{ currentPage }} of {{ totalPages }}
+            </div>
+            <button 
+              @click="goToPage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+              class="pagination-btn"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -488,6 +500,16 @@ export default {
       currentPage.value = 1
     }
 
+    const handlePageSizeChange = () => {
+      // Reset to page 1 when page size changes
+      currentPage.value = 1
+      // Scroll to the component container so "Search Friends Bets" title is visible
+      const friendsBetsElement = document.querySelector('.friends-bets')
+      if (friendsBetsElement) {
+        friendsBetsElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }
+
     // Watch for filter changes and reset pagination
     watch([selectedStatusFilter, searchUsername, selectedLeagueId], () => {
       watchFilters()
@@ -524,7 +546,9 @@ export default {
       fetchFriendsBets,
       liveScores,
       isGameLive,
-      goToPage
+      goToPage,
+      handlePageSizeChange,
+      itemsPerPage
     }
   }
 }
@@ -1060,12 +1084,50 @@ export default {
 /* Pagination Styles */
 .pagination {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 2rem;
   border-top: 1px solid #e5e7eb;
+  flex-wrap: wrap;
+}
+
+.pagination-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-size-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.page-size-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  min-width: 60px;
+}
+
+.page-size-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.pagination-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
 }
 
 .pagination-btn {
@@ -1104,7 +1166,18 @@ export default {
 @media (max-width: 768px) {
   .pagination {
     flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .pagination-left {
+    justify-content: center;
+  }
+  
+  .pagination-right {
+    flex-direction: column;
     gap: 0.75rem;
+    width: 100%;
   }
   
   .pagination-btn {
