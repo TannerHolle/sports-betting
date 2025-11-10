@@ -568,4 +568,11 @@ export default {
 .bet-icon {
   font-size: 0.9rem;
 }
+
+/* Hide Ask AI button on mobile */
+@media (max-width: 768px) {
+  .ask-ai-button {
+    display: none;
+  }
+}
 </style>

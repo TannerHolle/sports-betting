@@ -10,11 +10,6 @@
       <img src="../assets/icons/ai-icon.png" alt="AI Assistant" class="ai-icon" />
     </button>
 
-    <!-- Backdrop Overlay -->
-    <transition name="backdrop">
-      <div v-if="isOpen" class="chat-backdrop" @click="toggleChat"></div>
-    </transition>
-
     <!-- Chat Widget -->
     <transition name="chat-widget">
       <div v-if="isOpen" class="chat-widget" @click.stop>
@@ -752,34 +747,6 @@ export default {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Backdrop Overlay */
-.chat-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  backdrop-filter: blur(4px);
-  touch-action: none;
-  -webkit-overflow-scrolling: touch;
-  overflow: hidden;
-}
-
-/* Backdrop Animations */
-.backdrop-enter-active,
-.backdrop-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.backdrop-enter-from,
-.backdrop-leave-to {
-  opacity: 0;
-}
-
 /* Toggle Button */
 .chat-toggle-button {
   position: fixed;
@@ -831,7 +798,7 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  z-index: 1001;
+  z-index: 1000;
 }
 
 /* Chat Widget Animations */
@@ -1274,34 +1241,10 @@ export default {
   background: #9ca3af;
 }
 
-/* Mobile Responsiveness */
+/* Hide chat widget on mobile */
 @media (max-width: 768px) {
-  .chat-widget {
-    width: 100vw;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    top: 0;
-    height: 100vh;
-    max-height: 100vh;
-    border-radius: 0;
-  }
-
-  .chat-backdrop {
-    background: rgba(0, 0, 0, 0.7);
-  }
-}
-
-@media (max-width: 480px) {
-  .chat-toggle-button {
-    bottom: 16px;
-    right: 16px;
-    width: 52px;
-    height: 52px;
-  }
-
-  .message-content {
-    max-width: 80%;
+  .chat-widget-container {
+    display: none;
   }
 }
 </style>
