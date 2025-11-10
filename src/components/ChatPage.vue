@@ -151,7 +151,7 @@
 </template>
 
 <script>
-import { ref, nextTick, watch, computed, onMounted } from 'vue'
+import { ref, nextTick, watch, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
 import { useUserStore } from '../stores/userStore.js'
@@ -702,12 +702,19 @@ export default {
     })
 
     onMounted(() => {
+      // Prevent body scrolling when chat page is active
+      document.body.style.overflow = 'hidden'
       initializeFromRoute()
       nextTick(() => {
         if (chatInput.value) {
           chatInput.value.focus()
         }
       })
+    })
+
+    onUnmounted(() => {
+      // Restore body scrolling when chat page is unmounted
+      document.body.style.overflow = ''
     })
 
     return {
@@ -745,6 +752,7 @@ export default {
   background: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   position: relative;
+  overflow: hidden;
 }
 
 @media (max-width: 768px) {
@@ -889,11 +897,14 @@ export default {
 .chat-page-messages {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   background: white;
+  min-height: 0;
+  max-height: 100%;
 }
 
 /* Welcome Message */
