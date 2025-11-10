@@ -160,14 +160,6 @@
           <span class="nav-text">Admin</span>
         </button>
 
-        <!-- Chat Assistant - always visible -->
-        <button 
-          @click="handleNavClick('chat')"
-          :class="['mobile-nav-link', { active: currentPage === 'chat' }]"
-        >
-          <span class="nav-text">🤖 AI Assistant</span>
-        </button>
-
         <!-- Sign In - only when not authenticated -->
         <button 
           v-if="!isAuthenticated"
