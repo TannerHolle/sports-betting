@@ -27,8 +27,11 @@
     <!-- Auth Page -->
     <AuthPage v-if="currentPage === 'auth'" @change-page="setCurrentPage" />
     
-    <!-- Chat Widget (Available on all pages) -->
-    <ChatWidget v-if="showAiChat" />
+    <!-- Chat Page (Mobile) -->
+    <ChatPage v-if="currentPage === 'chat' && showAiChat" />
+    
+    <!-- Chat Widget (Available on all pages - Desktop only) -->
+    <ChatWidget v-if="showAiChat && currentPage !== 'chat'" />
   </div>
 </template>
 
@@ -43,6 +46,7 @@ import LeaguesPage from './components/LeaguesPage.vue'
 import AdminPage from './components/AdminPage.vue'
 import AuthPage from './components/AuthPage.vue'
 import ChatWidget from './components/ChatWidget.vue'
+import ChatPage from './components/ChatPage.vue'
 
 export default {
   name: 'App',
@@ -53,7 +57,8 @@ export default {
     LeaguesPage,
     AdminPage,
     AuthPage,
-    ChatWidget
+    ChatWidget,
+    ChatPage
   },
   setup() {
     const userStore = useUserStore()

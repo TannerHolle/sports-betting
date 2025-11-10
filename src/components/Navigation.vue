@@ -160,6 +160,14 @@
           <span class="nav-text">Admin</span>
         </button>
 
+        <!-- Chat Assistant - always visible -->
+        <button 
+          @click="handleNavClick('chat')"
+          :class="['mobile-nav-link', { active: currentPage === 'chat' }]"
+        >
+          <span class="nav-text">🤖 AI Assistant</span>
+        </button>
+
         <!-- Sign In - only when not authenticated -->
         <button 
           v-if="!isAuthenticated"
@@ -254,6 +262,11 @@ export default {
     }
 
     const handleNavClick = (page) => {
+      // If navigating to chat, store the previous page
+      if (page === 'chat') {
+        const currentPage = props.currentPage || localStorage.getItem('currentPage') || 'scoreboard'
+        sessionStorage.setItem('previousPage', currentPage)
+      }
       emit('change-page', page)
       closeMobileMenu()
       closeUserMenu()

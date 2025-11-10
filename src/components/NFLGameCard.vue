@@ -569,10 +569,5 @@ export default {
   font-size: 0.9rem;
 }
 
-/* Hide Ask AI button on mobile */
-@media (max-width: 768px) {
-  .ask-ai-button {
-    display: none;
-  }
-}
+/* Ask AI button is now visible on mobile - it will navigate to chat page */
 </style>
