@@ -176,13 +176,21 @@ const placeBet = async (betData) => {
       // Re-fetch full user to ensure bets/history are up to date
       await loadUserFromAPI(currentUser.value.username)
       return { success: true, bet: response.data.bet }
+    } else {
+      return { success: false, error: response.data.error || 'Failed to place bet' }
     }
   } catch (error) {
     console.error('Error placing bet:', error)
     if (error.response?.data?.error) {
       return { success: false, error: error.response.data.error }
     }
-    return { success: false, error: 'Failed to place bet' }
+    if (error.response?.status === 400) {
+      return { success: false, error: 'Invalid bet data. Please check your bet and try again.' }
+    }
+    if (error.response?.status === 404) {
+      return { success: false, error: 'User not found. Please log in again.' }
+    }
+    return { success: false, error: 'Failed to place bet. Please try again.' }
   }
 }
 

@@ -117,9 +117,16 @@
         <span v-if="isPlacingBet">Placing Bet...</span>
         <span v-else>Place Bet</span>
       </button>
-      
-      <p v-if="error" class="error-message">{{ error }}</p>
-      <p v-if="success" class="success-message">{{ success }}</p>
+    </div>
+    
+    <!-- Messages displayed outside conditional block so they persist after form reset -->
+    <div v-if="error" class="message-container error-message">
+      <span class="message-icon">⚠️</span>
+      <span>{{ error }}</span>
+    </div>
+    <div v-if="success" class="message-container success-message">
+      <span class="message-icon">✓</span>
+      <span>{{ success }}</span>
     </div>
   </div>
 </template>
@@ -370,15 +377,15 @@ export default {
           betAmount.value = 0
           error.value = ''
           
-          // Clear success message after 3 seconds
+          // Clear success message after 5 seconds
           setTimeout(() => {
             success.value = ''
-          }, 3000)
+          }, 5000)
         } else {
-          error.value = result.error || 'Failed to place bet'
+          error.value = result.error || 'Failed to place bet. Please try again.'
         }
       } catch (err) {
-        error.value = 'Failed to place bet'
+        error.value = err.response?.data?.error || 'An unexpected error occurred. Please try again.'
         console.error('Error placing bet:', err)
       } finally {
         isPlacingBet.value = false
@@ -603,18 +610,44 @@ export default {
   cursor: not-allowed;
 }
 
-.error-message {
-  color: #dc2626;
-  text-align: center;
+.message-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
   margin-top: 1rem;
   font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-message {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
 }
 
 .success-message {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
   color: #059669;
-  text-align: center;
-  margin-top: 1rem;
-  font-weight: 500;
+}
+
+.message-icon {
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
 @media (max-width: 768px) {
