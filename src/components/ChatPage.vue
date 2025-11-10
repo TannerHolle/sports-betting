@@ -1096,6 +1096,13 @@ export default {
   background: white;
 }
 
+/* Prevent zoom on mobile when focusing input */
+@media (max-width: 768px) {
+  .chat-input {
+    font-size: 16px;
+  }
+}
+
 .chat-input:focus {
   border-color: #4169e1;
   box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.1);
