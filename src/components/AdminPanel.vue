@@ -223,7 +223,7 @@ export default {
     const oddsMessage = ref('')
     const suggestions = ref([])
     const isLoadingSuggestions = ref(false)
-    const filterStatus = ref('all')
+    const filterStatus = ref('new')
     const editingNotesId = ref(null)
     const notesText = ref('')
     const aiQuestions = ref([])
