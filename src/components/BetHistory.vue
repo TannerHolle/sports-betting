@@ -11,6 +11,14 @@
           Active ({{ activeBets.length }})
         </button>
         <button 
+          v-if="todayBets.length > 0"
+          @click="switchTab('today')" 
+          :class="{ active: activeTab === 'today' }"
+          class="tab-btn"
+        >
+          Today's Results ({{ todayBets.length }})
+        </button>
+        <button 
           @click="switchTab('history')" 
           :class="{ active: activeTab === 'history' }"
           class="tab-btn"
@@ -35,6 +43,22 @@
           :cancelling-bet-id="cancellingBetId"
           :can-cancel-bet="canCancelBet"
           @cancel-bet="handleCancelBet"
+        />
+      </div>
+    </div>
+
+    <!-- Today's Results -->
+    <div v-if="activeTab === 'today'" class="bets-section">
+      <div v-if="todayBets.length === 0" class="no-bets">
+        <p>No completed bets today.</p>
+      </div>
+      <div v-else class="bets-list">
+        <BetCard
+          v-for="(bet, index) in todayBets" 
+          :key="`today-bet-${bet._id}-${index}`"
+          :bet="bet"
+          :live-scores="liveScores"
+          :show-cancel-button="false"
         />
       </div>
     </div>
@@ -146,6 +170,23 @@ export default {
       if (!currentUser.value?.bets) return []
       return currentUser.value.bets
         .filter(bet => bet.status === 'won' || bet.status === 'lost')
+        .sort((a, b) => new Date(b.resolvedAt || b.createdAt) - new Date(a.resolvedAt || a.createdAt))
+    })
+
+    const todayBets = computed(() => {
+      if (!currentUser.value?.bets) return []
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const tomorrow = new Date(today)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      
+      return currentUser.value.bets
+        .filter(bet => {
+          if (bet.status !== 'won' && bet.status !== 'lost') return false
+          const resolvedDate = bet.resolvedAt ? new Date(bet.resolvedAt) : new Date(bet.createdAt)
+          resolvedDate.setHours(0, 0, 0, 0)
+          return resolvedDate >= today && resolvedDate < tomorrow
+        })
         .sort((a, b) => new Date(b.resolvedAt || b.createdAt) - new Date(a.resolvedAt || a.createdAt))
     })
 
@@ -386,6 +427,7 @@ export default {
       isAuthenticated,
       activeBets,
       completedBets,
+      todayBets,
       paginatedCompletedBets,
       totalPages,
       currentPage,
