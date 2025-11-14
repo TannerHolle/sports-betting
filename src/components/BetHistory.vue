@@ -703,8 +703,20 @@ export default {
     align-items: stretch;
   }
   
+  .bet-history-header h3 {
+    font-size: 1.25rem;
+  }
+  
   .bet-tabs {
-    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .tab-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   
   .bet-details {
