@@ -105,9 +105,18 @@ class LiveScoreService {
       const time = status.displayClock || '0:00'
       const period = status.period || 1
       
-      // Check for halftime (0 seconds in 2nd quarter for basketball and football)
-      if (time === '0:00' && period === 2 && (status.type?.name?.toLowerCase().includes('basketball') || status.type?.name?.toLowerCase().includes('football'))) {
+      // Check for halftime
+      // For NFL, NCAA Football, NBA: halftime is at end of 2nd quarter (period 2, time 0:00 or 0.0)
+      // For College Basketball: halftime is at end of 1st half (period 1, time 0:00 or 0.0)
+      if ((time === '0:00' || time === '0.0') && period === 2) {
         return 'HALFTIME'
+      }
+      // For college basketball (2 halves), halftime is at end of 1st half
+      if ((time === '0:00' || time === '0.0') && period === 1) {
+        const sportType = status.type?.name?.toLowerCase() || ''
+        if (sportType.includes('college') && sportType.includes('basketball')) {
+          return 'HALFTIME'
+        }
       }
       
       const periodText = this.getPeriodText(period, status.type?.name)
