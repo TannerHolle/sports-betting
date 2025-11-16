@@ -182,7 +182,7 @@ export default {
       
       return currentUser.value.bets
         .filter(bet => {
-          if (bet.status !== 'won' && bet.status !== 'lost') return false
+          if (bet.status !== 'won' && bet.status !== 'lost' && bet.status !== 'push') return false
           const resolvedDate = bet.resolvedAt ? new Date(bet.resolvedAt) : new Date(bet.createdAt)
           resolvedDate.setHours(0, 0, 0, 0)
           return resolvedDate >= today && resolvedDate < tomorrow
