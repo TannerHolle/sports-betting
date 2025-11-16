@@ -243,8 +243,8 @@ export default {
       return null
     },
     getFinalScoreData(bet) {
-      // Only show final score for completed bets (won/lost)
-      if (bet.status !== 'won' && bet.status !== 'lost') return null
+      // Only show final score for completed bets (won/lost/push)
+      if (bet.status !== 'won' && bet.status !== 'lost' && bet.status !== 'push') return null
       
       // First, check if bet has actualResult (from backend)
       if (bet.actualResult) {
@@ -285,8 +285,8 @@ export default {
       return homeScore + awayScore
     },
     getSpreadDifference(bet) {
-      // Only show for completed bets (won/lost)
-      if (bet.status !== 'won' && bet.status !== 'lost') return null
+      // Only show for completed bets (won/lost/push)
+      if (bet.status !== 'won' && bet.status !== 'lost' && bet.status !== 'push') return null
       
       const scoreData = this.getFinalScoreData(bet)
       if (!scoreData) return null
@@ -326,6 +326,7 @@ export default {
     getAmountLabel(status) {
       if (status === 'won') return 'Won:'
       if (status === 'lost') return 'Lost:'
+      if (status === 'push') return 'Returned:'
       return 'Potential Win:'
     },
     getAmountValue(status) {
@@ -335,11 +336,15 @@ export default {
       if (status === 'lost') {
         return `-$${this.bet.amount.toLocaleString()}`
       }
+      if (status === 'push') {
+        return `$${this.bet.amount.toLocaleString()}`
+      }
       return `$${this.bet.potentialWin.toLocaleString()}`
     },
     getAmountValueClass(status) {
       if (status === 'won') return 'won'
       if (status === 'lost') return 'lost'
+      if (status === 'push') return 'push'
       return 'potential'
     }
   }
@@ -373,6 +378,11 @@ export default {
 .bet-card.lost {
   border-left: 4px solid #dc2626;
   background: #fef2f2;
+}
+
+.bet-card.push {
+  border-left: 4px solid #6366f1;
+  background: #eef2ff;
 }
 
 .bet-header {
@@ -444,6 +454,11 @@ export default {
   color: #991b1b;
 }
 
+.bet-status.push {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
 .bet-details {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -501,6 +516,10 @@ export default {
 
 .bet-amount .value.lost {
   color: #dc2626;
+}
+
+.bet-amount .value.push {
+  color: #6366f1;
 }
 
 .bet-odds {

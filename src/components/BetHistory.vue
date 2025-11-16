@@ -169,7 +169,7 @@ export default {
     const completedBets = computed(() => {
       if (!currentUser.value?.bets) return []
       return currentUser.value.bets
-        .filter(bet => bet.status === 'won' || bet.status === 'lost')
+        .filter(bet => bet.status === 'won' || bet.status === 'lost' || bet.status === 'push')
         .sort((a, b) => new Date(b.resolvedAt || b.createdAt) - new Date(a.resolvedAt || a.createdAt))
     })
 
@@ -555,6 +555,11 @@ export default {
   background: #fef2f2;
 }
 
+.bet-card.push {
+  border-left: 4px solid #6366f1;
+  background: #eef2ff;
+}
+
 .bet-header {
   display: flex;
   justify-content: space-between;
@@ -614,6 +619,11 @@ export default {
 .bet-status.lost {
   background: #fee2e2;
   color: #991b1b;
+}
+
+.bet-status.push {
+  background: #e0e7ff;
+  color: #4338ca;
 }
 
 .bet-details {

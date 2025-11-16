@@ -33,6 +33,12 @@
             Won
           </button>
           <button 
+            @click="resolveBet(betWithUser.bet._id, betWithUser.user.username, 'push')"
+            class="resolve-btn push"
+          >
+            Push
+          </button>
+          <button 
             @click="resolveBet(betWithUser.bet._id, betWithUser.user.username, 'lost')"
             class="resolve-btn lost"
           >
@@ -131,6 +137,11 @@ export default {
               resolutionMessage.value = {
                 type: 'success',
                 text: `🎉 ${username}'s bet won! Earned $${bet.potentialWin.toLocaleString()} profit (total return: $${totalWinnings.toLocaleString()})!`
+              }
+            } else if (result === 'push') {
+              resolutionMessage.value = {
+                type: 'info',
+                text: `⚖️ ${username}'s bet pushed. Bet amount of $${bet.amount.toLocaleString()} returned.`
               }
             } else {
               resolutionMessage.value = {
@@ -298,6 +309,16 @@ export default {
   transform: translateY(-1px);
 }
 
+.resolve-btn.push {
+  background: #6366f1;
+  color: white;
+}
+
+.resolve-btn.push:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+
 .resolution-message {
   margin-top: 1.5rem;
   padding: 1rem;
@@ -316,6 +337,12 @@ export default {
   background: #fef2f2;
   color: #991b1b;
   border: 1px solid #fecaca;
+}
+
+.resolution-message.info {
+  background: #eef2ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
 }
 
 @media (max-width: 768px) {
