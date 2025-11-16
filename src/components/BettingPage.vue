@@ -39,6 +39,10 @@
         </div>
         <div class="stat-label">Current Streak</div>
       </div>
+      <div class="stat-card" v-if="winPotential > 0">
+        <div class="stat-value positive">${{ winPotential.toLocaleString() }}</div>
+        <div class="stat-label">Win Potential</div>
+      </div>
       <div class="stat-card" v-if="userStats.todaysProfitLoss !== 0">
         <div class="stat-value" :class="{ 'positive': userStats.todaysProfitLoss > 0, 'negative': userStats.todaysProfitLoss < 0 }">
           {{ userStats.todaysProfitLoss >= 0 ? '+' : '' }}${{ userStats.todaysProfitLoss.toLocaleString() }}
@@ -158,6 +162,14 @@ export default {
       return userStore.currentUser.value.bets
         .filter(bet => bet.status === 'pending')
         .reduce((total, bet) => total + bet.amount, 0)
+    })
+
+    // Calculate win potential (sum of potential winnings from all pending bets)
+    const winPotential = computed(() => {
+      if (!userStore.currentUser.value?.bets) return 0
+      return userStore.currentUser.value.bets
+        .filter(bet => bet.status === 'pending')
+        .reduce((total, bet) => total + (bet.potentialWin || 0), 0)
     })
 
     // Check if current user is admin (tannerholle)
@@ -592,6 +604,7 @@ export default {
       userBalance,
       userStats,
       outstandingBetAmount,
+      winPotential,
       isAdmin,
       fetchData,
       setActiveLeague,
