@@ -5,7 +5,7 @@
         Betting Summary
       </h1>
       <p class="page-description">
-        Aren't you glad this isnt real money?
+        {{ userBalance > 1000 ? "Don't you wish this were real money?" : "Aren't you glad this isnt real money?" }}
       </p>
     </div>
 
