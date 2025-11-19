@@ -5,23 +5,38 @@
       <p class="leaderboard-description">
         Top performers by total winnings
       </p>
-      <div class="league-selector" v-if="availableLeagues && availableLeagues.length > 0">
-        <label for="league-select">View League:</label>
-        <select 
-          id="league-select" 
-          v-model="selectedLeagueId"
-          @change="onLeagueChange"
-          class="league-dropdown"
-        >
-          <option value="">Worldwide</option>
-          <option 
-            v-for="league in availableLeagues" 
-            :key="league._id" 
-            :value="league._id"
+      <div class="leaderboard-controls">
+        <div class="league-selector" v-if="availableLeagues && availableLeagues.length > 0">
+          <label for="league-select">View League:</label>
+          <select 
+            id="league-select" 
+            v-model="selectedLeagueId"
+            @change="onLeagueChange"
+            class="league-dropdown"
           >
-            {{ league.name }}
-          </option>
-        </select>
+            <option value="">Worldwide</option>
+            <option 
+              v-for="league in availableLeagues" 
+              :key="league._id" 
+              :value="league._id"
+            >
+              {{ league.name }}
+            </option>
+          </select>
+        </div>
+        <div class="limit-selector">
+          <label for="limit-select">Show:</label>
+          <select 
+            id="limit-select" 
+            v-model="leaderboardLimit"
+            @change="onLimitChange"
+            class="limit-dropdown"
+          >
+            <option :value="5">5</option>
+            <option :value="10">10</option>
+            <option :value="20">20</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -87,6 +102,7 @@ export default {
     const loading = ref(false)
     const selectedLeagueId = ref('')
     const userLeagues = ref([])
+    const leaderboardLimit = ref(5)
 
     const isAuthenticated = computed(() => userStore.isAuthenticated.value)
     const currentUser = computed(() => userStore.currentUser.value)
@@ -155,6 +171,10 @@ export default {
       fetchLeaderboard()
     }
 
+    const onLimitChange = () => {
+      fetchLeaderboard()
+    }
+
     const fetchLeaderboard = async () => {
       loading.value = true
       try {
@@ -203,17 +223,18 @@ export default {
           ? allLeaderboardData.findIndex(user => user.username === currentUsername) + 1
           : null
 
-        // Get top 5
-        const top5 = allLeaderboardData.slice(0, 5)
+        // Get top N based on selected limit
+        const limit = leaderboardLimit.value
+        const topN = allLeaderboardData.slice(0, limit)
         
-        // Check if current user is in top 5
-        const currentUserInTop5 = currentUsername && top5.some(user => user.username === currentUsername)
+        // Check if current user is in top N
+        const currentUserInTopN = currentUsername && topN.some(user => user.username === currentUsername)
         
-        // Build display list: top 5 + current user if not in top 5
-        let displayList = [...top5]
+        // Build display list: top N + current user if not in top N
+        let displayList = [...topN]
         
-        if (currentUserRank && !currentUserInTop5 && currentUserRank > 5) {
-          // Find current user in full list and add them as 6th entry
+        if (currentUserRank && !currentUserInTopN && currentUserRank > limit) {
+          // Find current user in full list and add them after the top N
           const currentUserData = allLeaderboardData.find(user => user.username === currentUsername)
           if (currentUserData) {
             displayList.push(currentUserData)
@@ -222,14 +243,14 @@ export default {
 
         // Add displayRank to each entry
         const leaderboardData = displayList.map((user, index) => {
-          // If this is the 6th entry and it's the current user, show their actual rank
-          if (index === 5 && user.username === currentUsername && currentUserRank) {
+          // If this is beyond the limit and it's the current user, show their actual rank
+          if (index === limit && user.username === currentUsername && currentUserRank) {
             return {
               ...user,
               displayRank: currentUserRank
             }
           }
-          // Otherwise show position in display list (1, 2, 3, 4, 5)
+          // Otherwise show position in display list (1, 2, 3, ...)
           return {
             ...user,
             displayRank: index + 1
@@ -261,7 +282,9 @@ export default {
       selectedLeagueId,
       selectedLeagueName,
       onLeagueChange,
-      availableLeagues
+      availableLeagues,
+      leaderboardLimit,
+      onLimitChange
     }
   }
 }
@@ -296,21 +319,36 @@ export default {
   font-size: 1rem;
 }
 
-.league-selector {
+.leaderboard-controls {
   margin-top: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.league-selector {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
-.league-selector label {
+.limit-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.league-selector label,
+.limit-selector label {
   font-size: 0.9rem;
   color: #374151;
   font-weight: 500;
 }
 
-.league-dropdown {
+.league-dropdown,
+.limit-dropdown {
   padding: 0.5rem 1rem;
   border: 1px solid #d1d5db;
   border-radius: 6px;
@@ -319,14 +357,23 @@ export default {
   color: #1a1a1a;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.league-dropdown {
   min-width: 200px;
 }
 
-.league-dropdown:hover {
+.limit-dropdown {
+  min-width: 80px;
+}
+
+.league-dropdown:hover,
+.limit-dropdown:hover {
   border-color: #3b82f6;
 }
 
-.league-dropdown:focus {
+.league-dropdown:focus,
+.limit-dropdown:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
