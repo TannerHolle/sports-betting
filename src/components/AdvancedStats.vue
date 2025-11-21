@@ -66,7 +66,7 @@
       <div class="stats-section">
         <h4>All Game Outcomes</h4>
         <p class="section-description">
-          Statistics showing how many games covered the spread or went over/under based on the official betting lines
+          Statistics from all completed games in the system, showing how many games covered the spread or went over/under based on the official betting lines (from GameOutcome data)
         </p>
 
         <div class="outcomes-row">
@@ -149,9 +149,6 @@ export default {
       try {
         const response = await axios.get(`${API_BASE_URL}/user/${props.username}/advanced-stats`)
         stats.value = response.data
-        console.log('[Frontend Debug] Advanced stats received:', response.data)
-        console.log('[Frontend Debug] Spread data:', response.data?.gameOutcomes?.spread)
-        console.log('[Frontend Debug] Covered percentage:', response.data?.gameOutcomes?.spread?.coveredPercentage)
       } catch (err) {
         console.error('Error fetching advanced stats:', err)
         error.value = err.response?.data?.error || 'Failed to load advanced statistics'
