@@ -14,6 +14,11 @@
     <!-- Bet Resolver -->
     <BetResolver />
 
+    <!-- Advanced Statistics -->
+    <div class="admin-section">
+      <AdvancedStats v-if="currentUser?.username" :username="currentUser.username" />
+    </div>
+
     <div class="admin-actions">
       <div class="action-group">
         <h4>Bet Resolution</h4>
@@ -208,15 +213,18 @@ import axios from 'axios'
 import { API_BASE_URL } from '../config/api.js'
 import SportsbookRevenue from './SportsbookRevenue.vue'
 import BetResolver from './BetResolver.vue'
+import AdvancedStats from './AdvancedStats.vue'
 
 export default {
   name: 'AdminPanel',
   components: {
     SportsbookRevenue,
-    BetResolver
+    BetResolver,
+    AdvancedStats
   },
   setup() {
     const userStore = useUserStore()
+    const currentUser = computed(() => userStore.currentUser.value)
     const isLoading = ref(false)
     const isLoadingOdds = ref(false)
     const resolveMessage = ref('')
@@ -445,6 +453,7 @@ export default {
 
     return {
       isAuthenticated,
+      currentUser,
       isLoading,
       isLoadingOdds,
       resolveMessage,
