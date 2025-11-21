@@ -62,60 +62,6 @@
         </div>
       </div>
 
-      <!-- Game Outcomes (All Games in System) -->
-      <div class="stats-section">
-        <h4>All Game Outcomes</h4>
-        <p class="section-description">
-          Statistics from all completed games in the system, showing how many games covered the spread or went over/under based on the official betting lines (from GameOutcome data)
-        </p>
-
-        <div class="outcomes-row">
-          <!-- Over/Under Statistics -->
-          <div class="outcome-section">
-            <h5 class="centered-header">Over/Under</h5>
-            <div v-if="currentGameOutcomes?.total?.totalGames > 0" class="outcome-stats">
-              <div class="outcome-card over">
-                <div class="outcome-label">Over</div>
-                <div class="outcome-percentage">{{ currentGameOutcomes.total.overPercentage }}%</div>
-                <div class="outcome-count">{{ currentGameOutcomes.total.overCount }} games</div>
-              </div>
-              <div class="outcome-card under">
-                <div class="outcome-label">Under</div>
-                <div class="outcome-percentage">{{ currentGameOutcomes.total.underPercentage }}%</div>
-                <div class="outcome-count">{{ currentGameOutcomes.total.underCount }} games</div>
-              </div>
-            </div>
-            <div v-else class="no-data">
-              <p>No data yet.</p>
-            </div>
-            <div class="total-games">
-              Total: {{ currentGameOutcomes?.total?.totalGames || 0 }}
-            </div>
-          </div>
-
-          <!-- Spread Statistics -->
-          <div class="outcome-section">
-            <h5 class="centered-header">Spread</h5>
-            <div v-if="currentGameOutcomes?.spread?.totalGames > 0" class="outcome-stats">
-              <div class="outcome-card" :class="{
-                'covered': parseFloat(currentGameOutcomes.spread.coveredPercentage || '0') > 50,
-                'covered-low': parseFloat(currentGameOutcomes.spread.coveredPercentage || '0') <= 50 && parseFloat(currentGameOutcomes.spread.coveredPercentage || '0') > 0,
-                'covered-zero': parseFloat(currentGameOutcomes.spread.coveredPercentage || '0') === 0
-              }">
-                <div class="outcome-label">Covered</div>
-                <div class="outcome-percentage">{{ currentGameOutcomes.spread.coveredPercentage || '0.0' }}%</div>
-                <div class="outcome-count">{{ currentGameOutcomes.spread.coveredCount }} games</div>
-              </div>
-            </div>
-            <div v-else class="no-data">
-              <p>No data yet.</p>
-            </div>
-            <div class="total-games">
-              Total: {{ currentGameOutcomes?.spread?.totalGames || 0 }}
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -182,11 +128,6 @@ export default {
       return stats.value.winPercentageByTypeBySport[sportKey] || stats.value.winPercentageByType || {}
     })
 
-    const currentGameOutcomes = computed(() => {
-      if (!stats.value?.gameOutcomes) return null
-      const sportKey = selectedSport.value === 'all' ? 'all' : selectedSport.value
-      return stats.value.gameOutcomes[sportKey] || null
-    })
 
     const onSportChange = () => {
       // Sport filter changed, computed property will update automatically
@@ -202,7 +143,6 @@ export default {
       stats,
       selectedSport,
       currentWinPercentageByType,
-      currentGameOutcomes,
       fetchStats,
       formatBetType,
       formatSportName,
@@ -532,6 +472,11 @@ export default {
 .total-games {
   text-align: center;
   margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 600;
   padding-top: 1rem;
   border-top: 1px solid #e5e7eb;
   font-size: 0.875rem;
