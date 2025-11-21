@@ -1,16 +1,6 @@
 <template>
   <div class="advanced-stats">
-    <div v-if="loading" class="loading-container">
-      <div class="spinner"></div>
-      <p>Loading advanced statistics...</p>
-    </div>
-
-    <div v-else-if="error" class="error-message">
-      <p>{{ error }}</p>
-      <button @click="fetchStats" class="retry-btn">Retry</button>
-    </div>
-
-    <div v-else-if="stats" class="stats-content">
+    <div v-if="stats && stats.availableSports && stats.availableSports.length > 0" class="stats-content">
       <!-- Sport Filter (applies to both sections) -->
       <div class="global-filter" v-if="stats.availableSports && stats.availableSports.length > 0">
         <label for="sport-select">Filter by Sport:</label>
@@ -63,13 +53,15 @@
       </div>
 
     </div>
+    <div v-else class="no-stats">
+      <p>No completed bets yet. Place some bets and wait for them to resolve to see your statistics!</p>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
-import axios from 'axios'
-import { API_BASE_URL } from '../config/api.js'
+import { ref, computed } from 'vue'
+import { useUserStore } from '../stores/userStore.js'
 
 export default {
   name: 'AdvancedStats',
@@ -81,27 +73,122 @@ export default {
     }
   },
   setup(props) {
-    const loading = ref(true)
-    const error = ref(null)
-    const stats = ref(null)
+    const userStore = useUserStore()
     const selectedSport = ref('all')
 
-    const fetchStats = async () => {
-      if (!props.username) return
-      
-      loading.value = true
-      error.value = null
-
-      try {
-        const response = await axios.get(`${API_BASE_URL}/user/${props.username}/advanced-stats`)
-        stats.value = response.data
-      } catch (err) {
-        console.error('Error fetching advanced stats:', err)
-        error.value = err.response?.data?.error || 'Failed to load advanced statistics'
-      } finally {
-        loading.value = false
+    // Calculate stats from user's bets
+    const stats = computed(() => {
+      const currentUser = userStore.currentUser.value
+      if (!currentUser?.bets || currentUser.bets.length === 0) {
+        return {
+          winPercentageByType: {},
+          winPercentageByTypeBySport: {},
+          availableSports: []
+        }
       }
-    }
+
+      // Filter to completed bets
+      const completedBets = currentUser.bets.filter(bet => 
+        bet.status === 'won' || bet.status === 'lost' || bet.status === 'push'
+      )
+
+      // Group by sport
+      const statsByBetTypeBySport = {}
+      const userSports = new Set()
+
+      completedBets.forEach(bet => {
+        if (!bet.sport) return
+        const sport = bet.sport
+        userSports.add(sport)
+        
+        if (!statsByBetTypeBySport[sport]) {
+          statsByBetTypeBySport[sport] = {
+            moneyline: { won: 0, lost: 0, push: 0, total: 0 },
+            spread: { won: 0, lost: 0, push: 0, total: 0 },
+            total: { won: 0, lost: 0, push: 0, total: 0 }
+          }
+        }
+        
+        if (statsByBetTypeBySport[sport][bet.betType]) {
+          statsByBetTypeBySport[sport][bet.betType][bet.status]++
+          statsByBetTypeBySport[sport][bet.betType].total++
+        }
+      })
+
+      // Calculate percentages for each sport
+      const winPercentageByTypeBySport = {}
+      for (const sport of userSports) {
+        const statsByBetType = statsByBetTypeBySport[sport]
+        winPercentageByTypeBySport[sport] = {}
+        
+        Object.keys(statsByBetType).forEach(betType => {
+          const stats = statsByBetType[betType]
+          const nonPushTotal = stats.total - stats.push
+          if (nonPushTotal > 0) {
+            winPercentageByTypeBySport[sport][betType] = {
+              winRate: ((stats.won / nonPushTotal) * 100).toFixed(1),
+              won: stats.won,
+              lost: stats.lost,
+              push: stats.push,
+              total: stats.total
+            }
+          } else {
+            winPercentageByTypeBySport[sport][betType] = {
+              winRate: '0.0',
+              won: 0,
+              lost: 0,
+              push: stats.push,
+              total: stats.total
+            }
+          }
+        })
+      }
+
+      // Calculate overall (all sports combined)
+      const overallStatsByBetType = {
+        moneyline: { won: 0, lost: 0, push: 0, total: 0 },
+        spread: { won: 0, lost: 0, push: 0, total: 0 },
+        total: { won: 0, lost: 0, push: 0, total: 0 }
+      }
+
+      completedBets.forEach(bet => {
+        if (overallStatsByBetType[bet.betType]) {
+          overallStatsByBetType[bet.betType][bet.status]++
+          overallStatsByBetType[bet.betType].total++
+        }
+      })
+
+      const winPercentageByType = {}
+      Object.keys(overallStatsByBetType).forEach(betType => {
+        const stats = overallStatsByBetType[betType]
+        const nonPushTotal = stats.total - stats.push
+        if (nonPushTotal > 0) {
+          winPercentageByType[betType] = {
+            winRate: ((stats.won / nonPushTotal) * 100).toFixed(1),
+            won: stats.won,
+            lost: stats.lost,
+            push: stats.push,
+            total: stats.total
+          }
+        } else {
+          winPercentageByType[betType] = {
+            winRate: '0.0',
+            won: 0,
+            lost: 0,
+            push: stats.push,
+            total: stats.total
+          }
+        }
+      })
+
+      winPercentageByTypeBySport.all = winPercentageByType
+
+      return {
+        winPercentageByType,
+        winPercentageByTypeBySport,
+        availableSports: Array.from(userSports).sort()
+      }
+    })
 
     const formatBetType = (betType) => {
       const types = {
@@ -128,22 +215,14 @@ export default {
       return stats.value.winPercentageByTypeBySport[sportKey] || stats.value.winPercentageByType || {}
     })
 
-
     const onSportChange = () => {
       // Sport filter changed, computed property will update automatically
     }
 
-    onMounted(() => {
-      fetchStats()
-    })
-
     return {
-      loading,
-      error,
       stats,
       selectedSport,
       currentWinPercentageByType,
-      fetchStats,
       formatBetType,
       formatSportName,
       onSportChange
@@ -157,9 +236,15 @@ export default {
   padding: 1rem 0;
 }
 
-.loading-container {
+.no-stats {
   text-align: center;
   padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.no-stats p {
+  font-size: 1rem;
+  margin: 0;
 }
 
 .spinner {
